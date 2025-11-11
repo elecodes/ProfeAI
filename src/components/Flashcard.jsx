@@ -2,12 +2,53 @@ import { useState } from "react";
 
 function Flashcard({ english, spanish, onLearned }) {
   const [showTranslation, setShowTranslation] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentLang, setCurrentLang] = useState(null); // 🇬🇧 o 🇪🇸
 
-  const handleSpeak = () => {
-    const utterance = new SpeechSynthesisUtterance(english);
-    utterance.lang = "en-US";
-    utterance.rate = 0.95;
-    speechSynthesis.speak(utterance);
+  // 🎧 Función genérica de reproducción
+  const reproducirTTS = async (texto, idioma = "en") => {
+    if (isPlaying) return;
+    setIsPlaying(true);
+    setCurrentLang(idioma === "en" ? "🇬🇧" : "🇪🇸");
+
+    try {
+      const response = await fetch("http://localhost:3001/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: texto, language: idioma }),
+      });
+
+      if (!response.ok) throw new Error("Error al generar audio");
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+
+      audio.onended = () => {
+        setIsPlaying(false);
+        setCurrentLang(null);
+      };
+
+      audio.onerror = () => {
+        setIsPlaying(false);
+        setCurrentLang(null);
+      };
+
+      audio.play();
+    } catch (error) {
+      console.error("Error al reproducir audio:", error);
+      setIsPlaying(false);
+      setCurrentLang(null);
+    }
+  };
+
+  // 🎤 Click normal → inglés
+  const handleSpeakEnglish = () => reproducirTTS(english, "en");
+
+  // 🇪🇸 Click derecho → español
+  const handleSpeakSpanish = (e) => {
+    e.preventDefault();
+    reproducirTTS(spanish, "es");
   };
 
   return (
@@ -17,10 +58,18 @@ function Flashcard({ english, spanish, onLearned }) {
         <h2 className="text-xl font-semibold text-gray-800">{english}</h2>
 
         <button
-          onClick={handleSpeak}
-          className="bg-blue-100 text-blue-600 hover:bg-blue-200 px-3 py-1 rounded-lg text-sm font-medium transition"
+          onClick={handleSpeakEnglish}
+          onContextMenu={handleSpeakSpanish}
+          disabled={isPlaying}
+          className={`${
+            isPlaying
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-blue-100 text-blue-600 hover:bg-blue-200"
+          } flex items-center gap-2 px-3 py-1 rounded-lg text-sm font-medium transition`}
+          title="Click: inglés 🇬🇧 — Click derecho: español 🇪🇸"
         >
-          🔊
+          {isPlaying ? "🔊..." : "🔊"}{" "}
+          {currentLang && <span>{currentLang}</span>}
         </button>
       </div>
 

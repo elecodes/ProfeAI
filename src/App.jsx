@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { lessons } from "./data/lessons";
+//import { lessons } from "./data/lessons";
+import { lessons } from "public/lessons/lessons.json";
 
 function App() {
   const [data, setData] = useState([]);
@@ -7,6 +8,8 @@ function App() {
   const [numSentences, setNumSentences] = useState(5);
   const [mode, setMode] = useState("study");
   const [topic, setTopic] = useState("general");
+  const [nivel, setNivel] = useState("principiante"); // ✅ nuevo
+  const [temasDisponibles, setTemasDisponibles] = useState([]); // ✅ nuevo
   const [showTranslation, setShowTranslation] = useState({});
   const [quizIndex, setQuizIndex] = useState(0);
   const [quizScore, setQuizScore] = useState(0);
@@ -30,6 +33,21 @@ function App() {
     const filtered = all.filter((s) => !learned.find((l) => l.text === s.text));
     setData(filtered.slice(0, numSentences));
   }, [topic, numSentences, learned]);
+
+  // === Cargar temas por nivel ===
+  useEffect(() => {
+    async function cargarTemas() {
+      try {
+        const response = await fetch("/lessons/index.json");
+        const data = await response.json();
+        setTemasDisponibles(data[nivel] || []);
+      } catch (error) {
+        console.warn("No se pudo cargar index.json, usando temas por defecto.");
+        setTemasDisponibles(["general", "travel", "food", "work"]);
+      }
+    }
+    cargarTemas();
+  }, [nivel]);
 
   // === Funciones ===
   const handleMarkLearned = (sentence) => {
@@ -78,18 +96,18 @@ function App() {
       setQuizCompleted(true);
     }
   };
+
   // === Text-to-Speech ===
   const speakText = (text, lang = "en-US") => {
     if (!window.speechSynthesis) {
       alert("La síntesis de voz no está disponible en tu navegador.");
       return;
     }
-
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = lang;
     utterance.rate = 1;
     utterance.pitch = 1;
-    window.speechSynthesis.cancel(); // detener cualquier audio previo
+    window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
   };
 
@@ -155,30 +173,36 @@ function App() {
       {/* ===== Main content ===== */}
       <main className="flex-1 p-6">
         {/* Barra superior */}
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-wrap justify-between items-center mb-6 gap-3">
           <h1 className="text-2xl font-bold text-blue-600">🌎 LearnLang</h1>
 
           <div className="flex items-center gap-3">
-            <label htmlFor="topic" className="text-sm text-gray-700">
-              Tema:
-            </label>
+            <label className="text-sm text-gray-700">Nivel:</label>
             <select
-              id="topic"
+              value={nivel}
+              onChange={(e) => setNivel(e.target.value)}
+              className="border rounded-lg px-2 py-1"
+            >
+              <option value="principiante">Principiante</option>
+              <option value="intermedio">Intermedio</option>
+              <option value="avanzado">Avanzado</option>
+            </select>
+
+            <label className="text-sm text-gray-700">Tema:</label>
+            <select
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
               className="border rounded-lg px-2 py-1"
             >
-              <option value="general">General</option>
-              <option value="travel">Viajes</option>
-              <option value="food">Comida</option>
-              <option value="work">Trabajo</option>
+              {temasDisponibles.map((t) => (
+                <option key={t} value={t}>
+                  {t.charAt(0).toUpperCase() + t.slice(1)}
+                </option>
+              ))}
             </select>
 
-            <label htmlFor="num" className="text-sm text-gray-700">
-              Frases:
-            </label>
+            <label className="text-sm text-gray-700">Frases:</label>
             <select
-              id="num"
               value={numSentences}
               onChange={(e) => setNumSentences(Number(e.target.value))}
               className="border rounded-lg px-2 py-1"
