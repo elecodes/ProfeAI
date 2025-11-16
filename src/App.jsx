@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from "react";
-//import { lessons } from "./data/lessons";
-import { lessons } from "public/lessons/lessons.json";
 
 function App() {
-  const [data, setData] = useState([]);
+  const [nivel, setNivel] = useState("beginner");
+  const [tema, setTema] = useState("");
+  const [temasDisponibles, setTemasDisponibles] = useState([]);
+  const [frases, setFrases] = useState([]);
   const [learned, setLearned] = useState([]);
-  const [numSentences, setNumSentences] = useState(5);
   const [mode, setMode] = useState("study");
-  const [topic, setTopic] = useState("general");
-  const [nivel, setNivel] = useState("principiante"); // ✅ nuevo
-  const [temasDisponibles, setTemasDisponibles] = useState([]); // ✅ nuevo
   const [showTranslation, setShowTranslation] = useState({});
   const [quizIndex, setQuizIndex] = useState(0);
   const [quizScore, setQuizScore] = useState(0);
@@ -17,39 +14,81 @@ function App() {
   const [quizOptions, setQuizOptions] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  // === Local Storage ===
+  // === Reproducir texto con ElevenLabs (TTS) ===
+  const speakText = (text, language) => {
+    const synth = window.speechSynthesis;
+
+    // Cancelar audio previo
+    synth.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+
+    // Configurar idioma
+    utterance.lang = language;
+
+    // Elegir voz adecuada
+    const voices = synth.getVoices();
+    const voice = voices.find((v) => v.lang === language);
+
+    if (voice) {
+      utterance.voice = voice;
+    }
+
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+
+    synth.speak(utterance);
+  };
+
+
+  // === Cargar temas disponibles según el nivel ===
   useEffect(() => {
-    const savedLearned = JSON.parse(localStorage.getItem("learned")) || [];
-    setLearned(savedLearned);
+    async function cargarTemas() {
+      try {
+        const response = await fetch("/lessons/index.json");
+        const data = await response.json();
+        const temas = data[nivel] || [];
+        setTemasDisponibles(temas);
+        setTema(temas[0] || "");
+      } catch (error) {
+        console.error("Error cargando index.json:", error);
+      }
+    }
+    cargarTemas();
+  }, [nivel]);
+
+  // === Cargar frases del tema seleccionado ===
+  useEffect(() => {
+    async function cargarLeccion() {
+      if (!nivel || !tema) return;
+      try {
+        const response = await fetch(`/lessons/${nivel}/${tema}.json`);
+        const data = await response.json();
+        setFrases(data.sentences || []);
+      } catch (error) {
+        console.error("Error cargando lección:", error);
+      }
+    }
+    cargarLeccion();
+  }, [nivel, tema]);
+
+  // === Manejo de frases aprendidas ===
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem("learned")) || [];
+    setLearned(saved);
   }, []);
 
   useEffect(() => {
     localStorage.setItem("learned", JSON.stringify(learned));
   }, [learned]);
 
-  // === Cargar lecciones ===
   useEffect(() => {
-    const all = lessons[topic] || [];
-    const filtered = all.filter((s) => !learned.find((l) => l.text === s.text));
-    setData(filtered.slice(0, numSentences));
-  }, [topic, numSentences, learned]);
+    window.speechSynthesis.onvoiceschanged = () => {
+      window.speechSynthesis.getVoices();
+    };
+  }, []);
 
-  // === Cargar temas por nivel ===
-  useEffect(() => {
-    async function cargarTemas() {
-      try {
-        const response = await fetch("/lessons/index.json");
-        const data = await response.json();
-        setTemasDisponibles(data[nivel] || []);
-      } catch (error) {
-        console.warn("No se pudo cargar index.json, usando temas por defecto.");
-        setTemasDisponibles(["general", "travel", "food", "work"]);
-      }
-    }
-    cargarTemas();
-  }, [nivel]);
 
-  // === Funciones ===
   const handleMarkLearned = (sentence) => {
     setLearned([...learned, sentence]);
   };
@@ -68,6 +107,7 @@ function App() {
 
   // === Quiz ===
   const startQuiz = () => {
+    if (!frases.length) return;
     setQuizIndex(0);
     setQuizScore(0);
     setQuizCompleted(false);
@@ -76,8 +116,8 @@ function App() {
   };
 
   const generateOptions = (index) => {
-    const correct = lessons[topic][index].translation;
-    const wrong = lessons[topic]
+    const correct = frases[index].translation;
+    const wrong = frases
       .filter((_, i) => i !== index)
       .sort(() => 0.5 - Math.random())
       .slice(0, 2)
@@ -86,29 +126,15 @@ function App() {
   };
 
   const handleAnswer = (option) => {
-    const correct = lessons[topic][quizIndex].translation;
+    const correct = frases[quizIndex].translation;
     if (option === correct) setQuizScore((s) => s + 1);
     const next = quizIndex + 1;
-    if (next < data.length) {
+    if (next < frases.length) {
       setQuizIndex(next);
       generateOptions(next);
     } else {
       setQuizCompleted(true);
     }
-  };
-
-  // === Text-to-Speech ===
-  const speakText = (text, lang = "en-US") => {
-    if (!window.speechSynthesis) {
-      alert("La síntesis de voz no está disponible en tu navegador.");
-      return;
-    }
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = lang;
-    utterance.rate = 1;
-    utterance.pitch = 1;
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utterance);
   };
 
   // === UI ===
@@ -173,74 +199,48 @@ function App() {
       {/* ===== Main content ===== */}
       <main className="flex-1 p-6">
         {/* Barra superior */}
-        <div className="flex flex-wrap justify-between items-center mb-6 gap-3">
-          <h1 className="text-2xl font-bold text-blue-600">🌎 LearnLang</h1>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-blue-600">
+            🇪🇸 Aprende Español
+          </h1>
 
           <div className="flex items-center gap-3">
-            <label className="text-sm text-gray-700">Nivel:</label>
+            <label htmlFor="nivel" className="text-sm text-gray-700">
+              Nivel:
+            </label>
             <select
+              id="nivel"
               value={nivel}
               onChange={(e) => setNivel(e.target.value)}
               className="border rounded-lg px-2 py-1"
             >
-              <option value="principiante">Principiante</option>
-              <option value="intermedio">Intermedio</option>
-              <option value="avanzado">Avanzado</option>
+              <option value="beginner">Principiante</option>
+              <option value="intermediate">Intermedio</option>
+              <option value="advanced">Avanzado</option>
             </select>
 
-            <label className="text-sm text-gray-700">Tema:</label>
+            <label htmlFor="tema" className="text-sm text-gray-700">
+              Tema:
+            </label>
             <select
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
+              id="tema"
+              value={tema}
+              onChange={(e) => setTema(e.target.value)}
               className="border rounded-lg px-2 py-1"
             >
               {temasDisponibles.map((t) => (
                 <option key={t} value={t}>
-                  {t.charAt(0).toUpperCase() + t.slice(1)}
+                  {t}
                 </option>
               ))}
-            </select>
-
-            <label className="text-sm text-gray-700">Frases:</label>
-            <select
-              value={numSentences}
-              onChange={(e) => setNumSentences(Number(e.target.value))}
-              className="border rounded-lg px-2 py-1"
-            >
-              <option value="3">3</option>
-              <option value="5">5</option>
-              <option value="10">10</option>
             </select>
           </div>
         </div>
 
-        {/* Barra de progreso */}
-        {mode === "study" && (
-          <div className="w-full max-w-2xl mb-4">
-            <div className="flex justify-between text-sm text-gray-600 mb-1">
-              <span>
-                Progreso: {learned.length}/{numSentences}
-              </span>
-              <span>{Math.round((learned.length / numSentences) * 100)}%</span>
-            </div>
-            <div className="w-full bg-gray-200 h-3 rounded-full">
-              <div
-                className="bg-blue-500 h-3 rounded-full transition-all duration-500"
-                style={{
-                  width: `${Math.min(
-                    (learned.length / numSentences) * 100,
-                    100
-                  )}%`,
-                }}
-              ></div>
-            </div>
-          </div>
-        )}
-
         {/* === Contenido dinámico === */}
         {mode === "study" && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {data.map((s, i) => (
+            {frases.map((s, i) => (
               <div
                 key={i}
                 className="p-4 bg-white rounded-2xl shadow hover:shadow-md transition"
@@ -250,9 +250,9 @@ function App() {
                     {s.text}
                   </p>
                   <button
-                    onClick={() => speakText(s.text, "en-US")}
+                    onClick={() => speakText(s.text, "es")}
                     className="text-blue-600 hover:text-blue-800 transition"
-                    title="Escuchar frase en inglés"
+                    title="Escuchar frase en español"
                   >
                     🔊
                   </button>
@@ -262,9 +262,9 @@ function App() {
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-gray-600 italic">{s.translation}</p>
                     <button
-                      onClick={() => speakText(s.translation, "es-ES")}
+                      onClick={() => speakText(s.translation, "en")}
                       className="text-green-600 hover:text-green-800 transition"
-                      title="Escuchar traducción en español"
+                      title="Escuchar traducción en inglés"
                     >
                       🔊
                     </button>
@@ -290,6 +290,7 @@ function App() {
           </div>
         )}
 
+        {/* Aprendidas */}
         {mode === "learned" && (
           <div>
             <h2 className="text-xl font-semibold mb-4">Frases aprendidas</h2>
@@ -307,27 +308,17 @@ function App() {
           </div>
         )}
 
-        {/* === Modo Quiz === */}
-        {mode === "quiz" && (
+        {/* === Quiz === */}
+        {mode === "quiz" && frases.length > 0 && (
           <div className="w-full max-w-md bg-white p-6 rounded-2xl shadow text-center">
             {!quizCompleted ? (
               <>
-                <div className="flex items-center justify-center gap-2 mb-4">
-                  <h2 className="text-xl font-semibold text-gray-800">
-                    Traduce:{" "}
-                    <span className="text-blue-600">
-                      {data[quizIndex].text}
-                    </span>
-                  </h2>
-                  <button
-                    onClick={() => speakText(data[quizIndex].text, "en-US")}
-                    className="text-blue-600 hover:text-blue-800 transition"
-                    title="Escuchar frase"
-                  >
-                    🔊
-                  </button>
-                </div>
-
+                <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                  Traduce:{" "}
+                  <span className="text-blue-600">
+                    {frases[quizIndex].text}
+                  </span>
+                </h2>
                 <div className="flex flex-col gap-3">
                   {quizOptions.map((opt, i) => (
                     <button
@@ -339,17 +330,9 @@ function App() {
                     </button>
                   ))}
                 </div>
-
                 <p className="mt-4 text-gray-600 text-sm">
-                  Pregunta {quizIndex + 1} / {data.length}
+                  Pregunta {quizIndex + 1} / {frases.length}
                 </p>
-
-                <button
-                  onClick={() => setMode("study")}
-                  className="mt-6 bg-gray-400 text-white px-4 py-2 rounded-lg shadow hover:bg-gray-500 transition"
-                >
-                  ⬅️ Volver al menú principal
-                </button>
               </>
             ) : (
               <div>
@@ -357,7 +340,7 @@ function App() {
                   🎉 ¡Quiz completado!
                 </h2>
                 <p className="text-lg mb-4">
-                  Puntuación: {quizScore} / {data.length}
+                  Puntuación: {quizScore} / {frases.length}
                 </p>
                 <button
                   onClick={startQuiz}
@@ -365,17 +348,12 @@ function App() {
                 >
                   Repetir quiz 🔁
                 </button>
-                <button
-                  onClick={() => setMode("study")}
-                  className="ml-3 bg-gray-400 text-white px-4 py-2 rounded-lg shadow hover:bg-gray-500 transition"
-                >
-                  Volver al menú principal
-                </button>
               </div>
             )}
           </div>
         )}
       </main>
+      <elevenlabs-convai agent-id="agent_5001k9j3ad8nfkr871pypnhj7m3r"></elevenlabs-convai>
     </div>
   );
 }

@@ -1,16 +1,86 @@
-# React + Vite
+I have fixed the button styles in `src/components/Flashcard.jsx` and created a `.env` file to store your API key securely.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+To complete the setup and fix the audio quality, please follow these steps:
 
-Currently, two official plugins are available:
+1.  **Add your API key to the `.env` file:**
+    Open the `.env` file in the root of your project and replace `"YOUR_ELEVENLABS_API_KEY"` with your actual ElevenLabs API key.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+2.  **Install the `dotenv` package:**
+    Open your terminal and run the following command:
+    ```bash
+    npm install dotenv
+    ```
 
-## React Compiler
+3.  **Update your `server.js` file:**
+    Replace the content of your `server.js` file with the following code. This will configure your server to use the `dotenv` package and the improved `eleven_multilingual_v2` model.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+    ```javascript
+    import express from "express";
+    import fetch from "node-fetch";
+    import cors from "cors";
+    import dotenv from "dotenv";
 
-## Expanding the ESLint configuration
+    dotenv.config();
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+    const app = express();
+    app.use(cors());
+    app.use(express.json());
+
+    const ELEVEN_API_KEY = process.env.ELEVENLABS_API_KEY;
+    const ELEVEN_VOICE_EN = "EXAVITQu4vr4xnSDxMaL";
+    const ELEVEN_VOICE_ES = "TxGEqnHWrfWFTfGW9XjX";
+
+    app.post("/tts", async (req, res) => {
+      try {
+        const { text, language } = req.body;
+        const voice = language === "es" ? ELEVEN_VOICE_ES : ELEVEN_VOICE_EN;
+
+        if (!ELEVEN_API_KEY || ELEVEN_API_KEY === "YOUR_ELEVENLABS_API_KEY") {
+          return res.status(401).json({
+            error: "Missing or invalid ElevenLabs API key.",
+            details:
+              "Please add your API key to the .env file (e.g., ELEVENLABS_API_KEY=your_key_here).",
+          });
+        }
+
+        const apiRes = await fetch(
+          `https://api.elevenlabs.io/v1/text-to-speech/${voice}`,
+          {
+            method: "POST",
+            headers: {
+              "xi-api-key": ELEVEN_API_KEY,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model_id: "eleven_multilingual_v2",
+              text,
+            }),
+          }
+        );
+
+        if (!apiRes.ok) {
+          const errTxt = await apiRes.text();
+          console.error("ElevenLabs ERROR:", errTxt);
+          return res
+            .status(500)
+            .json({ error: "Error de ElevenLabs", details: errTxt });
+        }
+
+        const audioBuffer = await apiRes.arrayBuffer();
+        const contentType = apiRes.headers.get("content-type");
+
+        res.setHeader("Content-Type", contentType);
+        res.send(Buffer.from(audioBuffer));
+      } catch (err) {
+        console.error("Server ERROR:", err);
+        res.status(500).json({ error: "Error interno del servidor" });
+      }
+    });
+
+    app.listen(3001, () => console.log("🚀 Servidor TTS en puerto 3001"));
+    ```
+
+4.  **Restart your server:**
+    After making these changes, restart your server to apply them.
+
+These changes should resolve the audio issues you are experiencing. Let me know if you have any other questions.

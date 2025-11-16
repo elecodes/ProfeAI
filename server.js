@@ -1,58 +1,60 @@
-// server.js
 import express from "express";
+import fetch from "node-fetch";
 import cors from "cors";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-import { exec } from "child_process";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
-const PORT = 3001;
-
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const ELEVEN_API_KEY = process.env.ELEVENLABS_API_KEY;
+const ELEVEN_VOICE_EN = "t5ztDJA7pj9EyW9QIcJ2";
+const ELEVEN_VOICE_ES = "f9DFWr0Y8aHd6VNMEdTt";
 
-// Ruta TTS con gTTS (gratuita)
 app.post("/tts", async (req, res) => {
   try {
-    const { text, language = "en" } = req.body;
+    const { text, language } = req.body;
+    const voice = language === "es" ? ELEVEN_VOICE_ES : ELEVEN_VOICE_EN;
 
-    if (!text) {
-      return res.status(400).json({ error: "Falta el texto a convertir" });
+    const apiRes = await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${voice}`,
+      {
+        method: "POST",
+        headers: {
+          "xi-api-key": ELEVEN_API_KEY,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model_id: "eleven_multilingual_v2",
+          text,
+          voice_settings: {
+            stability: 0.5,
+            similarity_boost: 0.5,
+          },
+        }),
+      }
+    );
+
+    // 🔍 Si ElevenLabs devolvió error → NO generar audio corrupto
+    if (!apiRes.ok) {
+      const errTxt = await apiRes.text();
+      console.error("ElevenLabs ERROR:", errTxt);
+      return res
+        .status(500)
+        .json({ error: "Error de ElevenLabs", details: errTxt });
     }
 
-    const tempFile = path.join(__dirname, "output.mp3");
-    const cmd = `gtts-cli "${text.replace(/"/g, '\\"')}" --lang ${language} --output "${tempFile}"`;
+    const audioBuffer = await apiRes.arrayBuffer();
+    const contentType = apiRes.headers.get("content-type");
 
-    exec(cmd, (error) => {
-      if (error) {
-        console.error("❌ Error al ejecutar gTTS:", error);
-        return res.status(500).json({ error: "Error al generar audio" });
-      }
-
-      res.set({
-        "Content-Type": "audio/mpeg",
-        "Content-Disposition": 'inline; filename="tts.mp3"',
-      });
-
-      const fileStream = fs.createReadStream(tempFile);
-      fileStream.pipe(res);
-
-      fileStream.on("end", () => {
-        fs.unlink(tempFile, () => {}); // borra el archivo temporal
-      });
-    });
-  } catch (error) {
-    console.error("❌ Error TTS:", error);
-    res.status(500).json({ error: "Error interno del servidor TTS" });
+    res.setHeader("Content-Type", contentType);
+    res.send(Buffer.from(audioBuffer));
+  } catch (err) {
+    console.error("Server ERROR:", err);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 });
 
-// Inicia el servidor
-app.listen(PORT, () => {
-  console.log(`✅ Servidor TTS gratuito en http://localhost:${PORT}`);
-});
+app.listen(3001, () => console.log("🚀 Servidor TTS en puerto 3001"));

@@ -1,27 +1,37 @@
 // src/data/lessons.js
 export const lessons = {
-  general: [
-    { text: "Hello, how are you?", translation: "Hola, ¿cómo estás?" },
+  beginner: [
     {
-      text: "I like learning languages.",
-      translation: "Me gusta aprender idiomas.",
+      spanish: "Hola, ¿cómo estás?",
+      english: "Hello, how are you?",
     },
-    { text: "See you tomorrow!", translation: "¡Nos vemos mañana!" },
-  ],
-  travel: [
-    { text: "Where is the hotel?", translation: "¿Dónde está el hotel?" },
-    { text: "I need a taxi.", translation: "Necesito un taxi." },
     {
-      text: "How much is the ticket?",
-      translation: "¿Cuánto cuesta el boleto?",
+      spanish: "Me gusta aprender idiomas.",
+      english: "I like learning languages.",
+    },
+    {
+      spanish: "Nos vemos mañana.",
+      english: "See you tomorrow.",
     },
   ],
-  food: [
-    { text: "I would like a coffee.", translation: "Quisiera un café." },
+  intermediate: [
     {
-      text: "The food is delicious!",
-      translation: "¡La comida está deliciosa!",
+      spanish: "Ayer fui al cine con mis amigos.",
+      english: "Yesterday I went to the cinema with my friends.",
     },
-    { text: "Can I see the menu?", translation: "¿Puedo ver el menú?" },
+    {
+      spanish: "He estado estudiando español por dos años.",
+      english: "I have been studying Spanish for two years.",
+    },
+  ],
+  advanced: [
+    {
+      spanish: "Aunque estaba cansado, terminé el proyecto a tiempo.",
+      english: "Although I was tired, I finished the project on time.",
+    },
+    {
+      spanish: "Si hubiera sabido la respuesta, la habría dicho.",
+      english: "If I had known the answer, I would have said it.",
+    },
   ],
 };
