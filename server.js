@@ -10,11 +10,20 @@ app.use(cors());
 app.use(express.json());
 
 const ELEVEN_API_KEY = process.env.ELEVENLABS_API_KEY;
+
 const ELEVEN_VOICE_EN = "t5ztDJA7pj9EyW9QIcJ2";
 const ELEVEN_VOICE_ES = "f9DFWr0Y8aHd6VNMEdTt";
 
+if (!ELEVEN_API_KEY) {
+  console.error("❌ ERROR: ELEVENLABS_API_KEY is missing in .env");
+} else {
+  console.log("✔️ API Key loaded correctly");
+}
+
 app.post("/tts", async (req, res) => {
   try {
+    console.log("📩 /tts request:", req.body);
+
     const { text, language } = req.body;
     const voice = language === "es" ? ELEVEN_VOICE_ES : ELEVEN_VOICE_EN;
 
@@ -37,24 +46,23 @@ app.post("/tts", async (req, res) => {
       }
     );
 
-    // 🔍 Si ElevenLabs devolvió error → NO generar audio corrupto
     if (!apiRes.ok) {
       const errTxt = await apiRes.text();
-      console.error("ElevenLabs ERROR:", errTxt);
+      console.error("🔴 ElevenLabs ERROR:", errTxt);
       return res
         .status(500)
-        .json({ error: "Error de ElevenLabs", details: errTxt });
+        .json({ error: "ElevenLabs error", details: errTxt });
     }
 
     const audioBuffer = await apiRes.arrayBuffer();
-    const contentType = apiRes.headers.get("content-type");
-
-    res.setHeader("Content-Type", contentType);
+    res.setHeader("Content-Type", "audio/mpeg");
     res.send(Buffer.from(audioBuffer));
   } catch (err) {
     console.error("Server ERROR:", err);
-    res.status(500).json({ error: "Error interno del servidor" });
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
-app.listen(3001, () => console.log("🚀 Servidor TTS en puerto 3001"));
+app.listen(3001, () => {
+  console.log("🚀 Server running on http://localhost:3001");
+});

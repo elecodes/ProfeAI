@@ -14,31 +14,35 @@ function App() {
   const [quizOptions, setQuizOptions] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  // === Reproducir texto con ElevenLabs (TTS) ===
-  const speakText = (text, language) => {
-    const synth = window.speechSynthesis;
+  const speakText = async (text, language) => {
+    try {
+      if (window.currentAudio) {
+        window.currentAudio.pause();
+        window.currentAudio = null;
+      }
 
-    // Cancelar audio previo
-    synth.cancel();
+      const response = await fetch("http://localhost:3001/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text, language }),
+      });
 
-    const utterance = new SpeechSynthesisUtterance(text);
+      if (!response.ok) throw new Error("Error al generar audio");
 
-    // Configurar idioma
-    utterance.lang = language;
+      const arrayBuffer = await response.arrayBuffer();
+      const audioBlob = new Blob([arrayBuffer], { type: "audio/mpeg" });
+      const audioURL = URL.createObjectURL(audioBlob);
 
-    // Elegir voz adecuada
-    const voices = synth.getVoices();
-    const voice = voices.find((v) => v.lang === language);
+      const audio = new Audio(audioURL);
+      window.currentAudio = audio;
 
-    if (voice) {
-      utterance.voice = voice;
+      audio.play();
+      audio.onended = () => URL.revokeObjectURL(audioURL);
+    } catch (err) {
+      console.error("TTS error:", err);
     }
-
-    utterance.rate = 1.0;
-    utterance.pitch = 1.0;
-
-    synth.speak(utterance);
   };
+
 
 
   // === Cargar temas disponibles según el nivel ===

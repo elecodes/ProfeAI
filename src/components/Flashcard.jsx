@@ -3,30 +3,38 @@ import { useState } from "react";
 function Flashcard({ english, spanish, onLearned }) {
   const [showTranslation, setShowTranslation] = useState(false);
 
- const handleSpeak = async (text, lang = "es") => {
-  try {
-    const response = await fetch("http://localhost:3001/tts", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text, language: lang }),
-    });
+  const handleSpeak = async (text, lang = "es") => {
+    try {
+      // detener audio previo
+      if (window.currentAudio) {
+        window.currentAudio.pause();
+        window.currentAudio = null;
+      }
 
-    if (!response.ok) throw new Error("Error al generar audio");
+      const response = await fetch("http://localhost:3001/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text, language: lang }),
+      });
 
-    const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
-    const audio = new Audio(url);
-    audio.play();
-  } catch (error) {
-    console.error("Error al reproducir audio:", error);
-  }
-};
+      if (!response.ok) throw new Error("Audio generation failed");
 
+      const arrayBuffer = await response.arrayBuffer();
+      const audioBlob = new Blob([arrayBuffer], { type: "audio/mpeg" });
+      const audioURL = URL.createObjectURL(audioBlob);
 
+      const audio = new Audio(audioURL);
+      window.currentAudio = audio;
+
+      audio.play();
+      audio.onended = () => URL.revokeObjectURL(audioURL);
+    } catch (error) {
+      console.error("Audio error:", error);
+    }
+  };
 
   return (
     <div className="p-6 bg-white shadow-md rounded-2xl border border-gray-200 hover:shadow-xl transition w-full max-w-lg mx-auto text-center relative">
-      {/* Título con botones de audio */}
       <div className="flex justify-between items-center mb-3">
         <h2 className="text-xl font-semibold text-gray-800">{english}</h2>
         <div className="flex gap-2">
@@ -45,14 +53,12 @@ function Flashcard({ english, spanish, onLearned }) {
         </div>
       </div>
 
-      {/* Traducción */}
       {showTranslation && (
         <p className="text-gray-600 text-lg mb-2 transition-all duration-500">
           {spanish}
         </p>
       )}
 
-      {/* Botones de control */}
       <div className="mt-4 flex flex-col gap-2">
         <button
           onClick={() => setShowTranslation((prev) => !prev)}
