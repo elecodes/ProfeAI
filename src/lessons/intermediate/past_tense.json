@@ -1,0 +1,37 @@
+{
+  "title": "Past Tense Practice",
+  "level": "Intermediate",
+  "topic": "Past Tense",
+  "sentences": [
+    {
+      "text": "Yesterday I went to the park.",
+      "translation": "Ayer fui al parque.",
+      "id": "WQ3nyT0rF2"
+    },
+    {
+      "text": "She cooked dinner last night.",
+      "translation": "Ella cocinó la cena anoche.",
+      "id": "l6O4r7nRE2"
+    },
+    {
+      "text": "We watched a movie together.",
+      "translation": "Vimos una película juntos.",
+      "id": "k7Z5lqGaF5"
+    },
+    {
+      "text": "He didn’t study for the exam.",
+      "translation": "Él no estudió para el examen.",
+      "id": "IWCGoJZVI1"
+    },
+    {
+      "text": "Did you call your friend?",
+      "translation": "¿Llamaste a tu amigo?",
+      "id": "43cNEXKpu2"
+    },
+    {
+      "text": "They traveled to Spain in 2020.",
+      "translation": "Viajaron a España en 2020.",
+      "id": "cCuPNJNK9p"
+    }
+  ]
+}

@@ -5,27 +5,33 @@
   "sentences": [
     {
       "text": "Yesterday I went to the park.",
-      "translation": "Ayer fui al parque."
+      "translation": "Ayer fui al parque.",
+      "id": "446TLcv8dx"
     },
     {
       "text": "She cooked dinner last night.",
-      "translation": "Ella cocinó la cena anoche."
+      "translation": "Ella cocinó la cena anoche.",
+      "id": "CL6xZL6Jn3"
     },
     {
       "text": "We watched a movie together.",
-      "translation": "Vimos una película juntos."
+      "translation": "Vimos una película juntos.",
+      "id": "XtQNREYcHa"
     },
     {
       "text": "He didn’t study for the exam.",
-      "translation": "Él no estudió para el examen."
+      "translation": "Él no estudió para el examen.",
+      "id": "Mf4Rt9N9Vn"
     },
     {
       "text": "Did you call your friend?",
-      "translation": "¿Llamaste a tu amigo?"
+      "translation": "¿Llamaste a tu amigo?",
+      "id": "6MuX9Quete"
     },
     {
       "text": "They traveled to Spain in 2020.",
-      "translation": "Viajaron a España en 2020."
+      "translation": "Viajaron a España en 2020.",
+      "id": "inSO3CwlzC"
     }
   ]
 }

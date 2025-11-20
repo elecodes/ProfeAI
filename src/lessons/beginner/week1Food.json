@@ -1,0 +1,37 @@
+{
+  "title": "Food and Drinks",
+  "level": "Beginner",
+  "topic": "Food",
+  "sentences": [
+    {
+      "text": "I’m hungry.",
+      "translation": "Tengo hambre.",
+      "id": "UqUQ8TthUQ"
+    },
+    {
+      "text": "I’m thirsty.",
+      "translation": "Tengo sed.",
+      "id": "Otvs3H3zK2"
+    },
+    {
+      "text": "This food is delicious.",
+      "translation": "Esta comida está deliciosa.",
+      "id": "xUDT9pAQmk"
+    },
+    {
+      "text": "I would like some water.",
+      "translation": "Quisiera un poco de agua.",
+      "id": "pIezceZmvl"
+    },
+    {
+      "text": "Do you like coffee?",
+      "translation": "¿Te gusta el café?",
+      "id": "Jtbuh2BmY1"
+    },
+    {
+      "text": "The soup is hot.",
+      "translation": "La sopa está caliente.",
+      "id": "Za3tOUTv81"
+    }
+  ]
+}

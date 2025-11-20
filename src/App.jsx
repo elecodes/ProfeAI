@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { loadLessons } from "../utils/loadLessons.js";
 
 function App() {
   const [nivel, setNivel] = useState("beginner");
@@ -44,38 +45,30 @@ function App() {
   };
 
 
-
   // === Cargar temas disponibles según el nivel ===
-  useEffect(() => {
-    async function cargarTemas() {
-      try {
-        const response = await fetch("/lessons/index.json");
-        const data = await response.json();
-        const temas = data[nivel] || [];
-        setTemasDisponibles(temas);
-        setTema(temas[0] || "");
-      } catch (error) {
-        console.error("Error cargando index.json:", error);
-      }
-    }
-    cargarTemas();
-  }, [nivel]);
+ useEffect(() => {
+   const cargarContenido = async () => {
+     if (!nivel) return;
 
-  // === Cargar frases del tema seleccionado ===
-  useEffect(() => {
-    async function cargarLeccion() {
-      if (!nivel || !tema) return;
-      try {
-        const response = await fetch(`/lessons/${nivel}/${tema}.json`);
-        const data = await response.json();
-        setFrases(data.sentences || []);
-      } catch (error) {
-        console.error("Error cargando lección:", error);
-      }
-    }
-    cargarLeccion();
-  }, [nivel, tema]);
+     const semanas = await loadLessons(nivel);
 
+     // Poner nombres de semanas en el sidebar
+     setTemasDisponibles(semanas.map((s) => s.weekName));
+
+     // Tomar la primera semana por defecto
+     if (semanas.length > 0 && !tema) {
+       setTema(semanas[0].weekName);
+     }
+
+     // Cargar frases de la semana seleccionada
+     const selected = semanas.find((s) => s.weekName === tema);
+     if (selected) {
+       setFrases(selected.items);
+     }
+   };
+
+   cargarContenido();
+ }, [nivel, tema]);
   // === Manejo de frases aprendidas ===
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem("learned")) || [];

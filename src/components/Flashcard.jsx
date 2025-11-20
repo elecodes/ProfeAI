@@ -1,7 +1,9 @@
 import { useState } from "react";
+ 
 
 function Flashcard({ english, spanish, onLearned }) {
   const [showTranslation, setShowTranslation] = useState(false);
+  const [learned, setLearned] = useState(false);
 
   const handleSpeak = async (text, lang = "es") => {
     try {
@@ -59,7 +61,7 @@ function Flashcard({ english, spanish, onLearned }) {
         </p>
       )}
 
-      <div className="mt-4 flex flex-col gap-2">
+      <div className="flex flex-col gap-3">
         <button
           onClick={() => setShowTranslation((prev) => !prev)}
           className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200 px-4 py-2 rounded-lg text-sm font-medium transition"
@@ -68,10 +70,18 @@ function Flashcard({ english, spanish, onLearned }) {
         </button>
 
         <button
-          onClick={onLearned}
-          className="bg-green-100 text-green-700 hover:bg-green-200 px-4 py-2 rounded-lg text-sm font-semibold transition"
+          onClick={() => {
+            setLearned(true);
+            onLearned();
+          }}
+          disabled={learned}
+          className={
+            learned
+              ? "bg-green-500 text-white px-4 py-2 rounded-lg cursor-not-allowed"
+              : "bg-green-100 text-green-700 hover:bg-green-200 px-4 py-2 rounded-lg"
+          }
         >
-          ✅ Marcar como aprendida
+          {learned ? "✔️ Aprendida" : "✅ Marcar como aprendida"}
         </button>
       </div>
     </div>

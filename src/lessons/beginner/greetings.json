@@ -1,0 +1,38 @@
+{
+  "title": "Greetings",
+  "level": "Beginner",
+  "topic": "Greetings",
+  "sentences": [
+    {
+      "text": "Hello, how are you?",
+      "translation": "Hola, ¿cómo estás?",
+      "id": "KDAjmN5j9L"
+    },
+    {
+      "text": "Good morning!",
+      "translation": "¡Buenos días!",
+      "id": "11rUbaSTep"
+    },
+    {
+      "text": "Good afternoon!",
+      "translation": "¡Buenas tardes!",
+      "id": "UT3CwNPtu0"
+    },
+    {
+      "text": "Good night!",
+      "translation": "¡Buenas noches!",
+      "id": "y7OOWEdnLd"
+    },
+    {
+      "text": "Nice to meet you.",
+      "translation": "Encantado de conocerte.",
+      "id": "PGAJBQwjyM"
+    },
+    {
+      "text": "See you soon!",
+      "translation": "¡Nos vemos pronto!",
+      "id": "3krUQH3sMu"
+    }
+  ],
+  "updated_at": "2025-11-19"
+}
