@@ -12,8 +12,8 @@ describe("FlashcardAudioButtons", () => {
     );
 
     // Verificamos que los botones existen por su contenido de texto
-    expect(screen.getByText("🇺🇸 🔊")).toBeInTheDocument();
-    expect(screen.getByText("🇪🇸 🔊")).toBeInTheDocument();
+    expect(screen.getByText("🇺🇸 🔊")).toBeTruthy();
+    expect(screen.getByText("🇪🇸 🔊")).toBeTruthy();
   });
 
   it("llama a speak con inglés al hacer clic en el botón de USA", () => {

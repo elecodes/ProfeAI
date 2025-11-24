@@ -8,7 +8,7 @@ describe("Flashcard", () => {
     render(<Flashcard english="Apple" spanish="Manzana" onLearned={vi.fn()} />);
 
     // Verifica que se muestra el texto en inglés
-    expect(screen.getByText("Apple")).toBeInTheDocument();
+    expect(screen.getByText("Apple")).toBeTruthy();
   }); // <--- ¡ESTO ES LO QUE FALTABA! (Cierre del primer test)
 
   it("marca como aprendida", () => {

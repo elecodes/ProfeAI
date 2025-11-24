@@ -13,7 +13,7 @@ describe("FlashcardTranslation", () => {
       />
     );
 
-    expect(screen.getByText("Hola")).toBeInTheDocument();
+    expect(screen.getByText("Hola")).toBeTruthy();
   });
 
   it("no muestra la traducción si showTranslation=false", () => {
@@ -26,8 +26,8 @@ describe("FlashcardTranslation", () => {
     );
 
     // Verificamos que "Hola" NO esté en el documento
-    expect(screen.queryByText("Hola")).not.toBeInTheDocument();
+    expect(screen.queryByText("Hola")).toBeNull();
     // Pero el inglés sí debería estar
-    expect(screen.getByText("Hello")).toBeInTheDocument();
+    expect(screen.getByText("Hello")).toBeTruthy();
   });
 });
