@@ -7,8 +7,12 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   test: {
-    environment: "jsdom",
+    environment: "happy-dom",
     globals: true,
     setupFiles: "./test/setup.js",
+    include: [
+      "src/tests/**/*.test.{js,jsx}",
+      "src/tests/**/integration/**/*.integration.test.{js,jsx}",
+    ],
   },
 });

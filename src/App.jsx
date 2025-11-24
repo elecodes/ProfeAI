@@ -90,6 +90,7 @@ function App() {
     setLearned([...learned, sentence]);
   };
 
+
   const handleClearLearned = () => {
     setLearned([]);
     localStorage.removeItem("learned");
@@ -277,6 +278,7 @@ function App() {
                   </button>
                   <button
                     onClick={() => handleMarkLearned(s)}
+                    data-testid={`learned-btn-${i}`}
                     className="px-3 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 transition"
                   >
                     Aprendida ✅
@@ -350,7 +352,8 @@ function App() {
           </div>
         )}
       </main>
-      <elevenlabs-convai agent-id="agent_5001k9j3ad8nfkr871pypnhj7m3r"></elevenlabs-convai>
+      {/* TODO: Uncomment when testing environment supports custom elements properly */}
+      {/* <elevenlabs-convai agent-id="agent_5001k9j3ad8nfkr871pypnhj7m3r"></elevenlabs-convai> */}
     </div>
   );
 }

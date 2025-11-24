@@ -1,4 +1,4 @@
-import "@testing-library/jest-dom";
+import { vi } from "vitest";
 
 // mock de Audio
 class AudioMock {
@@ -14,3 +14,16 @@ global.fetch = vi.fn(() =>
     arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)),
   })
 );
+
+// mock de speechSynthesis
+global.speechSynthesis = {
+  onvoiceschanged: null,
+  getVoices: vi.fn(() => []),
+  speak: vi.fn(),
+  cancel: vi.fn(),
+  pause: vi.fn(),
+  resume: vi.fn(),
+};
+
+// Mock custom element to prevent hang
+customElements.define("elevenlabs-convai", class extends HTMLElement {});
