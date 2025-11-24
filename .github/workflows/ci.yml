@@ -27,7 +27,7 @@ jobs:
         run: npm run lint
 
       - name: Run Unit Tests
-        run: npm run test:unit
+        run: npx vitest run "src/tests/flashcard/*.test.{js,jsx}"
 
       - name: Run Integration Tests
-        run: npm run test:integration
+        run: npx vitest run "src/tests/flashcard/integration/*.integration.test.jsx"
