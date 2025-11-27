@@ -6,6 +6,7 @@ import { useAuth } from "./hooks/useAuth";
 import UserService from "./services/UserService";
 import { AGENT_IDS } from "./config/agents";
 import DialogueViewer from "./components/DialogueViewer";
+import DialogueGenerator from "./components/DialogueGenerator";
 import { dialogues } from "./lessons/dialogues";
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
   const [quizOptions, setQuizOptions] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedDialogue, setSelectedDialogue] = useState(null);
+  const [showGenerator, setShowGenerator] = useState(false);
 
   // Use TTS hook with automatic fallback
   const { speak } = useTTS();
@@ -143,6 +145,11 @@ function App() {
       ...prev,
       [index]: !prev[index],
     }));
+  };
+
+  const handleDialogueGenerated = (newDialogue) => {
+    setSelectedDialogue(newDialogue);
+    setShowGenerator(false);
   };
 
   // === Quiz ===
@@ -346,24 +353,43 @@ function App() {
             
             {mode === "dialogues" && (
               <>
-                <label htmlFor="dialogue" className="text-sm text-gray-700">
-                  Diálogo:
-                </label>
-                <select
-                  id="dialogue"
-                  value={selectedDialogue?.id || ""}
-                  onChange={(e) => {
-                    const d = dialogues[nivel]?.find(d => d.id === e.target.value);
-                    setSelectedDialogue(d);
-                  }}
-                  className="border rounded-lg px-2 py-1"
-                >
-                  {(dialogues[nivel] || []).map((d) => (
-                    <option key={d.id} value={d.id}>
-                      {d.title}
-                    </option>
-                  ))}
-                </select>
+                <div className="flex items-center gap-2">
+                  <label htmlFor="dialogue" className="text-sm text-gray-700">
+                    Diálogo:
+                  </label>
+                  <select
+                    id="dialogue"
+                    value={selectedDialogue?.id || ""}
+                    onChange={(e) => {
+                      const d = dialogues[nivel]?.find(d => d.id === e.target.value);
+                      setSelectedDialogue(d);
+                      setShowGenerator(false);
+                    }}
+                    className="border rounded-lg px-2 py-1"
+                  >
+                    {(dialogues[nivel] || []).map((d) => (
+                      <option key={d.id} value={d.id}>
+                        {d.title}
+                      </option>
+                    ))}
+                    {selectedDialogue?.id?.startsWith('gen_') && (
+                      <option value={selectedDialogue.id}>
+                        ✨ {selectedDialogue.title}
+                      </option>
+                    )}
+                  </select>
+                  
+                  <button
+                    onClick={() => setShowGenerator(!showGenerator)}
+                    className={`px-3 py-1 rounded-lg text-sm transition ${
+                      showGenerator 
+                        ? 'bg-purple-100 text-purple-700' 
+                        : 'bg-gray-100 text-gray-600 hover:bg-purple-50 hover:text-purple-600'
+                    }`}
+                  >
+                    {showGenerator ? 'Cancelar' : '✨ Generar Nuevo'}
+                  </button>
+                </div>
               </>
             )}
           </div>
@@ -542,7 +568,13 @@ function App() {
 
             {/* === Dialogues Mode === */}
             {mode === "dialogues" && (
-              <DialogueViewer dialogue={selectedDialogue} />
+              <>
+                {showGenerator ? (
+                  <DialogueGenerator onGenerate={handleDialogueGenerated} level={nivel} />
+                ) : (
+                  <DialogueViewer dialogue={selectedDialogue} />
+                )}
+              </>
             )}
           </>
         )}

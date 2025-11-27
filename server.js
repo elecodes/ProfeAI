@@ -18,8 +18,28 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+import DialogueGenerator from './src/services/DialogueGenerator.js';
+
 // Serve static files from the build directory
 app.use(express.static(path.join(__dirname, "dist")));
+app.use(express.json()); // Enable JSON body parsing
+
+// API: Generate Dialogue
+app.post('/api/generate-dialogue', async (req, res) => {
+  try {
+    const { topic, level } = req.body;
+    if (!topic) {
+      return res.status(400).json({ error: "Topic is required" });
+    }
+    
+    console.log(`✨ Generating dialogue: "${topic}" (${level})`);
+    const dialogue = await DialogueGenerator.generate(topic, level || "intermediate");
+    res.json(dialogue);
+  } catch (error) {
+    console.error("Generation error:", error);
+    res.status(500).json({ error: "Failed to generate dialogue" });
+  }
+});
 
 app.post("/tts", async (req, res) => {
   try {
@@ -56,7 +76,7 @@ app.post("/tts", async (req, res) => {
 // Handle SPA routing - return index.html for any unknown routes
 app.get("*", (req, res) => {
   // Don't intercept API routes (though they should be matched above)
-  if (req.path.startsWith("/tts")) {
+  if (req.path.startsWith("/tts") || req.path.startsWith("/api")) {
     return res.status(404).json({ error: "Not found" });
   }
   res.sendFile(path.join(__dirname, "dist", "index.html"));

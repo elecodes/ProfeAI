@@ -1,86 +1,89 @@
-I have fixed the button styles in `src/components/Flashcard.jsx` and created a `.env` file to store your API key securely.
+# 🇪🇸 AppTutor - Tu Tutor de Español con IA
 
-To complete the setup and fix the audio quality, please follow these steps:
+AppTutor es una aplicación web interactiva diseñada para ayudar a estudiantes a aprender español mediante lecciones estructuradas, práctica de pronunciación (TTS), cuestionarios y conversaciones dinámicas impulsadas por Inteligencia Artificial.
 
-1.  **Add your API key to the `.env` file:**
-    Open the `.env` file in the root of your project and replace `"YOUR_ELEVENLABS_API_KEY"` with your actual ElevenLabs API key.
+![AppTutor Screenshot](https://via.placeholder.com/800x400?text=AppTutor+Preview)
 
-2.  **Install the `dotenv` package:**
-    Open your terminal and run the following command:
+## ✨ Características Principales
+
+*   **📚 Lecciones Estructuradas:** Contenido organizado por niveles (Principiante, Intermedio, Avanzado) y semanas.
+*   **🗣️ Texto a Voz (TTS):** Escucha la pronunciación nativa de frases y diálogos utilizando Google Cloud TTS y Amazon Polly.
+*   **🤖 Tutor de IA (LangChain):** Genera diálogos infinitos y personalizados sobre cualquier tema para practicar situaciones reales.
+*   **💬 Modo Conversación:** Practica hablar con un agente de IA en tiempo real (integración con ElevenLabs).
+*   **✅ Seguimiento de Progreso:** Marca frases como aprendidas y visualiza tu avance.
+*   **🎯 Cuestionarios (Quiz):** Pon a prueba tus conocimientos con tests interactivos.
+*   **🔐 Autenticación:** Sistema de registro y login seguro con Firebase Auth.
+*   **♿ Accesibilidad:** Diseño inclusivo verificado con Pa11y.
+
+## 🛠️ Tecnologías Utilizadas
+
+*   **Frontend:** React, Vite, Tailwind CSS.
+*   **Backend:** Node.js, Express.
+*   **Base de Datos & Auth:** Firebase (Firestore, Authentication).
+*   **IA & Servicios:**
+    *   **LangChain + OpenAI:** Generación de diálogos dinámicos.
+    *   **Google Cloud TTS / Amazon Polly:** Síntesis de voz.
+    *   **ElevenLabs:** Conversación fluida.
+*   **DevOps & Calidad:**
+    *   **Docker:** Contenerización de la aplicación.
+    *   **Husky:** Git hooks para calidad de código.
+    *   **GitHub Actions:** CI/CD para tests, linting y auditorías.
+    *   **Playwright:** Tests End-to-End (E2E).
+    *   **Vitest:** Tests unitarios.
+    *   **Lighthouse:** Auditoría de rendimiento y SEO.
+
+## 🚀 Requisitos Previos
+
+Asegúrate de tener instalado:
+*   [Node.js](https://nodejs.org/) (v18 o superior)
+*   [Docker](https://www.docker.com/) (opcional, para ejecutar en contenedor)
+*   Claves de API para: OpenAI, Google Cloud, Firebase.
+
+## 📥 Instalación
+
+1.  **Clonar el repositorio:**
     ```bash
-    npm install dotenv
+    git clone https://github.com/tu-usuario/apptutor.git
+    cd apptutor
     ```
 
-3.  **Update your `server.js` file:**
-    Replace the content of your `server.js` file with the following code. This will configure your server to use the `dotenv` package and the improved `eleven_multilingual_v2` model.
-
-    ```javascript
-    import express from "express";
-    import fetch from "node-fetch";
-    import cors from "cors";
-    import dotenv from "dotenv";
-
-    dotenv.config();
-
-    const app = express();
-    app.use(cors());
-    app.use(express.json());
-
-    const ELEVEN_API_KEY = process.env.ELEVENLABS_API_KEY;
-    const ELEVEN_VOICE_EN = "EXAVITQu4vr4xnSDxMaL";
-    const ELEVEN_VOICE_ES = "TxGEqnHWrfWFTfGW9XjX";
-
-    app.post("/tts", async (req, res) => {
-      try {
-        const { text, language } = req.body;
-        const voice = language === "es" ? ELEVEN_VOICE_ES : ELEVEN_VOICE_EN;
-
-        if (!ELEVEN_API_KEY || ELEVEN_API_KEY === "YOUR_ELEVENLABS_API_KEY") {
-          return res.status(401).json({
-            error: "Missing or invalid ElevenLabs API key.",
-            details:
-              "Please add your API key to the .env file (e.g., ELEVENLABS_API_KEY=your_key_here).",
-          });
-        }
-
-        const apiRes = await fetch(
-          `https://api.elevenlabs.io/v1/text-to-speech/${voice}`,
-          {
-            method: "POST",
-            headers: {
-              "xi-api-key": ELEVEN_API_KEY,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              model_id: "eleven_multilingual_v2",
-              text,
-            }),
-          }
-        );
-
-        if (!apiRes.ok) {
-          const errTxt = await apiRes.text();
-          console.error("ElevenLabs ERROR:", errTxt);
-          return res
-            .status(500)
-            .json({ error: "Error de ElevenLabs", details: errTxt });
-        }
-
-        const audioBuffer = await apiRes.arrayBuffer();
-        const contentType = apiRes.headers.get("content-type");
-
-        res.setHeader("Content-Type", contentType);
-        res.send(Buffer.from(audioBuffer));
-      } catch (err) {
-        console.error("Server ERROR:", err);
-        res.status(500).json({ error: "Error interno del servidor" });
-      }
-    });
-
-    app.listen(3001, () => console.log("🚀 Servidor TTS en puerto 3001"));
+2.  **Instalar dependencias:**
+    ```bash
+    npm install
     ```
 
-4.  **Restart your server:**
-    After making these changes, restart your server to apply them.
+3.  **Configurar variables de entorno:**
+    Crea un archivo `.env` en la raíz basado en el siguiente ejemplo:
+    ```env
+    OPENAI_API_KEY=tu_clave_openai
+    GOOGLE_APPLICATION_CREDENTIALS=./path/to/credentials.json
+    # ... otras claves necesarias
+    ```
 
-These changes should resolve the audio issues you are experiencing. Let me know if you have any other questions.
+## ▶️ Ejecución
+
+### Modo Desarrollo
+Para iniciar el servidor backend y el frontend con recarga en caliente:
+```bash
+npm run dev
+```
+La aplicación estará disponible en `http://localhost:5173`.
+
+### Con Docker 🐳
+Para levantar toda la aplicación en un entorno aislado:
+```bash
+docker-compose up --build
+```
+La aplicación estará disponible en `http://localhost:3001`.
+
+## 🧪 Tests y Calidad
+
+*   **Unitarios:** `npm test`
+*   **E2E (Playwright):** `npm run test:e2e`
+*   **Linting:** `npm run lint`
+*   **Accesibilidad:** `npm run ci:a11y`
+*   **Rendimiento:** `npm run ci:lighthouse`
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT. Consulta el archivo `LICENSE` para más detalles.

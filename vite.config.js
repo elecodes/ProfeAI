@@ -15,4 +15,10 @@ export default defineConfig({
       "src/tests/**/integration/**/*.integration.test.{js,jsx}",
     ],
   },
+  server: {
+    proxy: {
+      '/api': 'http://localhost:3001',
+      '/tts': 'http://localhost:3001',
+    },
+  },
 });
