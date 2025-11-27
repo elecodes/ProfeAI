@@ -1,14 +1,13 @@
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 
 import path from "path";
 import { fileURLToPath } from "url";
 
-// IMPORTANT: Load environment variables BEFORE importing TTSService
-dotenv.config();
+// IMPORTANT: Load and validate environment variables BEFORE importing anything else
+import { env } from "./src/config/env.js";
 
-// Now import TTSService after env vars are loaded
+// Now import TTSService after env vars are loaded and validated
 import TTSService from "./src/services/TTSService.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -20,20 +19,21 @@ app.use(express.json());
 
 import DialogueGenerator from './src/services/DialogueGenerator.js';
 
+import { validate } from "./src/middleware/validate.js";
+import { generateDialogueSchema, ttsSchema } from "./src/schemas/api.js";
+
 // Serve static files from the build directory
 app.use(express.static(path.join(__dirname, "dist")));
 app.use(express.json()); // Enable JSON body parsing
 
 // API: Generate Dialogue
-app.post('/api/generate-dialogue', async (req, res) => {
+app.post('/api/generate-dialogue', validate(generateDialogueSchema), async (req, res) => {
   try {
     const { topic, level } = req.body;
-    if (!topic) {
-      return res.status(400).json({ error: "Topic is required" });
-    }
+    // Validation handled by middleware, so topic is guaranteed to exist
     
     console.log(`✨ Generating dialogue: "${topic}" (${level})`);
-    const dialogue = await DialogueGenerator.generate(topic, level || "intermediate");
+    const dialogue = await DialogueGenerator.generate(topic, level);
     res.json(dialogue);
   } catch (error) {
     console.error("Generation error:", error);
@@ -41,15 +41,12 @@ app.post('/api/generate-dialogue', async (req, res) => {
   }
 });
 
-app.post("/tts", async (req, res) => {
+app.post("/tts", validate(ttsSchema), async (req, res) => {
   try {
     console.log("📩 /tts request:", req.body);
 
-    const { text, language = "es", options = {} } = req.body;
-
-    if (!text) {
-      return res.status(400).json({ error: "Text is required" });
-    }
+    const { text, language, options } = req.body;
+    // Validation handled by middleware, so text is guaranteed to exist
 
     // Use TTSService with automatic fallback
     const result = await TTSService.generateSpeech(text, language, options);
@@ -101,8 +98,8 @@ async function startServer() {
     console.warn("⚠️ WARNING: No TTS providers configured! Only Web Speech API will be available.");
   }
 
-  app.listen(3001, () => {
-    console.log("🚀 Server running on http://localhost:3001");
+  app.listen(env.PORT, () => {
+    console.log(`🚀 Server running on http://localhost:${env.PORT}`);
   });
 }
 

@@ -1,13 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { loadLessons } from "../utils/loadLessons.js";
 import { useTTS } from "./components/hooks/useTTS";
-import AuthForm from "./components/auth/AuthForm";
+// Lazy load components
+const AuthForm = React.lazy(() => import("./components/auth/AuthForm"));
+const DialogueViewer = React.lazy(() => import("./components/DialogueViewer"));
+const DialogueGenerator = React.lazy(() => import("./components/DialogueGenerator"));
+
 import { useAuth } from "./hooks/useAuth";
 import UserService from "./services/UserService";
 import { AGENT_IDS } from "./config/agents";
-import DialogueViewer from "./components/DialogueViewer";
-import DialogueGenerator from "./components/DialogueGenerator";
 import { dialogues } from "./lessons/dialogues";
+import * as Sentry from "@sentry/react";
+
+// Simple Loading Component
+const Loading = () => (
+  <div className="flex items-center justify-center p-8">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+  </div>
+);
 
 function App() {
   // Auth State from Hook
@@ -28,6 +38,20 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedDialogue, setSelectedDialogue] = useState(null);
   const [showGenerator, setShowGenerator] = useState(false);
+
+  // Track navigation in Sentry
+  useEffect(() => {
+    Sentry.addBreadcrumb({
+      category: "navigation",
+      message: `User switched to mode: ${mode}`,
+      level: "info",
+      data: {
+        mode,
+        level: nivel,
+        topic: tema
+      }
+    });
+  }, [mode, nivel, tema]);
 
   // Use TTS hook with automatic fallback
   const { speak } = useTTS();
@@ -96,18 +120,24 @@ function App() {
       // Poner nombres de semanas en el sidebar (con candado si están bloqueadas)
       setTemasDisponibles(processedWeeks);
 
-      // Tomar la primera semana por defecto si no hay tema seleccionado
-      if (processedWeeks.length > 0 && !tema) {
-        setTema(processedWeeks[0].weekName);
-      }
-
       // Cargar frases de la semana seleccionada
       const selected = processedWeeks.find((s) => s.weekName === tema);
+      
       if (selected) {
         if (selected.locked) {
           setFrases([]); // No mostrar frases si está bloqueado
         } else {
           setFrases(selected.items);
+        }
+      } else {
+        // Si el tema actual no existe en este nivel (ej: cambio de nivel),
+        // seleccionar el primero disponible
+        if (processedWeeks.length > 0) {
+          setTema(processedWeeks[0].weekName);
+          // Opcional: limpiar frases mientras cambia
+          setFrases([]); 
+        } else {
+          setFrases([]);
         }
       }
     };
@@ -407,7 +437,9 @@ function App() {
                   Inicia sesión para acceder a las lecciones y guardar tu progreso.
                 </p>
               </div>
-              <AuthForm onSignIn={handleSignIn} onSignUp={handleSignUp} />
+              <Suspense fallback={<Loading />}>
+                <AuthForm onSignIn={handleSignIn} onSignUp={handleSignUp} />
+              </Suspense>
             </div>
           </div>
         ) : (
@@ -569,17 +601,19 @@ function App() {
             {/* === Dialogues Mode === */}
             {mode === "dialogues" && (
               <>
-                {showGenerator ? (
-                  <DialogueGenerator onGenerate={handleDialogueGenerated} level={nivel} />
-                ) : (
-                  <DialogueViewer dialogue={selectedDialogue} />
-                )}
+                <Suspense fallback={<Loading />}>
+                  {showGenerator ? (
+                    <DialogueGenerator onGenerate={handleDialogueGenerated} level={nivel} />
+                  ) : (
+                    <DialogueViewer dialogue={selectedDialogue} />
+                  )}
+                </Suspense>
               </>
             )}
           </>
         )}
       </main>
-
+      
       {/* Only render in non-test environments */}
       {import.meta.env.MODE !== 'test' && mode === "conversation" && (
         <elevenlabs-convai agent-id={AGENT_IDS[nivel] || AGENT_IDS.beginner}></elevenlabs-convai>
