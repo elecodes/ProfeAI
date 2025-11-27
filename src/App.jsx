@@ -5,6 +5,7 @@ import { useTTS } from "./components/hooks/useTTS";
 const AuthForm = React.lazy(() => import("./components/auth/AuthForm"));
 const DialogueViewer = React.lazy(() => import("./components/DialogueViewer"));
 const DialogueGenerator = React.lazy(() => import("./components/DialogueGenerator"));
+const ConversationMode = React.lazy(() => import("./components/ConversationMode"));
 
 import { useAuth } from "./hooks/useAuth";
 import UserService from "./services/UserService";
@@ -443,7 +444,7 @@ function App() {
             </div>
           </div>
         ) : (
-          <>
+          <Suspense fallback={<Loading />}>
             {/* Locked Content Message */}
             {mode === "study" && temasDisponibles.find(t => t.weekName === tema)?.locked && (
               <div className="flex-1 flex items-center justify-center">
@@ -579,23 +580,11 @@ function App() {
 
             {/* === Conversation Mode === */}
             {mode === "conversation" && (
-              <div className="flex-1 flex flex-col items-center justify-center">
-                <div className="text-center mb-8">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-2">
-                    Práctica de Conversación
-                  </h2>
-                  <p className="text-gray-600">
-                    Habla con nuestro tutor de IA para practicar tu español (Nivel: {nivel})
-                  </p>
-                </div>
-                
-                {/* The agent is rendered below, but we show a placeholder here if needed */}
-                <div className="p-8 bg-white rounded-2xl shadow-lg border border-blue-100 max-w-2xl w-full">
-                   <p className="text-center text-gray-500 italic mb-4">
-                     Haz clic en el micrófono del agente para empezar a hablar.
-                   </p>
-                </div>
-              </div>
+              <ConversationMode 
+                topic={tema || "General Conversation"} 
+                level={nivel} 
+                onBack={() => setMode("study")}
+              />
             )}
 
             {/* === Dialogues Mode === */}
@@ -610,10 +599,10 @@ function App() {
                 </Suspense>
               </>
             )}
-          </>
+          </Suspense>
         )}
       </main>
-      
+
       {/* Only render in non-test environments */}
       {import.meta.env.MODE !== 'test' && mode === "conversation" && (
         <elevenlabs-convai agent-id={AGENT_IDS[nivel] || AGENT_IDS.beginner}></elevenlabs-convai>

@@ -9,22 +9,73 @@ import { env } from "./src/config/env.js";
 
 // Now import TTSService after env vars are loaded and validated
 import TTSService from "./src/services/TTSService.js";
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-import DialogueGenerator from './src/services/DialogueGenerator.js';
-
+import DialogueGenerator from "./src/services/DialogueGenerator.js";
+import ConversationService from "./src/services/ConversationService.js";
+import GrammarService from "./src/services/GrammarService.js";
 import { validate } from "./src/middleware/validate.js";
 import { generateDialogueSchema, ttsSchema } from "./src/schemas/api.js";
 
+const app = express();
+const PORT = process.env.PORT || 3001;
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// --- Routes ---
+
+// 1. Chat / Roleplay Endpoints
+app.post("/api/chat/start", async (req, res) => {
+  try {
+    const { topic, level, sessionId } = req.body;
+    // Simple validation
+    if (!topic || !level || !sessionId) {
+      return res.status(400).json({ error: "Missing topic, level, or sessionId" });
+    }
+
+    const reply = await ConversationService.startConversation(sessionId, topic, level);
+    res.json({ message: reply });
+  } catch (error) {
+    console.error("Error starting chat:", error);
+    res.status(500).json({ error: "Failed to start conversation" });
+  }
+});
+
+app.post("/api/chat/message", async (req, res) => {
+  try {
+    const { message, sessionId, topic, level } = req.body;
+    if (!message || !sessionId) {
+      return res.status(400).json({ error: "Missing message or sessionId" });
+    }
+
+    const reply = await ConversationService.sendMessage(sessionId, message, topic, level);
+    res.json({ message: reply });
+  } catch (error) {
+    console.error("Error sending message:", error);
+    res.status(500).json({ error: "Failed to process message" });
+  }
+});
+
+// 2. Grammar Analysis Endpoint
+app.post("/api/grammar/analyze", async (req, res) => {
+  try {
+    const { text, context } = req.body;
+    if (!text) {
+      return res.status(400).json({ error: "Missing text to analyze" });
+    }
+
+    const report = await GrammarService.analyze(text, context);
+    res.json(report);
+  } catch (error) {
+    console.error("Error analyzing grammar:", error);
+    res.status(500).json({ error: "Failed to analyze grammar" });
+  }
+});
 // Serve static files from the build directory
 app.use(express.static(path.join(__dirname, "dist")));
-app.use(express.json()); // Enable JSON body parsing
 
 // API: Generate Dialogue
 app.post('/api/generate-dialogue', validate(generateDialogueSchema), async (req, res) => {
