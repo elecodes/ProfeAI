@@ -8,8 +8,9 @@ AppTutor es una aplicación web interactiva diseñada para ayudar a estudiantes 
 
 *   **📚 Lecciones Estructuradas:** Contenido organizado por niveles (Principiante, Intermedio, Avanzado) y semanas.
 *   **🗣️ Texto a Voz (TTS):** Escucha la pronunciación nativa de frases y diálogos utilizando Google Cloud TTS y Amazon Polly.
-*   **🤖 Tutor de IA (LangChain):** Genera diálogos infinitos y personalizados sobre cualquier tema para practicar situaciones reales.
-*   **💬 Modo Conversación:** Practica hablar con un agente de IA en tiempo real (integración con ElevenLabs).
+*   **🤖 Tutor de IA (Roleplay):** Practica situaciones reales (ej. "En el restaurante") con un tutor de IA que se adapta a tu nivel y mantiene el contexto de la conversación.
+*   **👨‍⚕️ Doctor Gramática:** Recibe feedback detallado y correcciones gramaticales después de cada sesión de conversación.
+*   **💬 Modo Conversación Híbrido:** Combina chat de texto inteligente (LangChain) con interacción de voz fluida (ElevenLabs).
 *   **✅ Seguimiento de Progreso:** Marca frases como aprendidas y visualiza tu avance.
 *   **🎯 Cuestionarios (Quiz):** Pon a prueba tus conocimientos con tests interactivos.
 *   **🔐 Autenticación:** Sistema de registro y login seguro con Firebase Auth.
@@ -21,23 +22,28 @@ AppTutor es una aplicación web interactiva diseñada para ayudar a estudiantes 
 *   **Backend:** Node.js, Express.
 *   **Base de Datos & Auth:** Firebase (Firestore, Authentication).
 *   **IA & Servicios:**
-    *   **LangChain + OpenAI:** Generación de diálogos dinámicos.
-    *   **Google Cloud TTS / Amazon Polly:** Síntesis de voz.
-    *   **ElevenLabs:** Conversación fluida.
-*   **DevOps & Calidad:**
-    *   **Docker:** Contenerización de la aplicación.
-    *   **Husky:** Git hooks para calidad de código.
-    *   **GitHub Actions:** CI/CD para tests, linting y auditorías.
+    *   **LangChain + OpenAI:** Motor de conversación (Roleplay) y análisis gramatical.
+    *   **Google Cloud TTS / Amazon Polly:** Síntesis de voz de alta calidad.
+    *   **ElevenLabs:** Conversación fluida con avatares.
+*   **Calidad & Monitoreo:**
+    *   **Sentry:** Monitoreo de errores y rendimiento (RUM).
+    *   **Zod:** Validación robusta de esquemas (API y variables de entorno).
     *   **Playwright:** Tests End-to-End (E2E).
     *   **Vitest:** Tests unitarios.
     *   **Lighthouse:** Auditoría de rendimiento y SEO.
+    *   **Docker:** Contenerización completa.
+
+## 📚 Documentación Adicional
+
+*   **[Incident Response Playbook](docs/PLAYBOOK.md):** Guía para la gestión de incidentes críticos.
+*   **[Agentes de IA](AGENTS.md):** Definición de los agentes y sus personalidades.
 
 ## 🚀 Requisitos Previos
 
 Asegúrate de tener instalado:
 *   [Node.js](https://nodejs.org/) (v18 o superior)
 *   [Docker](https://www.docker.com/) (opcional, para ejecutar en contenedor)
-*   Claves de API para: OpenAI, Google Cloud, Firebase.
+*   Claves de API para: OpenAI, Google Cloud, Firebase, ElevenLabs, Sentry.
 
 ## 📥 Instalación
 
@@ -57,6 +63,8 @@ Asegúrate de tener instalado:
     ```env
     OPENAI_API_KEY=tu_clave_openai
     GOOGLE_APPLICATION_CREDENTIALS=./path/to/credentials.json
+    VITE_ENABLE_SENTRY=true
+    VITE_SENTRY_DSN=tu_dsn_sentry
     # ... otras claves necesarias
     ```
 
