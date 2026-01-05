@@ -1,3 +1,4 @@
+import process from 'node:process';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';

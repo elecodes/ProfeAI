@@ -1,5 +1,5 @@
 import { db } from "../../firebase/firebase";
-import { collection, getDocs, query, where, addDoc, doc, setDoc } from "firebase/firestore";
+import { collection, getDocs, query, where, doc, setDoc } from "firebase/firestore";
 
 const COLLECTION_NAME = "lessons";
 

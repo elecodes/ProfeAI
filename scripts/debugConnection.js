@@ -1,3 +1,4 @@
+import process from 'node:process';
 import { db } from '../firebase/firebase.js';
 import { collection, getDocs } from 'firebase/firestore';
 
