@@ -17,32 +17,38 @@ import DialogueGenerator from "./src/services/DialogueGenerator.js";
 import ConversationService from "./src/services/ConversationService.js";
 import GrammarService from "./src/services/GrammarService.js";
 import { validate } from "./src/middleware/validate.js";
-import { generateDialogueSchema, ttsSchema, grammarAnalysisSchema } from "./src/schemas/api.js";
+import {
+  generateDialogueSchema,
+  ttsSchema,
+  grammarAnalysisSchema,
+} from "./src/schemas/api.js";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Middleware
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"], // React needs unsafe-inline/eval in dev
-      connectSrc: [
-        "'self'", 
-        "https://identitytoolkit.googleapis.com", // Firebase Auth
-        "https://securetoken.googleapis.com", // Firebase Auth
-        "https://firestore.googleapis.com", // Firestore
-        "https://texttospeech.googleapis.com", // Google TTS
-        "https://api.elevenlabs.io", // ElevenLabs
-        "https://polly.us-east-1.amazonaws.com" // AWS Polly (adjust region if needed)
-      ],
-      imgSrc: ["'self'", "data:", "blob:"],
-      mediaSrc: ["'self'", "data:", "blob:"],
-      frameSrc: ["'self'"]
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"], // React needs unsafe-inline/eval in dev
+        connectSrc: [
+          "'self'",
+          "https://identitytoolkit.googleapis.com", // Firebase Auth
+          "https://securetoken.googleapis.com", // Firebase Auth
+          "https://firestore.googleapis.com", // Firestore
+          "https://texttospeech.googleapis.com", // Google TTS
+          "https://api.elevenlabs.io", // ElevenLabs
+          "https://polly.us-east-1.amazonaws.com", // AWS Polly (adjust region if needed)
+        ],
+        imgSrc: ["'self'", "data:", "blob:"],
+        mediaSrc: ["'self'", "data:", "blob:"],
+        frameSrc: ["'self'"],
+      },
     },
-  },
-}));
+  })
+);
 app.use(cors());
 app.use(express.json());
 
@@ -54,11 +60,29 @@ app.post("/api/chat/start", async (req, res) => {
     const { topic, level, sessionId } = req.body;
     // Simple validation
     if (!topic || !level || !sessionId) {
-      return res.status(400).json({ error: "Missing topic, level, or sessionId" });
+      return res
+        .status(400)
+        .json({ error: "Missing topic, level, or sessionId" });
     }
 
-    const reply = await ConversationService.startConversation(sessionId, topic, level);
-    res.json({ message: reply });
+    let reply;
+    try {
+      reply = await ConversationService.startConversation(
+        sessionId,
+        topic,
+        level
+      );
+    } catch (serviceError) {
+      console.error("ConversationService error:", serviceError);
+      reply = "Lo siento, hubo un problema al iniciar la conversación.";
+    }
+
+    // Normalize reply and force male gender safely
+    const safeReply =
+      typeof reply === "string" ? { text: reply } : reply || { text: "" };
+    const finalResponse = { ...safeReply, gender: "male" };
+
+    res.json({ message: finalResponse });
   } catch (error) {
     console.error("Error starting chat:", error);
     res.status(500).json({ error: "Failed to start conversation" });
@@ -72,8 +96,25 @@ app.post("/api/chat/message", async (req, res) => {
       return res.status(400).json({ error: "Missing message or sessionId" });
     }
 
-    const reply = await ConversationService.sendMessage(sessionId, message, topic, level);
-    res.json({ message: reply });
+    let reply;
+    try {
+      reply = await ConversationService.sendMessage(
+        sessionId,
+        message,
+        topic,
+        level
+      );
+    } catch (serviceError) {
+      console.error("ConversationService error:", serviceError);
+      reply = "Lo siento, hubo un problema al procesar tu mensaje.";
+    }
+
+    // Normalize reply and force male gender safely
+    const safeReply =
+      typeof reply === "string" ? { text: reply } : reply || { text: "" };
+    const finalResponse = { ...safeReply, gender: "male" };
+
+    res.json({ message: finalResponse });
   } catch (error) {
     console.error("Error sending message:", error);
     res.status(500).json({ error: "Failed to process message" });
@@ -81,41 +122,100 @@ app.post("/api/chat/message", async (req, res) => {
 });
 
 // 2. Grammar Analysis Endpoint
-app.post("/api/grammar/analyze", validate(grammarAnalysisSchema), async (req, res) => {
-  try {
-    const { text, context } = req.body;
-    // Validation handled by middleware
+app.post(
+  "/api/grammar/analyze",
+  validate(grammarAnalysisSchema),
+  async (req, res) => {
+    try {
+      const { text, context } = req.body;
+      // Validation handled by middleware
 
-    const report = await GrammarService.analyze(text, context);
-    res.json(report);
-  } catch (error) {
-    console.error("Error analyzing grammar:", error);
-    res.status(500).json({ error: "Failed to analyze grammar" });
+      const report = await GrammarService.analyze(text, context);
+      res.json(report);
+    } catch (error) {
+      console.error("Error analyzing grammar:", error);
+      res.status(500).json({ error: "Failed to analyze grammar" });
+    }
   }
-});
+);
 // Serve static files from the build directory
 app.use(express.static(path.join(__dirname, "dist")));
 
 // API: Generate Dialogue
-app.post('/api/generate-dialogue', validate(generateDialogueSchema), async (req, res) => {
-  try {
-    const { topic, level } = req.body;
-    // Validation handled by middleware, so topic is guaranteed to exist
-    
-    console.log(`✨ Generating dialogue: "${topic}" (${level})`);
-    const dialogue = await DialogueGenerator.generate(topic, level);
-    res.json(dialogue);
-  } catch (error) {
-    console.error("Generation error:", error);
-    res.status(500).json({ error: "Failed to generate dialogue" });
+app.post(
+  "/api/generate-dialogue",
+  validate(generateDialogueSchema),
+  async (req, res) => {
+    try {
+      const { topic, level } = req.body;
+      // Validation handled by middleware, so topic is guaranteed to exist
+
+      console.log(`✨ Generating dialogue: "${topic}" (${level})`);
+      const dialogue = await DialogueGenerator.generate(topic, level);
+
+      // Assign genders to speakers to ensure voice variety
+      if (
+        dialogue &&
+        dialogue.conversation &&
+        Array.isArray(dialogue.conversation)
+      ) {
+        // Filter valid speakers to avoid crashes if AI returns null/undefined
+        const speakers = [
+          ...new Set(
+            dialogue.conversation
+              .map((t) => t.speaker)
+              .filter((s) => typeof s === "string")
+          ),
+        ];
+        const speakerGenders = {};
+
+        speakers.forEach((speaker) => {
+          // Detect gender based on name heuristic
+          const name = speaker.toLowerCase();
+          // Ends in 'a' -> Female (Ana, Maria), Others -> Male (Juan, Carlos)
+          const isFemale =
+            name.endsWith("a") || ["carmen", "isabel", "raquel"].includes(name);
+
+          speakerGenders[speaker] = isFemale ? "female" : "male";
+        });
+
+        dialogue.conversation = dialogue.conversation.map((turn) => ({
+          ...turn,
+          gender:
+            turn.speaker && speakerGenders[turn.speaker]
+              ? speakerGenders[turn.speaker]
+              : "female",
+        }));
+      }
+
+      res.json(dialogue);
+    } catch (error) {
+      console.error("Generation error:", error);
+      res.status(500).json({ error: "Failed to generate dialogue" });
+    }
   }
-});
+);
 
 app.post("/tts", validate(ttsSchema), async (req, res) => {
   try {
     console.log("📩 /tts request:", req.body);
 
-    const { text, language, options } = req.body;
+    let { text, language, options } = req.body;
+    options = options || {};
+
+    // Ensure male voice is used if requested.
+    // We override voiceId to ensure character distinction in dialogues.
+    if (options.gender === "male") {
+      if (language && language.startsWith("es")) {
+        options.voiceId = "es-ES-Neural2-B"; // Google Spanish Male
+        options.provider = "google";
+      } else {
+        options.voiceId = "en-US-Neural2-D"; // Google English Male (default)
+        options.provider = "google";
+      }
+      console.log(`👨 Forced male voice: ${options.voiceId}`);
+    }
+
     // Validation handled by middleware, so text is guaranteed to exist
 
     // Use TTSService with automatic fallback
@@ -129,13 +229,13 @@ app.post("/tts", validate(ttsSchema), async (req, res) => {
     console.log(`✅ Audio generated successfully using ${result.provider}`);
   } catch (err) {
     console.error("🔴 TTS Error:", err.message);
-    
+
     // Return error with suggestion to use Web Speech API fallback
-    res.status(500).json({ 
+    res.status(500).json({
       error: "TTS generation failed",
       message: err.message,
       fallbackAvailable: true,
-      suggestion: "Client should use Web Speech API as fallback"
+      suggestion: "Client should use Web Speech API as fallback",
     });
   }
 });
@@ -154,7 +254,7 @@ app.get("/tts/status", async (req, res) => {
   const status = await TTSService.getProviderStatus();
   res.json({
     providers: status,
-    available: status.elevenlabs || status.google || status.webSpeech
+    available: status.elevenlabs || status.google || status.webSpeech,
   });
 });
 
@@ -164,8 +264,14 @@ async function startServer() {
   const providerStatus = await TTSService.getProviderStatus();
   console.log("🔊 TTS Provider Status:", providerStatus);
 
-  if (!providerStatus.polly && !providerStatus.elevenlabs && !providerStatus.google) {
-    console.warn("⚠️ WARNING: No TTS providers configured! Only Web Speech API will be available.");
+  if (
+    !providerStatus.polly &&
+    !providerStatus.elevenlabs &&
+    !providerStatus.google
+  ) {
+    console.warn(
+      "⚠️ WARNING: No TTS providers configured! Only Web Speech API will be available."
+    );
   }
 
   app.listen(env.PORT, () => {

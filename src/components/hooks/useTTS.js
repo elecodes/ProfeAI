@@ -4,13 +4,10 @@ export const useTTS = () => {
   const [audio, setAudio] = useState(null);
   const [currentProvider, setCurrentProvider] = useState(null);
 
-  /**
-   * Fallback to Web Speech API (browser native TTS)
-   */
   const speakWithWebSpeech = (text, lang = "es", options = {}) => {
     return new Promise((resolve, reject) => {
       if (!window.speechSynthesis) {
-        reject(new Error("Web Speech API not supported in this browser"));
+        reject(new Error("Web Speech API not supported"));
         return;
       }
 
@@ -18,68 +15,47 @@ export const useTTS = () => {
       const utterance = new SpeechSynthesisUtterance(text);
       const voices = window.speechSynthesis.getVoices();
 
-      // Lógica de género
-      
+      const isMale = options?.gender === "male";
+      const langCode = lang.startsWith("es") ? "es" : "en";
 
-     const isMale = options.gender === "male";
-     const langCode = lang.startsWith("es") ? "es" : "en";
+      const preferredVoice =
+        voices.find((voice) => {
+          const name = voice.name.toLowerCase();
+          const langMatch = voice.lang.startsWith(langCode);
+          if (!langMatch) return false;
 
-     const preferredVoice =
-       voices.find((voice) => {
-         const name = voice.name.toLowerCase();
-         const langMatch = voice.lang.startsWith(langCode);
-
-         if (isMale && langMatch) {
-           // Buscamos nombres de voces masculinas comunes en sistemas
-           return (
-             name.includes("pablo") ||
-             name.includes("david") ||
-             name.includes("male") ||
-             name.includes("enrique") ||
-             name.includes("guy")
-           );
-         }
-         if (!isMale && langMatch) {
-           return (
-             name.includes("helena") ||
-             name.includes("laura") ||
-             name.includes("female") ||
-             name.includes("google español")
-           );
-         }
-         return false;
-       }) || voices.find((voice) => voice.lang.startsWith(langCode));
+          if (isMale) {
+            return (
+              name.includes("pablo") ||
+              name.includes("david") ||
+              name.includes("enrique") ||
+              name.includes("male") ||
+              name.includes("guy")
+            );
+          }
+          return (
+            name.includes("helena") ||
+            name.includes("laura") ||
+            name.includes("female") ||
+            name.includes("google español")
+          );
+        }) || voices.find((v) => v.lang.startsWith(langCode));
 
       if (preferredVoice) {
         utterance.voice = preferredVoice;
-        console.log(
-          `🎤 Using voice: ${preferredVoice.name} (${preferredVoice.lang})`
-        );
+        console.log(`🎤 Browser Voice: ${preferredVoice.name}`);
       }
 
       utterance.lang = lang === "es" ? "es-ES" : "en-US";
       utterance.rate = 0.95;
-      utterance.pitch = 1.0;
-      utterance.volume = 1.0;
-
-      utterance.onend = () => {
-        console.log("✅ Web Speech API completed");
-        resolve();
-      };
-
-      utterance.onerror = (event) => {
-        console.error("❌ Web Speech API error:", event.error);
-        reject(new Error(`Web Speech API error: ${event.error}`));
-      };
+      utterance.onend = () => resolve();
+      utterance.onerror = (e) => reject(e);
 
       window.speechSynthesis.speak(utterance);
       setCurrentProvider("webspeech");
     });
   };
 
-  /**
-   * Main speak function with automatic fallback
-   */
   const speak = async (text, lang = "es", options = {}) => {
     try {
       if (window.currentAudio) {
@@ -92,7 +68,11 @@ export const useTTS = () => {
         const response = await fetch("http://localhost:3001/tts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text, language: lang, options }),
+          body: JSON.stringify({
+            text,
+            language: lang,
+            options: options || {},
+          }),
         });
 
         if (response.ok) {
@@ -101,40 +81,31 @@ export const useTTS = () => {
           const audioBlob = new Blob([arrayBuffer], { type: "audio/mpeg" });
           const audioURL = URL.createObjectURL(audioBlob);
           const newAudio = new Audio(audioURL);
-          
-          window.currentAudio = newAudio;
+
+          // ACTUALIZACIÓN DE ESTADO INMEDIATA
           setCurrentProvider(provider);
           setAudio(newAudio);
+          window.currentAudio = newAudio;
 
-          await new Promise((resolve, reject) => {
-            newAudio.onended = () => {
-              URL.revokeObjectURL(audioURL);
-              resolve();
-            };
-            newAudio.onerror = (err) => {
-              URL.revokeObjectURL(audioURL);
-              reject(err);
-            };
+          // Reproducción asíncrona (no bloqueante)
+          newAudio
+            .play()
+            .catch((err) => console.error("Error playing audio:", err));
 
-            const playPromise = newAudio.play();
-            if (playPromise !== undefined) {
-              playPromise.catch((err) => {
-                URL.revokeObjectURL(audioURL);
-                reject(err);
-              });
-            }
-          });
-          
-          console.log(`✅ TTS successful using ${provider} (high quality)`);
-          return;
+          newAudio.onended = () => {
+            URL.revokeObjectURL(audioURL);
+          };
+
+          console.log(`✅ TTS successful using ${provider}`);
+          return; // Salimos exitosamente
         } else {
           console.warn("⚠️ Backend TTS failed. Status:", response.status);
         }
       } catch (fetchError) {
-        console.warn("⚠️ Backend unreachable or error during playback:", fetchError.message);
+        console.warn("⚠️ Backend unreachable:", fetchError.message);
       }
 
-      // IMPORTANTE: Aquí pasamos 'options' para que el género llegue al fallback
+      // FALLBACK
       await speakWithWebSpeech(text, lang, options);
       console.log("✅ Using Web Speech API fallback");
     } catch (err) {

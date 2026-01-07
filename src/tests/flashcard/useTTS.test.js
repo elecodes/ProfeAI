@@ -127,26 +127,28 @@ describe("useTTS", () => {
   });
 
   it("actualiza currentProvider según el proveedor usado", async () => {
-    // Mock de fetch que devuelve el header correctamente
+    // Mock de fetch mejorado
     const mockFetch = vi.spyOn(global, "fetch").mockResolvedValue({
       ok: true,
+      // La clave es que 'headers.get' devuelva el valor correcto
       headers: {
-        get: (key) =>
-          key.toLowerCase() === "x-tts-provider" ? "google" : null,
+        get: vi.fn((key) => {
+          if (key.toLowerCase() === "x-tts-provider") return "google";
+          return null;
+        }),
       },
       arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)),
     });
 
     const { result } = renderHook(() => useTTS());
 
-    // Usamos act para las actualizaciones de estado de React
-    await waitFor(async () => {
-      await result.current.speak("Hello");
-    });
+    // Ejecutamos el habla
+    await result.current.speak("Hello");
 
-    // Esperamos a que el estado cambie
+    // Esperamos la actualización del estado
     await waitFor(
       () => {
+        // Si sigue fallando y da 'webspeech', es que 'ok' fue false o el header falló
         expect(result.current.currentProvider).toBe("google");
       },
       { timeout: 2000 }

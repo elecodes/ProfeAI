@@ -86,7 +86,9 @@ class TTSService {
     const langConfig =
       this.voices.elevenlabs[language] || this.voices.elevenlabs.en;
     const voiceId = langConfig[gender] || langConfig.female;
-
+    
+    console.log(`Using ElevenLabs Voice ID: ${voiceId} (${gender})`);
+    
     const response = await fetch(
       `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
       {
