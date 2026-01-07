@@ -20,7 +20,7 @@ class DialogueGenerator {
       modelName: "gpt-4o-mini", // Cost-effective and fast
       temperature: 0.7,
     });
-    
+
     this.structuredModel = this.model.withStructuredOutput(dialogueSchema);
   }
 
@@ -33,9 +33,10 @@ class DialogueGenerator {
       - The dialogue should have between 4 and 6 lines.
       - Use vocabulary appropriate for the level.
       - Include English translations.
-      - Assign a gender to each speaker for Text-to-Speech purposes.
+      - Assign a gender ("male" or "female") to each speaker.
+      - IMPORTANT: Ensure the speaker's name matches the assigned gender (e.g., Juan = male, Maria = female).
     `;
-
+    
     try {
       const result = await this.structuredModel.invoke(prompt);
       // Add a random ID to the dialogue

@@ -1,22 +1,26 @@
-import { describe, it, expect, vi, beforeEach } from "vitest"; 
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
-import { useTTS } from "../../components/hooks/useTTS"; 
+import { useTTS } from "../../components/hooks/useTTS";
 
 // Mock global para evitar errores de Audio y URL en JSDOM
-global.URL.createObjectURL = vi.fn();
+global.URL.createObjectURL = vi.fn(() => "mock-url");
 global.URL.revokeObjectURL = vi.fn();
-
-// Mock simple de la clase Audio
+global.Blob = vi.fn().mockImplementation((parts, options) => ({
+  parts,
+  options,
+  size: 0,
+  type: options?.type || "",
+}));
 global.Audio = vi.fn().mockImplementation(() => ({
-  play: vi.fn(),
+  play: vi.fn().mockResolvedValue(undefined),
   pause: vi.fn(),
   onended: null,
+  src: "",
 }));
-
 // Mock Web Speech API con callbacks que se ejecutan automáticamente
 let mockUtterance = null;
 
-global.SpeechSynthesisUtterance = vi.fn().mockImplementation((text) => {
+global.SpeechSynthesisUtterance = vi.fn(function (text) {
   mockUtterance = {
     text,
     lang: "es-ES",
@@ -39,6 +43,7 @@ global.speechSynthesis = {
     }, 0);
   }),
   cancel: vi.fn(),
+  getVoices: vi.fn(() => []),
 };
 
 describe("useTTS", () => {
@@ -70,7 +75,7 @@ describe("useTTS", () => {
       "http://localhost:3001/tts",
       expect.objectContaining({
         method: "POST",
-        body: JSON.stringify({ text: "Hello", language: "es" }),
+        body: JSON.stringify({ text: "Hello", language: "es", options: {} }),
       })
     );
 
@@ -91,46 +96,61 @@ describe("useTTS", () => {
     expect(mockFetch).toHaveBeenCalled();
 
     // Verificar que se usó Web Speech API como fallback
-    await waitFor(() => {
-      expect(global.speechSynthesis.speak).toHaveBeenCalled();
-    }, { timeout: 1000 });
+    await waitFor(
+      () => {
+        expect(global.speechSynthesis.speak).toHaveBeenCalled();
+      },
+      { timeout: 1000 }
+    );
 
     mockFetch.mockRestore();
   });
 
   it("hace fallback a Web Speech API cuando el servidor no está disponible", async () => {
-    const mockFetch = vi.spyOn(global, "fetch").mockRejectedValue(
-      new Error("Network error")
-    );
+    const mockFetch = vi
+      .spyOn(global, "fetch")
+      .mockRejectedValue(new Error("Network error"));
 
     const { result } = renderHook(() => useTTS());
 
     await result.current.speak("Hello");
 
     // Verificar que se usó Web Speech API
-    await waitFor(() => {
-      expect(global.speechSynthesis.speak).toHaveBeenCalled();
-    }, { timeout: 1000 });
+    await waitFor(
+      () => {
+        expect(global.speechSynthesis.speak).toHaveBeenCalled();
+      },
+      { timeout: 1000 }
+    );
 
     mockFetch.mockRestore();
   });
 
   it("actualiza currentProvider según el proveedor usado", async () => {
+    // Mock de fetch que devuelve el header correctamente
     const mockFetch = vi.spyOn(global, "fetch").mockResolvedValue({
       ok: true,
       headers: {
-        get: (key) => (key === "X-TTS-Provider" ? "google" : null),
+        get: (key) =>
+          key.toLowerCase() === "x-tts-provider" ? "google" : null,
       },
       arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)),
     });
 
     const { result } = renderHook(() => useTTS());
 
-    await result.current.speak("Hello");
+    // Usamos act para las actualizaciones de estado de React
+    await waitFor(async () => {
+      await result.current.speak("Hello");
+    });
 
-    await waitFor(() => {
-      expect(result.current.currentProvider).toBe("google");
-    }, { timeout: 1000 });
+    // Esperamos a que el estado cambie
+    await waitFor(
+      () => {
+        expect(result.current.currentProvider).toBe("google");
+      },
+      { timeout: 2000 }
+    );
 
     mockFetch.mockRestore();
   });

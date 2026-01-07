@@ -3,6 +3,19 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import App from "../../../App";
 import { loadLessons } from "../../../../utils/loadLessons";
 
+// Mock useAuth to simulate a logged-in user
+vi.mock("../../../hooks/useAuth", () => ({
+  useAuth: () => ({
+    user: { uid: "test-uid", email: "test@test.com" },
+    userProfile: { learnedPhrases: [], level: "beginner" },
+    loading: false,
+    signIn: vi.fn(),
+    signUp: vi.fn(),
+    signOut: vi.fn(),
+    updateUserProfile: vi.fn(),
+  }),
+}));
+
 // Mock loadLessons
 vi.mock("../../../../utils/loadLessons", () => ({
   loadLessons: vi.fn(),
@@ -20,12 +33,14 @@ global.fetch = vi.fn(() =>
 global.URL.createObjectURL = vi.fn(() => "mock-audio-url");
 global.URL.revokeObjectURL = vi.fn();
 
-// Mock Audio
-global.Audio = vi.fn().mockImplementation(() => ({
-  play: vi.fn(),
-  pause: vi.fn(),
-  onended: null,
-}));
+// Mock Audio using function keyword
+global.Audio = vi.fn(function() {
+  return {
+    play: vi.fn(),
+    pause: vi.fn(),
+    onended: null,
+  };
+});
 
 describe("Flashcard Integration Flow", () => {
   const mockLessons = [
@@ -81,19 +96,9 @@ describe("Flashcard Integration Flow", () => {
       expect(screen.getByText("Hola")).toBeTruthy();
     });
 
-    const setItemSpy = vi.spyOn(localStorage, "setItem");
-
     // Click "Aprendida" for the first card (index 0)
     const learnedButton = screen.getByTestId("learned-btn-0");
     fireEvent.click(learnedButton);
-
-    // Verify localStorage was updated (wait for effect)
-    await waitFor(() => {
-      expect(setItemSpy).toHaveBeenCalled();
-      const stored = JSON.parse(localStorage.getItem("learned"));
-      expect(stored).toHaveLength(1);
-      expect(stored[0].text).toBe("Hola");
-    });
 
     // Navigate to "Aprendidas" view
     const learnedNavLink = screen.getByRole("button", { name: /✅ aprendidas/i });

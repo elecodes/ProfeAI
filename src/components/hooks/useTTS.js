@@ -7,38 +7,58 @@ export const useTTS = () => {
   /**
    * Fallback to Web Speech API (browser native TTS)
    */
-  const speakWithWebSpeech = (text, lang = "es") => {
+  const speakWithWebSpeech = (text, lang = "es", options = {}) => {
     return new Promise((resolve, reject) => {
       if (!window.speechSynthesis) {
         reject(new Error("Web Speech API not supported in this browser"));
         return;
       }
 
-      // Cancel any ongoing speech
       window.speechSynthesis.cancel();
-
       const utterance = new SpeechSynthesisUtterance(text);
-      
-      // Select best voice for the language
       const voices = window.speechSynthesis.getVoices();
-      const langCode = lang === "es" ? "es" : "en";
+
+      // Lógica de género
       
-      // Try to find a high-quality voice for the language
-      const preferredVoice = voices.find(voice => 
-        voice.lang.startsWith(langCode) && 
-        (voice.name.includes("Premium") || 
-         voice.name.includes("Enhanced") ||
-         voice.name.includes("Google") ||
-         voice.name.includes("Microsoft"))
-      ) || voices.find(voice => voice.lang.startsWith(langCode));
-      
+
+     const isMale = options.gender === "male";
+     const langCode = lang.startsWith("es") ? "es" : "en";
+
+     const preferredVoice =
+       voices.find((voice) => {
+         const name = voice.name.toLowerCase();
+         const langMatch = voice.lang.startsWith(langCode);
+
+         if (isMale && langMatch) {
+           // Buscamos nombres de voces masculinas comunes en sistemas
+           return (
+             name.includes("pablo") ||
+             name.includes("david") ||
+             name.includes("male") ||
+             name.includes("enrique") ||
+             name.includes("guy")
+           );
+         }
+         if (!isMale && langMatch) {
+           return (
+             name.includes("helena") ||
+             name.includes("laura") ||
+             name.includes("female") ||
+             name.includes("google español")
+           );
+         }
+         return false;
+       }) || voices.find((voice) => voice.lang.startsWith(langCode));
+
       if (preferredVoice) {
         utterance.voice = preferredVoice;
-        console.log(`🎤 Using voice: ${preferredVoice.name} (${preferredVoice.lang})`);
+        console.log(
+          `🎤 Using voice: ${preferredVoice.name} (${preferredVoice.lang})`
+        );
       }
-      
+
       utterance.lang = lang === "es" ? "es-ES" : "en-US";
-      utterance.rate = 0.95; // Slightly slower for better clarity
+      utterance.rate = 0.95;
       utterance.pitch = 1.0;
       utterance.volume = 1.0;
 
@@ -62,13 +82,11 @@ export const useTTS = () => {
    */
   const speak = async (text, lang = "es", options = {}) => {
     try {
-      // Stop any currently playing audio
       if (window.currentAudio) {
         window.currentAudio.pause();
         window.currentAudio = null;
       }
 
-      // Try backend providers first (ElevenLabs → Google Cloud)
       try {
         console.log("🎙️ Attempting backend TTS...");
         const response = await fetch("http://localhost:3001/tts", {
@@ -78,48 +96,52 @@ export const useTTS = () => {
         });
 
         if (response.ok) {
-          // Get provider from response headers
           const provider = response.headers.get("X-TTS-Provider") || "unknown";
-          setCurrentProvider(provider);
-
           const arrayBuffer = await response.arrayBuffer();
           const audioBlob = new Blob([arrayBuffer], { type: "audio/mpeg" });
           const audioURL = URL.createObjectURL(audioBlob);
-
           const newAudio = new Audio(audioURL);
+          
           window.currentAudio = newAudio;
-
-          newAudio.play();
-          newAudio.onended = () => URL.revokeObjectURL(audioURL);
-
+          setCurrentProvider(provider);
           setAudio(newAudio);
+
+          await new Promise((resolve, reject) => {
+            newAudio.onended = () => {
+              URL.revokeObjectURL(audioURL);
+              resolve();
+            };
+            newAudio.onerror = (err) => {
+              URL.revokeObjectURL(audioURL);
+              reject(err);
+            };
+
+            const playPromise = newAudio.play();
+            if (playPromise !== undefined) {
+              playPromise.catch((err) => {
+                URL.revokeObjectURL(audioURL);
+                reject(err);
+              });
+            }
+          });
+          
           console.log(`✅ TTS successful using ${provider} (high quality)`);
           return;
         } else {
-          // Backend failed, try Web Speech API
-          const errorData = await response.json();
-          console.warn("⚠️ Backend TTS failed:", errorData.message);
-          console.log("🔄 Falling back to Web Speech API...");
+          console.warn("⚠️ Backend TTS failed. Status:", response.status);
         }
       } catch (fetchError) {
-        // Network error or server down
-        console.warn("⚠️ Backend unreachable:", fetchError.message);
-        console.log("🔄 Falling back to Web Speech API...");
+        console.warn("⚠️ Backend unreachable or error during playback:", fetchError.message);
       }
 
-      // Fallback to Web Speech API
-      await speakWithWebSpeech(text, lang);
-      console.log("✅ Using Web Speech API fallback (browser voice)");
-
+      // IMPORTANTE: Aquí pasamos 'options' para que el género llegue al fallback
+      await speakWithWebSpeech(text, lang, options);
+      console.log("✅ Using Web Speech API fallback");
     } catch (err) {
       console.error("❌ All TTS methods failed:", err);
       setCurrentProvider("failed");
     }
   };
 
-  return { 
-    speak, 
-    audio, 
-    currentProvider 
-  };
+  return { speak, audio, currentProvider };
 };

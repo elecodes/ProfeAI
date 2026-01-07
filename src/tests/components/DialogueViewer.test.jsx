@@ -30,7 +30,7 @@ describe("DialogueViewer", () => {
     render(<DialogueViewer dialogue={mockDialogue} />);
     const audioButtons = screen.getAllByTitle("Escuchar");
     fireEvent.click(audioButtons[0]);
-    expect(mockSpeak).toHaveBeenCalledWith("Hello", "es");
+    expect(mockSpeak).toHaveBeenCalledWith("Hello", "es", { gender: undefined });
   });
 
   it("toggles translation visibility", () => {

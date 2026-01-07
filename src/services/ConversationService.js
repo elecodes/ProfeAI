@@ -1,22 +1,34 @@
 import { ChatOpenAI } from "@langchain/openai";
-import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts";
+import {
+  ChatPromptTemplate,
+  MessagesPlaceholder,
+} from "@langchain/core/prompts";
 import { RunnableWithMessageHistory } from "@langchain/core/runnables";
 import { InMemoryChatMessageHistory } from "@langchain/core/chat_history";
+import { z } from "zod"; // Importante para la estructura
 import { env } from "../config/env.js";
+
+// Definimos la estructura de la respuesta
+const responseSchema = z.object({
+  text: z.string().describe("The response text in Spanish"),
+  gender: z
+    .enum(["male", "female"])
+    .describe("The gender of the character speaking"),
+});
 
 class ConversationService {
   constructor() {
     this.model = new ChatOpenAI({
       openAIApiKey: env.OPENAI_API_KEY,
-      modelName: "gpt-4o-mini", // Cost-effective and fast
+      modelName: "gpt-4o-mini",
       temperature: 0.7,
     });
 
-    // Store message histories by session ID
+    // Vinculamos el modelo a la salida estructurada
+    this.structuredModel = this.model.withStructuredOutput(responseSchema);
     this.messageHistories = new Map();
   }
 
-  // Helper to get history for a session
   getHistory(sessionId) {
     if (!this.messageHistories.has(sessionId)) {
       this.messageHistories.set(sessionId, new InMemoryChatMessageHistory());
@@ -24,30 +36,20 @@ class ConversationService {
     return this.messageHistories.get(sessionId);
   }
 
-  /**
-   * Starts a new conversation or resets an existing one.
-   * @param {string} sessionId - Unique session ID
-   * @param {string} topic - Conversation topic (e.g., "At the Restaurant")
-   * @param {string} level - User level (e.g., "Intermediate")
-   */
   async startConversation(sessionId, topic, level) {
-    // Reset history for this session
     this.messageHistories.set(sessionId, new InMemoryChatMessageHistory());
 
-    // Define the persona and instructions
-    const systemTemplate = `You are a helpful language tutor roleplaying a scenario.
-    
+    const systemTemplate = `You are a language tutor roleplaying a scenario.
     SCENARIO: {topic}
     USER LEVEL: {level}
     
     INSTRUCTIONS:
-    1. Act as a character appropriate for the scenario (e.g., waiter for restaurant).
-    2. Keep your responses concise (1-2 sentences) to encourage conversation.
-    3. Adjust your vocabulary to match the user's level ({level}).
-    4. If the user makes a mistake, DO NOT correct them immediately. Just continue the flow naturally.
-    5. Start the conversation by greeting the user in character.
+    1. Act as a character appropriate for the scenario.
+    2. Respond in Spanish.
+    3. Keep responses concise (1-2 sentences).
+    4. You MUST assign yourself a gender ("male" or "female") based on your character.
     
-    Language: Spanish (Target) but you can understand English if the user is stuck.`;
+    Example: If you are a waiter named Juan, your gender is "male".`;
 
     const prompt = ChatPromptTemplate.fromMessages([
       ["system", systemTemplate],
@@ -55,52 +57,28 @@ class ConversationService {
       ["human", "{input}"],
     ]);
 
-    // Create the chain with history
+    // Usamos el structuredModel aquí
     this.chain = new RunnableWithMessageHistory({
-      runnable: prompt.pipe(this.model),
+      runnable: prompt.pipe(this.structuredModel),
       getMessageHistory: (sessionId) => this.getHistory(sessionId),
       inputMessagesKey: "input",
       historyMessagesKey: "history",
     });
 
-    // Generate the initial greeting (empty input to trigger system prompt context)
-    // We simulate a "start" signal or just ask the AI to start.
-    // Actually, usually we wait for user input, but for roleplay, AI often starts.
-    // Let's invoke it with a hidden instruction to start.
-    const response = await this.chain.invoke(
-      {
-        topic,
-        level,
-        input: "(System: Start the conversation now as your character)",
-      },
+    return await this.chain.invoke(
+      { topic, level, input: "Start the conversation and introduce yourself." },
       { configurable: { sessionId } }
     );
-
-    return response.content;
   }
 
-  /**
-   * Sends a user message and gets the AI response.
-   * @param {string} sessionId 
-   * @param {string} message 
-   * @param {string} topic - Needed for the prompt template context
-   * @param {string} level - Needed for the prompt template context
-   */
   async sendMessage(sessionId, message, topic, level) {
-    if (!this.chain) {
-      throw new Error("Conversation not initialized. Call startConversation first.");
-    }
+    if (!this.chain) throw new Error("Conversation not initialized.");
 
-    const response = await this.chain.invoke(
-      {
-        topic,
-        level,
-        input: message,
-      },
+    // Esto devolverá directamente { text: "...", gender: "..." }
+    return await this.chain.invoke(
+      { topic, level, input: message },
       { configurable: { sessionId } }
     );
-
-    return response.content;
   }
 }
 

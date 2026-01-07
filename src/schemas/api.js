@@ -7,11 +7,14 @@ export const generateDialogueSchema = z.object({
 
 export const ttsSchema = z.object({
   text: z.string().min(1, "Text is required"),
-  language: z.string().optional().default("es"),
-  options: z.object({
-    gender: z.enum(["male", "female"]).optional(),
-    speed: z.number().optional(),
-  }).optional(),
+  language: z.string().optional(), // Más flexible
+  options: z
+    .object({
+      gender: z.string().optional(), // Cambiamos enum por string para evitar errores de validación si llega vacío
+      speed: z.number().optional(),
+    })
+    .optional()
+    .default({}), // Valor por defecto para que no sea undefined
 });
 
 export const grammarAnalysisSchema = z.object({

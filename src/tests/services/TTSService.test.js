@@ -1,8 +1,37 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import TTSService from "../../services/TTSService.js";
+import fetch from "node-fetch";
 
-// Mock fetch for ElevenLabs
-global.fetch = vi.fn();
+// Set environment variables FIRST before importing anything
+process.env.ELEVENLABS_API_KEY = "test-elevenlabs-key";
+process.env.GOOGLE_CLOUD_API_KEY = "test-google-key";
+process.env.AWS_ACCESS_KEY_ID = "test-aws-key";
+process.env.AWS_SECRET_ACCESS_KEY = "test-aws-secret";
+process.env.AWS_REGION = "us-east-1";
+
+vi.mock("node-fetch", () => ({
+  __esModule: true,
+  default: vi.fn(),
+}));
+
+// Mock AWS Polly
+const mockPollyClient = {
+  send: vi.fn().mockResolvedValue({
+    AudioStream: {
+      transformToByteArray: vi
+        .fn()
+        .mockResolvedValue(Buffer.from("mock-polly-audio")),
+    },
+  }),
+};
+
+vi.mock("@aws-sdk/client-polly", () => {
+  return {
+    PollyClient: vi.fn(function () {
+      return mockPollyClient;
+    }),
+    SynthesizeSpeechCommand: vi.fn(),
+  };
+});
 
 // Mock Google Cloud TTS
 vi.mock("@google-cloud/text-to-speech", () => ({
@@ -17,51 +46,65 @@ vi.mock("@google-cloud/text-to-speech", () => ({
   },
 }));
 
+// NOW import TTSService after all mocks are set up
+import TTSService from "../../services/TTSService.js";
+
 describe("TTSService", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+  beforeEach(async () => {
+    vi.restoreAllMocks();
+    // Re-initialize the singleton state before each test for isolation
+    TTSService.initialized = false;
+    await TTSService._ensureInitialized();
   });
 
   describe("generateWithElevenLabs", () => {
     it("genera audio exitosamente con ElevenLabs", async () => {
       const mockArrayBuffer = new ArrayBuffer(8);
-      
-      global.fetch.mockResolvedValue({
-        ok: true,
-        arrayBuffer: () => Promise.resolve(mockArrayBuffer),
-      });
+
+      fetch.mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          arrayBuffer: () => Promise.resolve(mockArrayBuffer),
+        })
+      );
 
       const result = await TTSService.generateWithElevenLabs("Hello", "en");
 
       expect(result.provider).toBe("elevenlabs");
       expect(result.contentType).toBe("audio/mpeg");
-      expect(result.audioBuffer).toBe(mockArrayBuffer);
+      expect(result.audioBuffer).toEqual(Buffer.from(mockArrayBuffer));
     });
 
     it("lanza error cuando falta la API key", async () => {
+      // This test should throw before fetch is called.
+      // Add a defensive mock to ensure fetch is not the cause of the failure.
+      fetch.mockImplementation(() => {
+        throw new Error("FETCH SHOULD NOT BE CALLED IN THIS TEST");
+      });
+
       const originalKey = TTSService.elevenLabsKey;
       TTSService.elevenLabsKey = null;
 
       await expect(
         TTSService.generateWithElevenLabs("Hello", "en")
-      ).rejects.toThrow("ElevenLabs API key not configured");
+      ).rejects.toThrow("ElevenLabs not configured");
 
       TTSService.elevenLabsKey = originalKey;
     });
 
     it("detecta error de cuota excedida", async () => {
-      global.fetch.mockResolvedValue({
-        ok: false,
-        text: () =>
-          Promise.resolve(
-            JSON.stringify({
+      fetch.mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: false,
+          json: () =>
+            Promise.resolve({
               detail: {
                 status: "quota_exceeded",
                 message: "Quota exceeded",
               },
-            })
-          ),
-      });
+            }),
+        })
+      );
 
       await expect(
         TTSService.generateWithElevenLabs("Hello", "en")
@@ -71,71 +114,66 @@ describe("TTSService", () => {
 
   describe("generateSpeech (fallback logic)", () => {
     it("intenta ElevenLabs primero cuando está disponible", async () => {
-      const mockArrayBuffer = new ArrayBuffer(8);
-      
-      global.fetch.mockResolvedValue({
+      // Mock a successful ElevenLabs response
+      fetch.mockResolvedValueOnce({
         ok: true,
-        arrayBuffer: () => Promise.resolve(mockArrayBuffer),
+        arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)),
       });
 
       const result = await TTSService.generateSpeech("Hello", "en");
 
       expect(result.provider).toBe("elevenlabs");
-      expect(global.fetch).toHaveBeenCalled();
+      expect(result.contentType).toBe("audio/mpeg");
     });
 
-    it("hace fallback a Google Cloud cuando ElevenLabs falla", async () => {
+    it("hace fallback a Polly cuando ElevenLabs falla", async () => {
       // Simular que ElevenLabs falla
-      global.fetch.mockResolvedValue({
+      fetch.mockResolvedValueOnce({
         ok: false,
-        text: () => Promise.resolve(JSON.stringify({ error: "Failed" })),
+        json: () => Promise.resolve({ message: "Something went wrong" }),
       });
 
-      // Mock Google Client disponible
-      const originalClient = TTSService.googleClient;
-      TTSService.googleClient = {
-        synthesizeSpeech: vi.fn().mockResolvedValue([
-          {
-            audioContent: Buffer.from("google-audio"),
-          },
-        ]),
-      };
-
+      // Polly should be used as fallback
       const result = await TTSService.generateSpeech("Hello", "en");
 
-      expect(result.provider).toBe("google");
-      expect(TTSService.googleClient.synthesizeSpeech).toHaveBeenCalled();
-
-      TTSService.googleClient = originalClient;
+      expect(result.provider).toBe("polly");
     });
 
     it("lanza error cuando todos los proveedores fallan", async () => {
-      // Simular que ElevenLabs falla
-      global.fetch.mockResolvedValue({
-        ok: false,
-        text: () => Promise.resolve(JSON.stringify({ error: "Failed" })),
+      // This test should never call fetch.
+      fetch.mockImplementation(() => {
+        throw new Error("FETCH SHOULD NOT BE CALLED IN THIS TEST");
       });
 
-      // Simular que Google Cloud no está disponible
-      const originalClient = TTSService.googleClient;
-      TTSService.googleClient = null;
+      // Simular que todos los proveedores fallan
+      const originalPolly = TTSService.pollyClient;
+      const originalElevenLabs = TTSService.elevenLabsKey;
+      const originalGoogle = TTSService.googleApiKey;
+
+      TTSService.pollyClient = null;
+      TTSService.elevenLabsKey = null;
+      TTSService.googleApiKey = null;
 
       await expect(TTSService.generateSpeech("Hello", "en")).rejects.toThrow(
-        "All TTS providers failed"
+        /Todos los proveedores fallaron/
       );
 
-      TTSService.googleClient = originalClient;
+      TTSService.pollyClient = originalPolly;
+      TTSService.elevenLabsKey = originalElevenLabs;
+      TTSService.googleApiKey = originalGoogle;
     });
   });
 
   describe("getProviderStatus", () => {
-    it("retorna el estado de los proveedores", () => {
-      const status = TTSService.getProviderStatus();
+    it("retorna el estado de los proveedores", async () => {
+      const status = await TTSService.getProviderStatus();
 
+      expect(status).toHaveProperty("polly");
       expect(status).toHaveProperty("elevenlabs");
       expect(status).toHaveProperty("google");
       expect(status).toHaveProperty("webSpeech");
       expect(status.webSpeech).toBe(true);
+      expect(status.polly).toBe(true);
     });
   });
 });
