@@ -5,18 +5,22 @@ import { useTTS } from "../../components/hooks/useTTS";
 // Mock global para evitar errores de Audio y URL en JSDOM
 global.URL.createObjectURL = vi.fn(() => "mock-url");
 global.URL.revokeObjectURL = vi.fn();
-global.Blob = vi.fn().mockImplementation((parts, options) => ({
-  parts,
-  options,
-  size: 0,
-  type: options?.type || "",
-}));
-global.Audio = vi.fn().mockImplementation(() => ({
-  play: vi.fn().mockResolvedValue(undefined),
-  pause: vi.fn(),
-  onended: null,
-  src: "",
-}));
+global.Blob = vi.fn().mockImplementation(function (parts, options) {
+  return {
+    parts,
+    options,
+    size: 0,
+    type: options?.type || "",
+  };
+});
+global.Audio = vi.fn().mockImplementation(function () {
+  return {
+    play: vi.fn().mockResolvedValue(undefined),
+    pause: vi.fn(),
+    onended: null,
+    src: "",
+  };
+});
 // Mock Web Speech API con callbacks que se ejecutan automáticamente
 let mockUtterance = null;
 
@@ -43,7 +47,10 @@ global.speechSynthesis = {
     }, 0);
   }),
   cancel: vi.fn(),
-  getVoices: vi.fn(() => []),
+  getVoices: vi.fn(() => [
+    { name: "Google US English", lang: "en-US", default: true },
+    { name: "Google español", lang: "es-ES", default: false },
+  ]),
 };
 
 describe("useTTS", () => {

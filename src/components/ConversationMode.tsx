@@ -1,24 +1,31 @@
 import React, { useState, useEffect, useRef } from "react";
 import GrammarReport from "./GrammarReport";
 import { useTTS } from "./hooks/useTTS"; 
+import { ChatMessage } from "../types/chat";
 
-const ConversationMode = ({ topic: initialTopic, level, onBack }) => {
+interface Props {
+  topic: string;
+  level: string;
+  onBack: () => void;
+}
+
+const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack }) => {
   const { speak } = useTTS(); 
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [showReport, setShowReport] = useState(false);
-  const [grammarReport, setGrammarReport] = useState(null);
-  const [showTopicSelector, setShowTopicSelector] = useState(false);
-  const [newTopic, setNewTopic] = useState("");
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [input, setInput] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [showReport, setShowReport] = useState<boolean>(false);
+  const [grammarReport, setGrammarReport] = useState<any>(null);
+  const [showTopicSelector, setShowTopicSelector] = useState<boolean>(false);
+  const [newTopic, setNewTopic] = useState<string>("");
   
-  const [currentTopic, setCurrentTopic] = useState(initialTopic);
-  const [currentSessionId, setCurrentSessionId] = useState(() => 
+  const [currentTopic, setCurrentTopic] = useState<string>(initialTopic);
+  const [currentSessionId, setCurrentSessionId] = useState<string>(() => 
     Math.random().toString(36).substring(7)
   );
 
-  const messagesEndRef = useRef(null);
-  const fetchingRef = useRef(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fetchingRef = useRef<boolean>(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -67,7 +74,7 @@ const ConversationMode = ({ topic: initialTopic, level, onBack }) => {
         console.error("Chat Error:", error);
         let errorMsg = "Hubo un problema al conectar con el tutor.";
         
-        if (error.message === "LIMITE_CUOTA") {
+        if (error instanceof Error && error.message === "LIMITE_CUOTA") {
           errorMsg = "⚠️ Has alcanzado el límite de mensajes gratuitos por hoy (200/día). Por favor, intenta de nuevo mañana o añade crédito a tu cuenta de OpenAI.";
         }
         
@@ -81,7 +88,7 @@ const ConversationMode = ({ topic: initialTopic, level, onBack }) => {
     startChat();
   }, [currentTopic, level, currentSessionId]);
 
-  const handleSend = async (e) => {
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
@@ -115,7 +122,7 @@ const ConversationMode = ({ topic: initialTopic, level, onBack }) => {
 
     } catch (error) {
       let errorMsg = "No pude enviarte la respuesta.";
-      if (error.message === "LIMITE_CUOTA") {
+      if (error instanceof Error && error.message === "LIMITE_CUOTA") {
         errorMsg = "⚠️ Límite de mensajes alcanzado. No puedo responder más por hoy.";
       }
       setMessages(prev => [...prev, { role: "ai", content: errorMsg }]);
@@ -150,10 +157,10 @@ const ConversationMode = ({ topic: initialTopic, level, onBack }) => {
               <input
                 type="text"
                 value={newTopic}
-                onChange={(e) => setNewTopic(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewTopic(e.target.value)}
                 placeholder="Ej: 'Pedir comida en un restaurante', 'Hablar de mis hobbies'..."
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none"
-                onKeyDown={(e) => e.key === 'Enter' && handleNewCustomConversation()}
+                onKeyDown={(e: React.KeyboardEvent) => e.key === 'Enter' && handleNewCustomConversation()}
               />
             </div>
 
@@ -220,7 +227,7 @@ const ConversationMode = ({ topic: initialTopic, level, onBack }) => {
         <input
           type="text"
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
           placeholder="Escribe tu respuesta en español..."
           className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           disabled={isLoading}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Suspense } from "react";
 import { loadLessons } from "../utils/loadLessons.js";
-import { useTTS } from "./components/hooks/useTTS.jsx";
+import { useTTS } from "./components/hooks/useTTS";
 // Lazy load components
 const AuthForm = React.lazy(() => import("./components/auth/AuthForm"));
 const DialogueViewer = React.lazy(() => import("./components/DialogueViewer"));
@@ -12,6 +12,37 @@ import UserService from "./services/UserService";
 import { AGENT_IDS } from "./config/agents";
 import { dialogues } from "./lessons/dialogues";
 import * as Sentry from "@sentry/react";
+
+interface Phrase {
+  text: string;
+  translation: string;
+}
+
+interface Lesson {
+  week: number;
+  weekName: string;
+  items: Phrase[];
+  locked?: boolean;
+}
+
+interface UserProfile {
+  level?: string;
+  learnedPhrases?: Phrase[];
+  createdAt?: any;
+  [key: string]: any;
+}
+
+// Define User type to fix missing property errors
+interface User {
+  uid: string;
+  email: string;
+  displayName?: string;
+}
+
+// Helper to access dialogues safely
+const getDialoguesForLevel = (level: string) => {
+  return (dialogues as any)[level] || [];
+};
 
 // Simple Loading Component
 const Loading = () => (
@@ -27,20 +58,20 @@ function App() {
   // Voice debugging removed - voices now work automatically
 
   // App State
-  const [nivel, setNivel] = useState("beginner");
-  const [tema, setTema] = useState("");
-  const [temasDisponibles, setTemasDisponibles] = useState([]);
-  const [frases, setFrases] = useState([]);
-  const [learned, setLearned] = useState([]);
-  const [mode, setMode] = useState("study"); // study, learned, quiz, conversation, dialogues
-  const [showTranslation, setShowTranslation] = useState({});
-  const [quizIndex, setQuizIndex] = useState(0);
-  const [quizScore, setQuizScore] = useState(0);
-  const [quizCompleted, setQuizCompleted] = useState(false);
-  const [quizOptions, setQuizOptions] = useState([]);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [selectedDialogue, setSelectedDialogue] = useState(null);
-  const [showGenerator, setShowGenerator] = useState(false);
+  const [nivel, setNivel] = useState<string>("beginner");
+  const [tema, setTema] = useState<string>("");
+  const [temasDisponibles, setTemasDisponibles] = useState<Lesson[]>([]);
+  const [frases, setFrases] = useState<Phrase[]>([]);
+  const [learned, setLearned] = useState<Phrase[]>([]);
+  const [mode, setMode] = useState<string>("study"); // study, learned, quiz, conversation, dialogues
+  const [showTranslation, setShowTranslation] = useState<Record<number, boolean>>({});
+  const [quizIndex, setQuizIndex] = useState<number>(0);
+  const [quizScore, setQuizScore] = useState<number>(0);
+  const [quizCompleted, setQuizCompleted] = useState<boolean>(false);
+  const [quizOptions, setQuizOptions] = useState<string[]>([]);
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
+  const [selectedDialogue, setSelectedDialogue] = useState<any>(null); // Type this better if possible
+  const [showGenerator, setShowGenerator] = useState<boolean>(false);
 
   // Track navigation in Sentry
   useEffect(() => {
@@ -59,16 +90,16 @@ function App() {
   // Use TTS hook with automatic fallback
   const { speak } = useTTS();
 
-  const speakText = (text, language) => {
+  const speakText = (text: string, language: string) => {
     speak(text, language);
   };
 
   // === Auth Handlers ===
-  const handleSignIn = async (formData) => {
+  const handleSignIn = async (formData: any) => {
     await signIn(formData.email, formData.password);
   };
 
-  const handleSignUp = async (formData) => {
+  const handleSignUp = async (formData: any) => {
     await signUp(formData.email, formData.password);
   };
 
@@ -81,15 +112,15 @@ function App() {
   // === Sync with User Profile ===
   useEffect(() => {
     if (userProfile) {
-      if (userProfile.level) setNivel(userProfile.level);
-      if (userProfile.learnedPhrases) setLearned(userProfile.learnedPhrases);
+      if ((userProfile as any).level) setNivel((userProfile as any).level);
+      if ((userProfile as any).learnedPhrases) setLearned((userProfile as any).learnedPhrases);
     }
   }, [userProfile]);
 
   // === Update selected dialogue when level changes ===
   useEffect(() => {
     if (mode === "dialogues") {
-      const levelDialogues = dialogues[nivel] || [];
+      const levelDialogues = getDialoguesForLevel(nivel);
       if (levelDialogues.length > 0) {
         setSelectedDialogue(levelDialogues[0]);
       } else {
@@ -106,11 +137,11 @@ function App() {
       const todasLasSemanas = await loadLessons(nivel);
       
       // Sort by week number if available
-      todasLasSemanas.sort((a, b) => (a.week || 99) - (b.week || 99));
+      todasLasSemanas.sort((a: any, b: any) => (a.week || 99) - (b.week || 99));
 
       // Filter based on unlocked weeks
       let unlockedCount = 1;
-      if (userProfile && userProfile.createdAt) {
+      if (userProfile && (userProfile as any).createdAt) {
         unlockedCount = UserService.getUnlockedWeeks(userProfile);
       }
 
@@ -154,14 +185,14 @@ function App() {
     };
   }, []);
 
-  const handleMarkLearned = async (sentence) => {
+  const handleMarkLearned = async (sentence: Phrase) => {
     // Optimistic update
     const newLearned = [...learned, sentence];
     setLearned(newLearned);
     
     // Save to Firestore
     if (user) {
-      await UserService.addLearnedPhrase(user.uid, sentence);
+      await UserService.addLearnedPhrase((user as any).uid, sentence);
     }
   };
 
@@ -169,18 +200,18 @@ function App() {
   const handleClearLearned = async () => {
     setLearned([]);
     if (user) {
-      await UserService.updateUserProgress(user.uid, { learnedPhrases: [] });
+      await UserService.updateUserProgress((user as any).uid, { learnedPhrases: [] });
     }
   };
 
-  const handleToggleTranslation = (index) => {
-    setShowTranslation((prev) => ({
+  const handleToggleTranslation = (index: number) => {
+    setShowTranslation((prev: Record<number, boolean>) => ({
       ...prev,
       [index]: !prev[index],
     }));
   };
 
-  const handleDialogueGenerated = (newDialogue) => {
+  const handleDialogueGenerated = (newDialogue: any) => {
     setSelectedDialogue(newDialogue);
     setShowGenerator(false);
   };
@@ -195,7 +226,7 @@ function App() {
     generateOptions(0);
   };
 
-  const generateOptions = (index) => {
+  const generateOptions = (index: number) => {
     const correct = frases[index].translation;
     const wrong = frases
       .filter((_, i) => i !== index)
@@ -205,7 +236,7 @@ function App() {
     setQuizOptions([...wrong, correct].sort(() => 0.5 - Math.random()));
   };
 
-  const handleAnswer = async (option) => {
+  const handleAnswer = async (option: string) => {
     const correct = frases[quizIndex].translation;
     let newScore = quizScore;
     if (option === correct) {
@@ -221,7 +252,7 @@ function App() {
       setQuizCompleted(true);
       // Save quiz result to history
       if (user) {
-        await UserService.recordSession(user.uid, {
+        await UserService.recordSession((user as any).uid, {
           type: "quiz",
           score: newScore,
           total: frases.length,
@@ -324,7 +355,7 @@ function App() {
         {sidebarOpen && user && (
           <div className="mt-auto pt-4 border-t border-gray-200">
             <p className="text-sm text-gray-600 mb-2 truncate">
-              👤 {user.displayName || user.email}
+              👤 {(user as any).displayName || (user as any).email}
             </p>
             <button
               onClick={handleLogout}
@@ -355,7 +386,7 @@ function App() {
               value={nivel}
               onChange={(e) => {
                 setNivel(e.target.value);
-                if (user) UserService.updateUserProgress(user.uid, { level: e.target.value });
+                if (user) UserService.updateUserProgress((user as any).uid, { level: e.target.value });
               }}
               className="border rounded-lg px-2 py-1"
             >
@@ -394,13 +425,13 @@ function App() {
                     id="dialogue"
                     value={selectedDialogue?.id || ""}
                     onChange={(e) => {
-                      const d = dialogues[nivel]?.find(d => d.id === e.target.value);
+                      const d = getDialoguesForLevel(nivel).find((d: any) => d.id === e.target.value);
                       setSelectedDialogue(d);
                       setShowGenerator(false);
                     }}
                     className="border rounded-lg px-2 py-1"
                   >
-                    {(dialogues[nivel] || []).map((d) => (
+                    {getDialoguesForLevel(nivel).map((d: any) => (
                       <option key={d.id} value={d.id}>
                         {d.title}
                       </option>

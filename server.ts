@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import cors from "cors";
 import helmet from "helmet";
 
@@ -14,7 +14,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 import DialogueGenerator from "./src/services/DialogueGenerator.js";
-import ConversationService from "./src/services/ConversationService.js";
+import ConversationService from "./src/services/ConversationService.ts";
+// @ts-ignore
 import GrammarService from "./src/services/GrammarService.js";
 import { validate } from "./src/middleware/validate.js";
 import {
@@ -23,7 +24,7 @@ import {
   grammarAnalysisSchema,
 } from "./src/schemas/api.js";
 
-const app = express();
+const app: express.Application = express();
 const PORT = process.env.PORT || 3001;
 
 // Middleware
@@ -55,7 +56,7 @@ app.use(express.json());
 // --- Routes ---
 
 // 1. Chat / Roleplay Endpoints
-app.post("/api/chat/start", async (req, res) => {
+app.post("/api/chat/start", async (req: Request, res: Response) => {
   try {
     const { topic, level, sessionId } = req.body;
     // Simple validation
@@ -83,7 +84,7 @@ app.post("/api/chat/start", async (req, res) => {
     const finalResponse = { ...safeReply, gender: "male" };
 
     res.json({ message: finalResponse });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error starting chat:", error);
     if (error.response) {
        console.error("OpenAI API Error details:", error.response.data);
@@ -92,7 +93,7 @@ app.post("/api/chat/start", async (req, res) => {
   }
 });
 
-app.post("/api/chat/message", async (req, res) => {
+app.post("/api/chat/message", async (req: Request, res: Response) => {
   try {
     const { message, sessionId, topic, level } = req.body;
     if (!message || !sessionId) {
@@ -128,14 +129,14 @@ app.post("/api/chat/message", async (req, res) => {
 app.post(
   "/api/grammar/analyze",
   validate(grammarAnalysisSchema),
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     try {
       const { text, context } = req.body;
       // Validation handled by middleware
 
       const report = await GrammarService.analyze(text, context);
       res.json(report);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error analyzing grammar:", error);
       res.status(500).json({ error: "Failed to analyze grammar" });
     }
@@ -148,13 +149,13 @@ app.use(express.static(path.join(__dirname, "dist")));
 app.post(
   "/api/generate-dialogue",
   validate(generateDialogueSchema),
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     try {
       const { topic, level } = req.body;
       // Validation handled by middleware, so topic is guaranteed to exist
 
       console.log(`✨ Generating dialogue: "${topic}" (${level})`);
-      const dialogue = await DialogueGenerator.generate(topic, level);
+      const dialogue: any = await DialogueGenerator.generate(topic, level);
 
       // Assign genders to speakers to ensure voice variety
       if (
@@ -166,28 +167,29 @@ app.post(
         const speakers = [
           ...new Set(
             dialogue.conversation
-              .map((t) => t.speaker)
-              .filter((s) => typeof s === "string")
+              .map((t: any) => t.speaker)
+              .filter((s: any) => typeof s === "string")
           ),
         ];
-        const speakerGenders = {};
+        const speakerGenders: Record<string, string> = {};
 
-        speakers.forEach((speaker) => {
+        speakers.forEach((speaker: unknown) => {
+           const spk = speaker as string;
           // Detect gender based on name heuristic
           // Clean name: remove parens, trim to avoid issues with "Maria (Cliente)"
-          const name = speaker
+          const name = spk
             .toLowerCase()
-            .replace(/[\(\[].*?[\)\]]/g, "")
+            .replace(/[([].*?[)\]]/g, "")
             .trim();
           // Ends in 'a' -> Female (Ana, Maria), Others -> Male (Juan, Carlos)
           const isFemale =
             name.endsWith("a") ||
             ["carmen", "isabel", "raquel", "beatriz"].includes(name);
 
-          speakerGenders[speaker] = isFemale ? "female" : "male";
+          speakerGenders[spk] = isFemale ? "female" : "male";
         });
 
-        dialogue.conversation = dialogue.conversation.map((turn) => ({
+        dialogue.conversation = dialogue.conversation.map((turn: any) => ({
           ...turn,
           gender:
             turn.speaker && speakerGenders[turn.speaker]
@@ -198,14 +200,14 @@ app.post(
       }
 
       res.json(dialogue);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Generation error:", error);
       res.status(500).json({ error: "Failed to generate dialogue" });
     }
   }
 );
 
-app.post("/tts", validate(ttsSchema), async (req, res) => {
+app.post("/tts", validate(ttsSchema), async (req: Request, res: Response) => {
   try {
     console.log("📩 /tts request:", req.body);
 
@@ -227,14 +229,14 @@ app.post("/tts", validate(ttsSchema), async (req, res) => {
     let result;
     try {
       result = await TTSService.generateSpeech(text, language, options);
-    } catch (error) {
+    } catch (error: any) {
       console.warn(`⚠️ Primary TTS failed: ${error.message}`);
 
       // Fallback 1: Try default options (usually works if female works)
       try {
         console.log("🔄 Fallback 1: Trying default voice...");
         result = await TTSService.generateSpeech(text, language, {});
-      } catch (err2) {
+      } catch (err2: any) {
         console.warn(`⚠️ Fallback 1 failed: ${err2.message}`);
 
         // Fallback 2: Explicitly try the voice that is known to work (Google Standard Female)
@@ -257,7 +259,7 @@ app.post("/tts", validate(ttsSchema), async (req, res) => {
     res.send(Buffer.from(result.audioBuffer));
 
     console.log(`✅ Audio generated successfully using ${result.provider}`);
-  } catch (err) {
+  } catch (err: any) {
     console.error("🔴 TTS Error:", err.message);
 
     // Return error with suggestion to use Web Speech API fallback
@@ -271,7 +273,7 @@ app.post("/tts", validate(ttsSchema), async (req, res) => {
 });
 
 // Handle SPA routing - return index.html for any unknown routes
-app.get("*", (req, res) => {
+app.get("*", (req: Request, res: Response) => {
   // Don't intercept API routes (though they should be matched above)
   if (req.path.startsWith("/tts") || req.path.startsWith("/api")) {
     return res.status(404).json({ error: "Not found" });
@@ -280,7 +282,7 @@ app.get("*", (req, res) => {
 });
 
 // Health check endpoint
-app.get("/tts/status", async (req, res) => {
+app.get("/tts/status", async (req: Request, res: Response) => {
   const status = await TTSService.getProviderStatus();
   res.json({
     providers: status,

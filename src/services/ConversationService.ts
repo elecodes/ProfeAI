@@ -2,7 +2,18 @@ import { ChatOpenAI } from "@langchain/openai";
 import { InMemoryChatMessageHistory } from "@langchain/core/chat_history";
 import { SystemMessage, HumanMessage } from "@langchain/core/messages";
 import { env } from "../config/env.js";
+import { z } from "zod";
+
+const ResponseSchema = z.object({
+  text: z.string(),
+  gender: z.enum(["male", "female"]),
+});
+
+type Response = z.infer<typeof ResponseSchema>;
 class ConversationService {
+  private model: ChatOpenAI;
+  private messageHistories: Map<string, InMemoryChatMessageHistory>;
+
   constructor() {
     this.model = new ChatOpenAI({
       openAIApiKey: env.OPENAI_API_KEY,
@@ -12,16 +23,16 @@ class ConversationService {
     this.messageHistories = new Map();
   }
 
-  getHistory(sessionId) {
+  getHistory(sessionId: string): InMemoryChatMessageHistory {
     if (!this.messageHistories.has(sessionId)) {
       this.messageHistories.set(sessionId, new InMemoryChatMessageHistory());
     }
-    return this.messageHistories.get(sessionId);
+    return this.messageHistories.get(sessionId)!;
   }
 
-  async _generateResponse(sessionId, input, topic, level) {
+  async _generateResponse(sessionId: string, input: string, topic: string, level: string): Promise<Response> {
     const history = this.getHistory(sessionId);
-    const messages = await history.getMessages();
+    // const messages = await history.getMessages(); // Unused
 
     // Manual message construction to avoid LangChain Template hangs
     const systemInstruction = `You are a language tutor roleplaying a scenario.
@@ -56,21 +67,22 @@ class ConversationService {
       const result = await this.model.invoke(finalMessages);
       
       // Parse JSON
-      
-      // Parse JSON
-      let content = result.content;
-      try {
-        content = content.replace(/```json/g, "").replace(/```/g, "").trim();
-        const parsed = JSON.parse(content);
-        
-        // Add AI response to history
-        await history.addAIChatMessage(parsed.text);
-        
-        return parsed;
+        let content = result.content as string;
+        try {
+          content = content.replace(/```json/g, "").replace(/```/g, "").trim();
+          const parsedJSON = JSON.parse(content);
+          
+          // Validate with Zod
+          const parsed = ResponseSchema.parse(parsedJSON);
+          
+          // Add AI response to history
+          await history.addAIMessage(parsed.text);
+          
+          return parsed;
       } catch (parseError) {
         console.error("JSON Parse Error:", parseError);
         // Fallback
-        await history.addAIChatMessage(content);
+        await history.addAIMessage(content);
         return { text: content, gender: "female" };
       }
     } catch (error) {
@@ -82,11 +94,11 @@ class ConversationService {
     }
   }
 
-  _getFallbackResponse(topic, input) {
+  _getFallbackResponse(topic: string, input: string): Response {
     // Simple keyword matching to simulate conversation
     const lowerInput = input.toLowerCase();
     let text = "Hola, ¿en qué puedo ayudarte?";
-    let gender = "male";
+    let gender: "male" | "female" = "male";
 
     // Scenario: Restaurant
     if (topic.toLowerCase().includes("restaurant") || topic.toLowerCase().includes("comida") || topic.toLowerCase().includes("food")) {
@@ -127,7 +139,7 @@ class ConversationService {
     return { text, gender };
   }
 
-  async startConversation(sessionId, topic, level) {
+  async startConversation(sessionId: string, topic: string, level: string) {
     this.messageHistories.set(sessionId, new InMemoryChatMessageHistory());
     // For start, we don't add the user instruction to history as a visible message usually,
     // but here we treat it as the initiating system prompt trigger.
@@ -141,7 +153,7 @@ class ConversationService {
     );
   }
 
-  async sendMessage(sessionId, message, topic, level) {
+  async sendMessage(sessionId: string, message: string, topic: string, level: string) {
     return await this._generateResponse(sessionId, message, topic, level);
   }
 }

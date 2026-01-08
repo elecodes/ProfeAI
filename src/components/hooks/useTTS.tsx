@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
+import { TTSOptions, ManualVoiceConfig, UseTTSReturn } from "../../types/tts";
 
-export const useTTS = () => {
-  const [audio, setAudio] = useState(null);
-  const [currentProvider, setCurrentProvider] = useState(null);
+export const useTTS = (): UseTTSReturn => {
+  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+  const [currentProvider, setCurrentProvider] = useState<string | null>(null);
 
   // Manual voice configuration - can be set by user
-  const [manualVoiceConfig, setManualVoiceConfig] = useState({
+  const [manualVoiceConfig, setManualVoiceConfig] = useState<ManualVoiceConfig>({
     male: null, // voice index or name
     female: null // voice index or name
   });
@@ -22,7 +23,7 @@ export const useTTS = () => {
   };
 
   // Debug function to test voice selection for specific gender
-  const debugVoiceSelection = (gender) => {
+  const debugVoiceSelection = (gender: string) => {
     if (window.speechSynthesis) {
       const voices = window.speechSynthesis.getVoices();
       const isMale = gender === "male";
@@ -196,8 +197,8 @@ export const useTTS = () => {
   };
 
   // Function to force use a specific voice by index
-  const speakWithVoiceIndex = (text, voiceIndex, lang = "es", options = {}) => {
-    return new Promise((resolve, reject) => {
+  const speakWithVoiceIndex = (text: string, voiceIndex: number, lang: string = "es", options: any = {}) => {
+    return new Promise<void>((resolve, reject) => {
       if (!window.speechSynthesis) {
         reject(new Error("Web Speech API not supported"));
         return;
@@ -221,7 +222,7 @@ export const useTTS = () => {
         }
       };
 
-      const proceedWithIndex = (voices) => {
+      const proceedWithIndex = (voices: SpeechSynthesisVoice[]) => {
         if (voiceIndex < 0 || voiceIndex >= voices.length) {
           reject(new Error(`Voice index ${voiceIndex} out of range. Available: 0-${voices.length - 1}`));
           return;
@@ -234,7 +235,7 @@ export const useTTS = () => {
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.voice = selectedVoice;
         utterance.lang = lang === "es" ? "es-ES" : "en-US";
-        utterance.rate = 0.9;
+        utterance.rate = options.speed || 0.9;
         utterance.pitch = 1.0;
         utterance.volume = 1.0;
         utterance.onend = () => resolve();
@@ -249,7 +250,7 @@ export const useTTS = () => {
   };
 
   // Function to manually set voice configuration
-  const setVoiceConfig = (gender, voiceIdentifier) => {
+  const setVoiceConfig = (gender: 'male' | 'female', voiceIdentifier: number | string) => {
     // voiceIdentifier can be a number (index) or string (name)
     setManualVoiceConfig(prev => ({
       ...prev,
@@ -260,7 +261,7 @@ export const useTTS = () => {
 
   // Function to reset manual voice configuration
   const resetVoiceConfig = () => {
-    setManualVoiceConfig({});
+    setManualVoiceConfig({ male: null, female: null });
     console.log(`🔄 Reset all manual voice configurations`);
   };
 
@@ -296,7 +297,7 @@ export const useTTS = () => {
     }
   };
 
-  const speakWithWebSpeech = (text, lang = "es", options = {}) => {
+  const speakWithWebSpeech = (text: string, lang: string = "es", options: TTSOptions = {}): Promise<void> => {
     return new Promise((resolve, reject) => {
       if (!window.speechSynthesis) {
         reject(new Error("Web Speech API not supported"));
@@ -324,7 +325,7 @@ export const useTTS = () => {
         }
       };
 
-      const proceedWithVoices = (voices) => {
+      const proceedWithVoices = (voices: SpeechSynthesisVoice[]) => {
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
 
@@ -389,7 +390,7 @@ export const useTTS = () => {
           console.log(`Available Spanish voices: ${spanishVoices.length}`);
 
           // PRIORITY 1: Look for natural-sounding voices (avoid robotic Google voices)
-          const anyNaturalVoice = voices.find((voice) => {
+          const anyNaturalVoice: SpeechSynthesisVoice | undefined = voices.find((voice: SpeechSynthesisVoice) => {
             const name = voice.name.toLowerCase();
             const langMatch = voice.lang.startsWith(langCode);
             if (!langMatch) return false;
@@ -483,10 +484,14 @@ export const useTTS = () => {
             return fallbackNaturalVoice;
           }
 
+          /* 
+          // FIX: genderSpecificPremiumVoice was not defined in this scope (copy-paste error from debug function)
+          // Removing this block as logic seems to be handled by priority 3 (any premium) or we should re-implement finding it
           if (genderSpecificPremiumVoice) {
             console.log(`✅ Found gender-specific premium voice: ${genderSpecificPremiumVoice.name}`);
             return genderSpecificPremiumVoice;
           }
+          */
 
           // PRIORITY 3: Use any premium voice if available (better quality)
           const anyPremiumVoice = voices.find((voice) => {
@@ -530,11 +535,11 @@ export const useTTS = () => {
 
         // More aggressive gender differentiation
         if (isMale) {
-          utterance.rate = 0.8; // Slower for male voices (more authoritative)
+          utterance.rate = options.speed || 0.8; // Slower for male voices (more authoritative)
           utterance.pitch = 0.7; // Much lower pitch for male voices
           console.log(`👨 Male voice parameters: rate=${utterance.rate}, pitch=${utterance.pitch}`);
         } else {
-          utterance.rate = 0.95; // Slightly faster for female voices
+          utterance.rate = options.speed || 0.95; // Slightly faster for female voices
           utterance.pitch = 1.1; // Higher pitch for female voices
           console.log(`👩 Female voice parameters: rate=${utterance.rate}, pitch=${utterance.pitch}`);
         }
@@ -551,16 +556,16 @@ export const useTTS = () => {
     });
   };
 
-  const speak = async (text, lang = "es", options = {}) => {
+  const speak = async (text: string, lang: string = "es", options: TTSOptions = {}): Promise<void> => {
     try {
       // Cancel any ongoing speech synthesis
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
       }
 
-      if (window.currentAudio) {
-        window.currentAudio.pause();
-        window.currentAudio = null;
+      if ((window as any).currentAudio) {
+        (window as any).currentAudio.pause();
+        (window as any).currentAudio = null;
       }
 
       // SPECIAL CASE: Always use Web Speech API for male voices (they sound better)
@@ -599,7 +604,7 @@ export const useTTS = () => {
           // ACTUALIZACIÓN DE ESTADO INMEDIATA
           setCurrentProvider(provider);
           setAudio(newAudio);
-          window.currentAudio = newAudio;
+          (window as any).currentAudio = newAudio;
 
           // Reproducción asíncrona (no bloqueante)
           newAudio
@@ -615,7 +620,7 @@ export const useTTS = () => {
         } else {
           console.warn("⚠️ Backend TTS failed. Status:", response.status);
         }
-      } catch (fetchError) {
+      } catch (fetchError: any) {
         console.warn("⚠️ Backend unreachable:", fetchError.message);
       }
 
@@ -629,8 +634,8 @@ export const useTTS = () => {
   };
 
   // Debug component for voice testing and configuration
-  const VoiceDebugger = () => {
-    const [voices, setVoices] = useState([]);
+  const VoiceDebugger: React.FC = () => {
+    const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
     const [testText, setTestText] = useState("Hola, soy Juan y quiero probar esta voz.");
 
     useEffect(() => {
@@ -647,7 +652,7 @@ export const useTTS = () => {
       };
     }, []);
 
-    const testVoice = (voiceIndex) => {
+    const testVoice = (voiceIndex: number) => {
       if (voices[voiceIndex]) {
         speakWithVoiceIndex(testText, voiceIndex);
       }
@@ -806,6 +811,14 @@ export const useTTS = () => {
     showCurrentConfig,
     setupNaturalVoices,
     manualVoiceConfig,
-    VoiceDebugger
+    VoiceDebugger,
+    stop: () => {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      if ((window as any).currentAudio) {
+        (window as any).currentAudio.pause();
+      }
+    }
   };
 };
