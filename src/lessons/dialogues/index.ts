@@ -1,4 +1,6 @@
-export const dialogues = {
+import { Dialogue } from "../../types/dialogue";
+
+export const dialogues: Record<string, Dialogue[]> = {
   beginner: [
     {
       id: "beg_1",

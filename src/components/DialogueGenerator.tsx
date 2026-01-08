@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
+import { Dialogue } from '../types/dialogue';
 
-const DialogueGenerator = ({ onGenerate, level }) => {
-  const [topic, setTopic] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+interface Props {
+  onGenerate: (dialogue: Dialogue) => void;
+  level: string;
+}
+
+const DialogueGenerator: React.FC<Props> = ({ onGenerate, level }) => {
+  const [topic, setTopic] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleGenerate = async () => {
     if (!topic.trim()) return;
@@ -24,11 +30,11 @@ const DialogueGenerator = ({ onGenerate, level }) => {
         throw new Error('Failed to generate dialogue');
       }
 
-      const data = await response.json();
+      const data: Dialogue = await response.json();
       onGenerate(data);
       setTopic(''); // Clear input on success
-    } catch (err) {
-      setError(err.message);
+    } catch (err: any) {
+      setError(err.message || 'Error desconocido');
     } finally {
       setLoading(false);
     }

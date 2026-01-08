@@ -1,30 +1,25 @@
 import { ChatOpenAI } from "@langchain/openai";
-import { z } from "zod";
-
-// Define the schema for the output
-const dialogueSchema = z.object({
-  title: z.string().describe("The title of the dialogue in Spanish"),
-  lines: z.array(
-    z.object({
-      speaker: z.string().describe("Name of the speaker"),
-      text: z.string().describe("The text spoken in Spanish"),
-      translation: z.string().describe("English translation of the text"),
-      gender: z.enum(["male", "female"]).describe("Gender of the speaker for TTS"),
-    })
-  ).describe("The lines of the dialogue"),
-});
+import { DialogueSchema, Dialogue } from "../types";
+import { Runnable } from "@langchain/core/runnables";
 
 class DialogueGenerator {
+  private model: ChatOpenAI;
+  // Using explicit type for structuredModel might be complex as it depends on the schema output,
+  // but Runnable<string, z.infer<typeof DialogueSchema>> is a good guess if using LC expression language,
+  // or simply 'any' or inferred if too complex for now. The .withStructuredOutput returns a Runnable.
+  private structuredModel: Runnable<string, any>; // Relaxed type for now to avoid deep generic issues
+
   constructor() {
     this.model = new ChatOpenAI({
       modelName: "gpt-4o-mini", // Cost-effective and fast
       temperature: 0.7,
     });
 
-    this.structuredModel = this.model.withStructuredOutput(dialogueSchema);
+    // @ts-ignore - langchain types can be tricky with structured output
+    this.structuredModel = this.model.withStructuredOutput(DialogueSchema);
   }
 
-  async generate(topic, level) {
+  async generate(topic: string, level: string): Promise<Dialogue> {
     const prompt = `
       Generate a realistic dialogue in Spanish for a student of level "${level}".
       Topic: "${topic}".
@@ -38,7 +33,9 @@ class DialogueGenerator {
     `;
     
     try {
+      // The result should match the schema (z.infer<typeof DialogueSchema>)
       const result = await this.structuredModel.invoke(prompt);
+      
       // Add a random ID to the dialogue
       return {
         ...result,

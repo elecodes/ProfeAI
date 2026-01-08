@@ -41,7 +41,7 @@ interface User {
 
 // Helper to access dialogues safely
 const getDialoguesForLevel = (level: string) => {
-  return (dialogues as any)[level] || [];
+  return dialogues[level] || [];
 };
 
 // Simple Loading Component

@@ -13,7 +13,7 @@ import TTSService from "./src/services/TTSService.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-import DialogueGenerator from "./src/services/DialogueGenerator.js";
+import DialogueGenerator from "./src/services/DialogueGenerator.ts";
 import ConversationService from "./src/services/ConversationService.ts";
 // @ts-ignore
 import GrammarService from "./src/services/GrammarService.js";
@@ -155,49 +155,7 @@ app.post(
       // Validation handled by middleware, so topic is guaranteed to exist
 
       console.log(`✨ Generating dialogue: "${topic}" (${level})`);
-      const dialogue: any = await DialogueGenerator.generate(topic, level);
-
-      // Assign genders to speakers to ensure voice variety
-      if (
-        dialogue &&
-        dialogue.conversation &&
-        Array.isArray(dialogue.conversation)
-      ) {
-        // Filter valid speakers to avoid crashes if AI returns null/undefined
-        const speakers = [
-          ...new Set(
-            dialogue.conversation
-              .map((t: any) => t.speaker)
-              .filter((s: any) => typeof s === "string")
-          ),
-        ];
-        const speakerGenders: Record<string, string> = {};
-
-        speakers.forEach((speaker: unknown) => {
-           const spk = speaker as string;
-          // Detect gender based on name heuristic
-          // Clean name: remove parens, trim to avoid issues with "Maria (Cliente)"
-          const name = spk
-            .toLowerCase()
-            .replace(/[([].*?[)\]]/g, "")
-            .trim();
-          // Ends in 'a' -> Female (Ana, Maria), Others -> Male (Juan, Carlos)
-          const isFemale =
-            name.endsWith("a") ||
-            ["carmen", "isabel", "raquel", "beatriz"].includes(name);
-
-          speakerGenders[spk] = isFemale ? "female" : "male";
-        });
-
-        dialogue.conversation = dialogue.conversation.map((turn: any) => ({
-          ...turn,
-          gender:
-            turn.speaker && speakerGenders[turn.speaker]
-              ? speakerGenders[turn.speaker]
-              : "female",
-        }));
-        console.log("👥 Detected genders:", speakerGenders);
-      }
+      const dialogue = await DialogueGenerator.generate(topic, level);
 
       res.json(dialogue);
     } catch (error: any) {

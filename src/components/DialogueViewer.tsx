@@ -1,18 +1,23 @@
 import React, { useState } from "react";
 import { useTTS } from "./hooks/useTTS";
+import { Dialogue } from "../types/dialogue";
 
-const DialogueViewer = ({ dialogue }) => {
+interface Props {
+  dialogue: Dialogue | null;
+}
+
+const DialogueViewer: React.FC<Props> = ({ dialogue }) => {
   const { speak } = useTTS();
-  const [showTranslation, setShowTranslation] = useState({});
-  const [playingIndex, setPlayingIndex] = useState(null);
+  const [showTranslation, setShowTranslation] = useState<Record<number, boolean>>({});
+  const [playingIndex, setPlayingIndex] = useState<number | null>(null);
 
-  const handlePlay = async (text, index, gender) => {
+  const handlePlay = async (text: string, index: number, gender: "male" | "female") => {
     setPlayingIndex(index);
     await speak(text, "es", { gender });
     setPlayingIndex(null);
   };
 
-  const toggleTranslation = (index) => {
+  const toggleTranslation = (index: number) => {
     setShowTranslation((prev) => ({
       ...prev,
       [index]: !prev[index],
@@ -47,7 +52,7 @@ const DialogueViewer = ({ dialogue }) => {
                   {line.speaker}
                 </span>
                 <button
-                  onClick={() => handlePlay(line.text, index, line.gender)}
+                  onClick={() => handlePlay(line.text, index, line.gender as "male" | "female")}
                   disabled={playingIndex !== null}
                   className={`p-2 rounded-full transition ${
                     playingIndex === index
