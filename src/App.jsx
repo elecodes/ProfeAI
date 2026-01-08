@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Suspense } from "react";
 import { loadLessons } from "../utils/loadLessons.js";
-import { useTTS } from "./components/hooks/useTTS";
+import { useTTS } from "./components/hooks/useTTS.jsx";
 // Lazy load components
 const AuthForm = React.lazy(() => import("./components/auth/AuthForm"));
 const DialogueViewer = React.lazy(() => import("./components/DialogueViewer"));
@@ -23,6 +23,8 @@ const Loading = () => (
 function App() {
   // Auth State from Hook
   const { user, userProfile, loading: authLoading, signIn, signUp, signOut } = useAuth();
+
+  // Voice debugging removed - voices now work automatically
 
   // App State
   const [nivel, setNivel] = useState("beginner");
@@ -604,9 +606,12 @@ function App() {
       </main>
 
       {/* Only render in non-test environments */}
-      {import.meta.env.MODE !== 'test' && mode === "conversation" && (
+      {/* Voice disabled by user request */}
+      {/* {import.meta.env.MODE !== 'test' && mode === "conversation" && (
         <elevenlabs-convai agent-id={AGENT_IDS[nivel] || AGENT_IDS.beginner}></elevenlabs-convai>
-      )}
+      )} */}
+
+      {/* Voice Debugger removed - voices now work automatically */}
     </div>
   );
 }

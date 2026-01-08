@@ -85,6 +85,9 @@ app.post("/api/chat/start", async (req, res) => {
     res.json({ message: finalResponse });
   } catch (error) {
     console.error("Error starting chat:", error);
+    if (error.response) {
+       console.error("OpenAI API Error details:", error.response.data);
+    }
     res.status(500).json({ error: "Failed to start conversation" });
   }
 });
@@ -171,10 +174,15 @@ app.post(
 
         speakers.forEach((speaker) => {
           // Detect gender based on name heuristic
-          const name = speaker.toLowerCase();
+          // Clean name: remove parens, trim to avoid issues with "Maria (Cliente)"
+          const name = speaker
+            .toLowerCase()
+            .replace(/[\(\[].*?[\)\]]/g, "")
+            .trim();
           // Ends in 'a' -> Female (Ana, Maria), Others -> Male (Juan, Carlos)
           const isFemale =
-            name.endsWith("a") || ["carmen", "isabel", "raquel"].includes(name);
+            name.endsWith("a") ||
+            ["carmen", "isabel", "raquel", "beatriz"].includes(name);
 
           speakerGenders[speaker] = isFemale ? "female" : "male";
         });
@@ -186,6 +194,7 @@ app.post(
               ? speakerGenders[turn.speaker]
               : "female",
         }));
+        console.log("👥 Detected genders:", speakerGenders);
       }
 
       res.json(dialogue);
@@ -206,20 +215,41 @@ app.post("/tts", validate(ttsSchema), async (req, res) => {
     // Ensure male voice is used if requested.
     // We override voiceId to ensure character distinction in dialogues.
     if (options.gender === "male") {
-      if (language && language.startsWith("es")) {
-        options.voiceId = "es-ES-Neural2-B"; // Google Spanish Male
-        options.provider = "google";
-      } else {
-        options.voiceId = "en-US-Neural2-D"; // Google English Male (default)
-        options.provider = "google";
-      }
-      console.log(`👨 Forced male voice: ${options.voiceId}`);
+      // Use Web Speech API with Google español voice for best male sound
+      options.forceWebSpeech = true;
+      options.webSpeechVoiceIndex = 195; // Google español index where user found it works best
+      console.log(`👨 Setup male voice: Using Web Speech API with Google español (index 195)`);
     }
 
     // Validation handled by middleware, so text is guaranteed to exist
 
     // Use TTSService with automatic fallback
-    const result = await TTSService.generateSpeech(text, language, options);
+    let result;
+    try {
+      result = await TTSService.generateSpeech(text, language, options);
+    } catch (error) {
+      console.warn(`⚠️ Primary TTS failed: ${error.message}`);
+
+      // Fallback 1: Try default options (usually works if female works)
+      try {
+        console.log("🔄 Fallback 1: Trying default voice...");
+        result = await TTSService.generateSpeech(text, language, {});
+      } catch (err2) {
+        console.warn(`⚠️ Fallback 1 failed: ${err2.message}`);
+
+        // Fallback 2: Explicitly try the voice that is known to work (Google Standard Female)
+        console.log(
+          "🔄 Fallback 2: Trying Google Standard Female (Safety Net)..."
+        );
+        result = await TTSService.generateSpeech(text, language, {
+          provider: "google",
+          voiceId:
+            language && language.startsWith("es")
+              ? "es-ES-Standard-A"
+              : "en-US-Standard-A",
+        });
+      }
+    }
 
     // Send audio with provider information in headers
     res.setHeader("Content-Type", result.contentType);

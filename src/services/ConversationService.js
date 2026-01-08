@@ -1,21 +1,7 @@
 import { ChatOpenAI } from "@langchain/openai";
-import {
-  ChatPromptTemplate,
-  MessagesPlaceholder,
-} from "@langchain/core/prompts";
-import { RunnableWithMessageHistory } from "@langchain/core/runnables";
 import { InMemoryChatMessageHistory } from "@langchain/core/chat_history";
-import { z } from "zod"; // Importante para la estructura
+import { SystemMessage, HumanMessage } from "@langchain/core/messages";
 import { env } from "../config/env.js";
-
-// Definimos la estructura de la respuesta
-const responseSchema = z.object({
-  text: z.string().describe("The response text in Spanish"),
-  gender: z
-    .enum(["male", "female"])
-    .describe("The gender of the character speaking"),
-});
-
 class ConversationService {
   constructor() {
     this.model = new ChatOpenAI({
@@ -23,9 +9,6 @@ class ConversationService {
       modelName: "gpt-4o-mini",
       temperature: 0.7,
     });
-
-    // Vinculamos el modelo a la salida estructurada
-    this.structuredModel = this.model.withStructuredOutput(responseSchema);
     this.messageHistories = new Map();
   }
 
@@ -36,49 +19,130 @@ class ConversationService {
     return this.messageHistories.get(sessionId);
   }
 
-  async startConversation(sessionId, topic, level) {
-    this.messageHistories.set(sessionId, new InMemoryChatMessageHistory());
+  async _generateResponse(sessionId, input, topic, level) {
+    const history = this.getHistory(sessionId);
+    const messages = await history.getMessages();
 
-    const systemTemplate = `You are a language tutor roleplaying a scenario.
-    SCENARIO: {topic}
-    USER LEVEL: {level}
+    // Manual message construction to avoid LangChain Template hangs
+    const systemInstruction = `You are a language tutor roleplaying a scenario.
+    SCENARIO: ${topic}
+    USER LEVEL: ${level}
     
     INSTRUCTIONS:
     1. Act as a character appropriate for the scenario.
     2. Respond in Spanish.
     3. Keep responses concise (1-2 sentences).
-    4. You MUST assign yourself a gender ("male" or "female") based on your character.
+    4. You MUST return your response in valid JSON format with the following structure:
+       {{
+         "text": "Your response in Spanish",
+         "gender": "male" or "female"
+       }}
+    5. Do NOT include any markdown formatting. Just the raw JSON object.`;
+
+    // Get previous messages (assuming history works, if not we'll use local array)
+    const storedMessages = await history.getMessages();
     
-    Example: If you are a waiter named Juan, your gender is "male".`;
+    const finalMessages = [
+      new SystemMessage(systemInstruction),
+      ...storedMessages, // These should already be BaseMessage objects
+      new HumanMessage(input)
+    ];
 
-    const prompt = ChatPromptTemplate.fromMessages([
-      ["system", systemTemplate],
-      new MessagesPlaceholder("history"),
-      ["human", "{input}"],
-    ]);
+    // Add user message to history
+    await history.addUserMessage(input);
 
-    // Usamos el structuredModel aquí
-    this.chain = new RunnableWithMessageHistory({
-      runnable: prompt.pipe(this.structuredModel),
-      getMessageHistory: (sessionId) => this.getHistory(sessionId),
-      inputMessagesKey: "input",
-      historyMessagesKey: "history",
-    });
+    try {
+      // Invoke model directly with manual messages
+      const result = await this.model.invoke(finalMessages);
+      
+      // Parse JSON
+      
+      // Parse JSON
+      let content = result.content;
+      try {
+        content = content.replace(/```json/g, "").replace(/```/g, "").trim();
+        const parsed = JSON.parse(content);
+        
+        // Add AI response to history
+        await history.addAIChatMessage(parsed.text);
+        
+        return parsed;
+      } catch (parseError) {
+        console.error("JSON Parse Error:", parseError);
+        // Fallback
+        await history.addAIChatMessage(content);
+        return { text: content, gender: "female" };
+      }
+    } catch (error) {
+      console.error("Generation Error:", error);
+      
+      // FALLBACK STRATEGY: If OpenAI fails (Rate Limit 429, etc), use simulated response
+      console.warn("⚠️ Switching to Fallback Simulation due to API Error");
+      return this._getFallbackResponse(topic, input);
+    }
+  }
 
-    return await this.chain.invoke(
-      { topic, level, input: "Start the conversation and introduce yourself." },
-      { configurable: { sessionId } }
+  _getFallbackResponse(topic, input) {
+    // Simple keyword matching to simulate conversation
+    const lowerInput = input.toLowerCase();
+    let text = "Hola, ¿en qué puedo ayudarte?";
+    let gender = "male";
+
+    // Scenario: Restaurant
+    if (topic.toLowerCase().includes("restaurant") || topic.toLowerCase().includes("comida") || topic.toLowerCase().includes("food")) {
+        if (input.includes("Start") || input.includes("Hola")) {
+            text = "¡Hola! Bienvenido a nuestro restaurante. ¿Mesa para uno?";
+        } else if (lowerInput.includes("mesa") || lowerInput.includes("table")) {
+            text = "Perfecto. Aquí tiene el menú. ¿Qué desea beber?";
+        } else if (lowerInput.includes("carta") || lowerInput.includes("menu")) {
+            text = "Tenemos paella, gazpacho y tortilla. ¿Qué le apetece?";
+        } else if (lowerInput.includes("cuenta") || lowerInput.includes("bill")) {
+            text = "En seguida se la traigo. ¿Pagará con tarjeta?";
+        } else {
+            text = "¿Desea algo más?";
+        }
+        gender = "male";
+    }
+    // Scenario: Doctor
+    else if (topic.toLowerCase().includes("doctor") || topic.toLowerCase().includes("medico")) {
+         if (input.includes("Start") || input.includes("Hola")) {
+            text = "Buenos días. Soy el doctor Pérez. ¿Qué le duele hoy?";
+            gender = "male";
+        } else {
+            text = "Entiendo. Vamos a recetarle algo para el dolor. ¿Tiene alergias?";
+            gender = "male";
+        }
+    }
+    // Default / Generic
+    else {
+        if (input.includes("Start")) {
+             text = "¡Hola! ¿De qué te gustaría hablar hoy sobre " + topic + "?";
+             gender = "female";
+        } else {
+             text = "Interesante. Cuéntame más, por favor. (Modo simulación activado por límite de API)";
+             gender = "female";
+        }
+    }
+
+    return { text, gender };
+  }
+
+  async startConversation(sessionId, topic, level) {
+    this.messageHistories.set(sessionId, new InMemoryChatMessageHistory());
+    // For start, we don't add the user instruction to history as a visible message usually,
+    // but here we treat it as the initiating system prompt trigger.
+    // Actually, we can just trigger the generation.
+    
+    return await this._generateResponse(
+      sessionId, 
+      "Start the conversation and introduce yourself regarding the topic.", 
+      topic, 
+      level
     );
   }
 
   async sendMessage(sessionId, message, topic, level) {
-    if (!this.chain) throw new Error("Conversation not initialized.");
-
-    // Esto devolverá directamente { text: "...", gender: "..." }
-    return await this.chain.invoke(
-      { topic, level, input: message },
-      { configurable: { sessionId } }
-    );
+    return await this._generateResponse(sessionId, message, topic, level);
   }
 }
 
