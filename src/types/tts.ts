@@ -1,10 +1,18 @@
+export type TTSProvider = 'elevenlabs' | 'polly' | 'google' | 'webspeech' | 'failed';
+
 export interface TTSOptions {
   gender?: 'male' | 'female';
   forceWebSpeech?: boolean;
   webSpeechVoiceIndex?: number;
   voiceId?: string;
-  provider?: string;
+  provider?: TTSProvider;
   speed?: number;
+}
+
+export interface TTSResult {
+  audioBuffer: Buffer;
+  provider: TTSProvider;
+  contentType: string;
 }
 
 export interface ManualVoiceConfig {

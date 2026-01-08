@@ -1,15 +1,26 @@
 import fetch from "node-fetch";
 import { PollyClient, SynthesizeSpeechCommand } from "@aws-sdk/client-polly";
 import { env } from "../config/env.js";
+import { TTSOptions, TTSResult, TTSProvider } from "../types/tts";
+
+interface VoiceConfig {
+  female: any;
+  male: any;
+}
+
+interface ProviderVoiceConfig {
+  en: VoiceConfig;
+  es: VoiceConfig;
+}
 
 class TTSService {
-  constructor() {
-    this.elevenLabsKey = null;
-    this.googleApiKey = null;
-    this.pollyClient = null;
-    this.initialized = false;
+  private elevenLabsKey: string | null = null;
+  private googleApiKey: string | null = null;
+  private pollyClient: PollyClient | null = null;
+  private initialized: boolean = false;
+  private voices: Record<string, ProviderVoiceConfig>;
 
-    // Configuración de voces por género y proveedor
+  constructor() {
     this.voices = {
       polly: {
         en: {
@@ -60,12 +71,12 @@ class TTSService {
     };
   }
 
-  async _ensureInitialized() {
+  private async _ensureInitialized(): Promise<void> {
     if (this.initialized) return;
     this.initialized = true;
 
-    this.elevenLabsKey = env.ELEVENLABS_API_KEY;
-    this.googleApiKey = env.GOOGLE_CLOUD_API_KEY;
+    this.elevenLabsKey = env.ELEVENLABS_API_KEY || null;
+    this.googleApiKey = env.GOOGLE_CLOUD_API_KEY || null;
 
     if (env.AWS_ACCESS_KEY_ID && env.AWS_SECRET_ACCESS_KEY) {
       this.pollyClient = new PollyClient({
@@ -79,12 +90,12 @@ class TTSService {
     }
   }
 
-  async generateWithElevenLabs(text, language, options = {}) {
+  private async generateWithElevenLabs(text: string, language: string, options: TTSOptions = {}): Promise<TTSResult> {
     if (!this.elevenLabsKey) throw new Error("ElevenLabs not configured");
 
     const gender = options.gender || "female";
-    const langConfig =
-      this.voices.elevenlabs[language] || this.voices.elevenlabs.en;
+    // @ts-ignore - Dynamic access to voices config
+    const langConfig = this.voices.elevenlabs[language] || this.voices.elevenlabs.en;
     const voiceId = langConfig[gender] || langConfig.female;
     
     console.log(`Using ElevenLabs Voice ID: ${voiceId} (${gender})`);
@@ -106,7 +117,7 @@ class TTSService {
     );
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData: any = await response.json();
       if (errorData.detail?.status === "quota_exceeded")
         throw new Error("QUOTA_EXCEEDED");
       throw new Error(`ElevenLabs error: ${errorData.message || "Unknown"}`);
@@ -114,15 +125,16 @@ class TTSService {
 
     return {
       audioBuffer: Buffer.from(await response.arrayBuffer()),
-      provider: "elevenlabs",
+      provider: "elevenlabs" as TTSProvider,
       contentType: "audio/mpeg",
     };
   }
 
-  async generateWithPolly(text, language, options = {}) {
+  private async generateWithPolly(text: string, language: string, options: TTSOptions = {}): Promise<TTSResult> {
     if (!this.pollyClient) throw new Error("Polly not configured");
 
     const gender = options.gender || "female";
+    // @ts-ignore
     const langConfig = this.voices.polly[language] || this.voices.polly.en;
     const voiceConfig = langConfig[gender] || langConfig.female;
 
@@ -135,19 +147,23 @@ class TTSService {
     });
 
     const response = await this.pollyClient.send(command);
+    if (!response.AudioStream) {
+        throw new Error("Polly did not return an audio stream");
+    }
     const byteArray = await response.AudioStream.transformToByteArray();
 
     return {
       audioBuffer: Buffer.from(byteArray),
-      provider: "polly",
+      provider: "polly" as TTSProvider,
       contentType: "audio/mpeg",
     };
   }
 
-  async generateWithGoogle(text, language, options = {}) {
+  private async generateWithGoogle(text: string, language: string, options: TTSOptions = {}): Promise<TTSResult> {
     if (!this.googleApiKey) throw new Error("Google TTS not configured");
 
     const gender = options.gender || "female";
+    // @ts-ignore
     const langConfig = this.voices.google[language] || this.voices.google.en;
     const voiceConfig = langConfig[gender] || langConfig.female;
 
@@ -162,10 +178,13 @@ class TTSService {
       }),
     });
 
-    const data = await response.json();
+    const data: any = await response.json();
+    if (!data.audioContent) {
+        throw new Error("Google TTS did not return audioContent");
+    }
     return {
       audioBuffer: Buffer.from(data.audioContent, "base64"),
-      provider: "google",
+      provider: "google" as TTSProvider,
       contentType: "audio/mpeg",
     };
   }
@@ -173,16 +192,16 @@ class TTSService {
   /**
    * MÉTODO PRINCIPAL CON CASCADA (FALLBACK)
    */
-  async generateSpeech(text, language = "es", options = {}) {
+  async generateSpeech(text: string, language: string = "es", options: TTSOptions = {}): Promise<TTSResult> {
     await this._ensureInitialized();
-    const errors = [];
+    const errors: {provider: string, error: string}[] = [];
 
     // 1. ElevenLabs (Si hay créditos)
     if (this.elevenLabsKey) {
       try {
         console.log(`🎙️ TTS: ElevenLabs (${options.gender || "female"})...`);
         return await this.generateWithElevenLabs(text, language, options);
-      } catch (error) {
+      } catch (error: any) {
         console.warn("⚠️ ElevenLabs falló:", error.message);
         errors.push({ provider: "elevenlabs", error: error.message });
       }
@@ -193,7 +212,7 @@ class TTSService {
       try {
         console.log(`🎙️ TTS: Amazon Polly (${options.gender || "female"})...`);
         return await this.generateWithPolly(text, language, options);
-      } catch (error) {
+      } catch (error: any) {
         console.warn("⚠️ Polly falló:", error.message);
         errors.push({ provider: "polly", error: error.message });
       }
@@ -204,7 +223,7 @@ class TTSService {
       try {
         console.log(`🎙️ TTS: Google Cloud (${options.gender || "female"})...`);
         return await this.generateWithGoogle(text, language, options);
-      } catch (error) {
+      } catch (error: any) {
         console.warn("⚠️ Google falló:", error.message);
         errors.push({ provider: "google", error: error.message });
       }
