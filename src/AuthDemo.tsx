@@ -1,4 +1,5 @@
 import React from "react";
+// @ts-ignore
 import AuthForm from "./components/auth/AuthForm";
 
 /**
@@ -6,7 +7,7 @@ import AuthForm from "./components/auth/AuthForm";
  * To use: Change src/main.jsx to import AuthDemo instead of App
  */
 function AuthDemo() {
-  const handleSignIn = async (formData) => {
+  const handleSignIn = async (formData: any) => {
     console.log("✅ Sign in successful!");
     console.log("Email:", formData.email);
     console.log("Password:", formData.password);
@@ -17,7 +18,7 @@ function AuthDemo() {
     alert(`¡Bienvenido! Email: ${formData.email}`);
   };
 
-  const handleSignUp = async (formData) => {
+  const handleSignUp = async (formData: any) => {
     console.log("✅ Sign up successful!");
     console.log("Email:", formData.email);
     console.log("Password:", formData.password);

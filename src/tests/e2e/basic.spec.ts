@@ -4,7 +4,7 @@ test('has title', async ({ page }) => {
   await page.goto('/');
 
   // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle(/tutor-idiomas/);
+  await expect(page).toHaveTitle(/tutor-idiomas/i);
 });
 
 test('navigation to dialogues', async ({ page }) => {

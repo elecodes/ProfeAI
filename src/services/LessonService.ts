@@ -1,5 +1,6 @@
 import { db } from "../../firebase/firebase";
 import { collection, getDocs, query, where, doc, setDoc } from "firebase/firestore";
+import { Lesson } from "../types";
 
 const COLLECTION_NAME = "lessons";
 
@@ -7,9 +8,9 @@ export const LessonService = {
   /**
    * Fetch all lessons for a specific level
    * @param {string} level - 'beginner', 'intermediate', or 'advanced'
-   * @returns {Promise<Array>} - Array of lesson objects
+   * @returns {Promise<Lesson[]>} - Array of lesson objects
    */
-  async getLessons(level) {
+  async getLessons(level: string): Promise<Lesson[]> {
     try {
       const q = query(
         collection(db, COLLECTION_NAME),
@@ -17,13 +18,13 @@ export const LessonService = {
       );
       
       const querySnapshot = await getDocs(q);
-      const lessons = [];
+      const lessons: Lesson[] = [];
       
       querySnapshot.forEach((doc) => {
         lessons.push({
           id: doc.id,
           ...doc.data()
-        });
+        } as Lesson);
       });
       
       return lessons;
@@ -36,9 +37,9 @@ export const LessonService = {
   /**
    * Add or overwrite a lesson (used for seeding/admin)
    * @param {string} id - Unique ID for the lesson (e.g., 'beginner_food')
-   * @param {object} lessonData - The lesson content
+   * @param {Lesson} lessonData - The lesson content
    */
-  async setLesson(id, lessonData) {
+  async setLesson(id: string, lessonData: Lesson): Promise<void> {
     try {
       await setDoc(doc(db, COLLECTION_NAME, id), lessonData);
       console.log(`Lesson ${id} written successfully.`);

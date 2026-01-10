@@ -1,6 +1,7 @@
 /* eslint-env node */
 import { z } from 'zod';
 import dotenv from 'dotenv';
+import { resolve } from 'path';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -21,14 +22,16 @@ const envSchema = z.object({
   AWS_REGION: z.string().optional(),
 });
 
+type Env = z.infer<typeof envSchema>;
+
 // Validate process.env
-const parseEnv = () => {
-  const result = envSchema.safeParse(process.env); // eslint-disable-line no-undef
+const parseEnv = (): Env => {
+  const result = envSchema.safeParse(process.env);
 
   if (!result.success) {
     console.error('❌ Invalid environment variables:');
     console.error(JSON.stringify(result.error.format(), null, 2));
-    process.exit(1); // eslint-disable-line no-undef
+    process.exit(1); 
   }
 
   return result.data;

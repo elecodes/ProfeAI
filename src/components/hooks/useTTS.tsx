@@ -584,7 +584,7 @@ export const useTTS = (): UseTTSReturn => {
 
       try {
         console.log("🎙️ Attempting backend TTS...");
-        const response = await fetch("http://localhost:3001/tts", {
+        const response = await fetch("/tts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

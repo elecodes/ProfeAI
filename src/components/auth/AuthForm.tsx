@@ -1,9 +1,14 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import SignInForm from "./SignInForm";
 import SignUpForm from "./SignUpForm";
 
-export default function AuthForm({ onSignIn, onSignUp }) {
-  const [activeTab, setActiveTab] = useState("signin");
+interface AuthFormProps {
+  onSignIn: (data: any) => Promise<void>;
+  onSignUp: (data: any) => Promise<void>;
+}
+
+export default function AuthForm({ onSignIn, onSignUp }: AuthFormProps) {
+  const [activeTab, setActiveTab] = useState<"signin" | "signup">("signin");
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg">

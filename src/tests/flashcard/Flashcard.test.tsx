@@ -26,7 +26,7 @@ describe("Flashcard", () => {
     const buttons = screen.getAllByRole("button");
     // Ajusta el índice [1] si es necesario
     const learnedButton =
-      buttons.find((btn) => btn.textContent.includes("✅")) ||
+      buttons.find((btn) => btn.textContent?.includes("✅")) ||
       buttons[buttons.length - 1];
 
     if (learnedButton) {

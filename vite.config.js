@@ -41,14 +41,14 @@ export default defineConfig({
     globals: true,
     setupFiles: "./test/setup.js",
     include: [
-      "src/tests/**/*.test.{js,jsx}",
-      "src/tests/**/integration/**/*.integration.test.{js,jsx}",
+      "src/tests/**/*.test.{js,jsx,ts,tsx}",
+      "src/tests/**/integration/**/*.integration.test.{js,jsx,ts,tsx}",
     ],
   },
   server: {
     proxy: {
-      '/api': 'http://localhost:3001',
-      '/tts': 'http://localhost:3001',
+      '/api': 'http://127.0.0.1:3001',
+      '/tts': 'http://127.0.0.1:3001',
     },
   },
 });

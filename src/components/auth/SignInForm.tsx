@@ -1,17 +1,21 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useFormValidation } from "./hooks/useFormValidation";
 
-export default function SignInForm({ onSubmit }) {
+interface SignInFormProps {
+  onSubmit: (data: any) => Promise<void>;
+}
+
+export default function SignInForm({ onSubmit }: SignInFormProps) {
   const [showPassword, setShowPassword] = useState(false);
 
   const validationRules = () => ({
-    email: (value) => {
+    email: (value: string) => {
       if (!value) return "El email es obligatorio.";
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
         return "El email no es válido.";
       return "";
     },
-    password: (value) => {
+    password: (value: string) => {
       if (!value) return "La contraseña es obligatoria.";
       if (value.length < 6)
         return "La contraseña debe tener al menos 6 caracteres.";

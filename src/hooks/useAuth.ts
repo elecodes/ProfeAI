@@ -1,16 +1,29 @@
 import { useState, useEffect } from "react";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, User } from "firebase/auth";
 import { auth, emailLogin, emailSignup, googleLogin, logout } from "../../firebase/firebase";
 import UserService from "../services/UserService";
+import { AppUser } from "../types";
+
+export interface UseAuthReturn {
+  user: User | null;
+  userProfile: AppUser | null;
+  loading: boolean;
+  error: string | null;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
+  signOut: () => Promise<void>;
+  setUserProfile: React.Dispatch<React.SetStateAction<AppUser | null>>;
+}
 
 /**
  * Hook to manage authentication state and user data
  */
-export function useAuth() {
-  const [user, setUser] = useState(null);
-  const [userProfile, setUserProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+export function useAuth(): UseAuthReturn {
+  const [user, setUser] = useState<User | null>(null);
+  const [userProfile, setUserProfile] = useState<AppUser | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -37,12 +50,12 @@ export function useAuth() {
     return () => unsubscribe();
   }, []);
 
-  const signIn = async (email, password) => {
+  const signIn = async (email: string, password: string) => {
     setLoading(true);
     setError(null);
     try {
       await emailLogin(email, password);
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message);
       throw err;
     } finally {
@@ -50,14 +63,16 @@ export function useAuth() {
     }
   };
 
-  const signUp = async (email, password) => {
+  const signUp = async (email: string, password: string) => {
     setLoading(true);
     setError(null);
     try {
       const result = await emailSignup(email, password);
       // Create profile immediately after signup
-      await UserService.createUserProfile(result.user);
-    } catch (err) {
+      if (result.user) {
+        await UserService.createUserProfile(result.user);
+      }
+    } catch (err: any) {
       setError(err.message);
       throw err;
     } finally {
@@ -70,8 +85,10 @@ export function useAuth() {
     setError(null);
     try {
       const result = await googleLogin();
-      await UserService.createUserProfile(result.user);
-    } catch (err) {
+      if (result.user) {
+        await UserService.createUserProfile(result.user);
+      }
+    } catch (err: any) {
       setError(err.message);
       throw err;
     } finally {

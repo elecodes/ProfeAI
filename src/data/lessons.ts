@@ -1,5 +1,11 @@
-// src/data/lessons.js
-export const lessons = {
+// src/data/lessons.ts
+
+export interface LessonData {
+  spanish: string;
+  english: string;
+}
+
+export const lessons: Record<string, LessonData[]> = {
   beginner: [
     {
       spanish: "Hola, ¿cómo estás?",

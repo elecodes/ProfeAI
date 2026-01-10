@@ -12,7 +12,8 @@ global.Blob = vi.fn().mockImplementation(function (parts, options) {
     size: 0,
     type: options?.type || "",
   };
-});
+}) as any;
+
 global.Audio = vi.fn().mockImplementation(function () {
   return {
     play: vi.fn().mockResolvedValue(undefined),
@@ -20,9 +21,10 @@ global.Audio = vi.fn().mockImplementation(function () {
     onended: null,
     src: "",
   };
-});
+}) as any;
+
 // Mock Web Speech API con callbacks que se ejecutan automáticamente
-let mockUtterance = null;
+let mockUtterance: any = null;
 
 global.SpeechSynthesisUtterance = vi.fn(function (text) {
   mockUtterance = {
@@ -35,9 +37,9 @@ global.SpeechSynthesisUtterance = vi.fn(function (text) {
     onerror: null,
   };
   return mockUtterance;
-});
+}) as any;
 
-global.speechSynthesis = {
+(global as any).speechSynthesis = {
   speak: vi.fn((utterance) => {
     // Simular que el speech termina exitosamente después de un breve delay
     setTimeout(() => {
@@ -50,7 +52,7 @@ global.speechSynthesis = {
   getVoices: vi.fn(() => [
     { name: "Google US English", lang: "en-US", default: true },
     { name: "Google español", lang: "es-ES", default: false },
-  ]),
+  ] as any[]),
 };
 
 describe("useTTS", () => {
@@ -69,20 +71,23 @@ describe("useTTS", () => {
     const mockFetch = vi.spyOn(global, "fetch").mockResolvedValue({
       ok: true,
       headers: {
-        get: (key) => (key === "X-TTS-Provider" ? "elevenlabs" : null),
-      },
+        get: (key: string) => (key === "X-TTS-Provider" ? "elevenlabs" : null),
+      } as any,
       arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)),
-    });
+    } as Response);
 
     const { result } = renderHook(() => useTTS());
 
     await result.current.speak("Hello");
 
     expect(mockFetch).toHaveBeenCalledWith(
-      "http://localhost:3001/tts",
+      "/tts",
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify({ text: "Hello", language: "es", options: {} }),
+        headers: {
+          "Content-Type": "application/json",
+        },
       })
     );
 
@@ -93,7 +98,7 @@ describe("useTTS", () => {
     const mockFetch = vi.spyOn(global, "fetch").mockResolvedValue({
       ok: false,
       json: () => Promise.resolve({ error: "Backend failed" }),
-    });
+    } as Response);
 
     const { result } = renderHook(() => useTTS());
 
@@ -105,7 +110,7 @@ describe("useTTS", () => {
     // Verificar que se usó Web Speech API como fallback
     await waitFor(
       () => {
-        expect(global.speechSynthesis.speak).toHaveBeenCalled();
+        expect((global as any).speechSynthesis.speak).toHaveBeenCalled();
       },
       { timeout: 1000 }
     );
@@ -125,7 +130,7 @@ describe("useTTS", () => {
     // Verificar que se usó Web Speech API
     await waitFor(
       () => {
-        expect(global.speechSynthesis.speak).toHaveBeenCalled();
+        expect((global as any).speechSynthesis.speak).toHaveBeenCalled();
       },
       { timeout: 1000 }
     );
@@ -143,9 +148,9 @@ describe("useTTS", () => {
           if (key.toLowerCase() === "x-tts-provider") return "google";
           return null;
         }),
-      },
+      } as any,
       arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)),
-    });
+    } as Response);
 
     const { result } = renderHook(() => useTTS());
 
@@ -171,15 +176,15 @@ describe("useTTS", () => {
       onended: null,
     };
 
-    window.currentAudio = mockAudio;
+    (window as any).currentAudio = mockAudio;
 
     const mockFetch = vi.spyOn(global, "fetch").mockResolvedValue({
       ok: true,
       headers: {
         get: () => "elevenlabs",
-      },
+      } as any,
       arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)),
-    });
+    } as Response);
 
     const { result } = renderHook(() => useTTS());
 

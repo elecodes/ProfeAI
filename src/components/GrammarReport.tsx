@@ -1,11 +1,16 @@
 import React from 'react';
+import { GrammarReport as IGrammarReport } from '../types/grammar';
 
-const GrammarReport = ({ report }) => {
+interface GrammarReportProps {
+  report: IGrammarReport | null;
+}
+
+const GrammarReport: React.FC<GrammarReportProps> = ({ report }) => {
   if (!report) return null;
 
   const { score, corrections, generalFeedback } = report;
 
-  const getScoreColor = (s) => {
+  const getScoreColor = (s: number): string => {
     if (s >= 90) return 'text-green-600';
     if (s >= 70) return 'text-yellow-600';
     return 'text-red-600';

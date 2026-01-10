@@ -1,10 +1,20 @@
+import React from 'react';
+
+interface FlashcardActionsProps {
+  showTranslation: boolean;
+  setShowTranslation: React.Dispatch<React.SetStateAction<boolean>>;
+  learned: boolean;
+  setLearned: React.Dispatch<React.SetStateAction<boolean>>;
+  onLearned: () => void;
+}
+
 export default function FlashcardActions({
   showTranslation,
   setShowTranslation,
   learned,
   setLearned,
   onLearned,
-}) {
+}: FlashcardActionsProps) {
   return (
     <div className="flex flex-col gap-3">
       <button

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import GrammarReport from "./GrammarReport";
-import { useTTS } from "./hooks/useTTS"; 
 import { ChatMessage } from "../types/chat";
 
 interface Props {
@@ -10,7 +9,6 @@ interface Props {
 }
 
 const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack }) => {
-  const { speak } = useTTS(); 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -41,8 +39,11 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
       fetchingRef.current = true;
       setIsLoading(true);
 
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 20000);
+
       try {
-        const res = await fetch("http://localhost:3001/api/chat/start", {
+        const res = await fetch("/api/chat/start", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ 
@@ -50,7 +51,10 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
             level, 
             sessionId: currentSessionId 
           }),
+          signal: controller.signal,
         });
+
+        clearTimeout(timeoutId);
 
         // DETECCIÓN MEJORADA DEL LÍMITE DE CUOTA (ERROR 429)
         if (!res.ok) {
@@ -68,18 +72,25 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
 
         const { text, gender } = messageData;
         setMessages([{ role: "ai", content: text }]);
-        speak(text, "es", { gender });
+        
+        // Text only mode
+        // setTimeout(() => {
+        //   speak(text, "es", { gender, forceWebSpeech: true });
+        // }, 50);
 
-      } catch (error) {
+      } catch (error: any) {
         console.error("Chat Error:", error);
         let errorMsg = "Hubo un problema al conectar con el tutor.";
         
-        if (error instanceof Error && error.message === "LIMITE_CUOTA") {
+        if (error.name === 'AbortError') {
+           errorMsg = "El tutor está tardando mucho en responder. Por favor, recarga la página.";
+        } else if (error.message === "LIMITE_CUOTA") {
           errorMsg = "⚠️ Has alcanzado el límite de mensajes gratuitos por hoy (200/día). Por favor, intenta de nuevo mañana o añade crédito a tu cuenta de OpenAI.";
         }
         
         setMessages([{ role: "ai", content: errorMsg }]);
       } finally {
+        clearTimeout(timeoutId);
         setIsLoading(false);
         setTimeout(() => { fetchingRef.current = false; }, 1000);
       }
@@ -97,8 +108,11 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
     setMessages((prev) => [...prev, { role: "user", content: userMsg }]);
     setIsLoading(true);
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000);
+
     try {
-      const res = await fetch("http://localhost:3001/api/chat/message", {
+      const res = await fetch("/api/chat/message", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
@@ -107,7 +121,10 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
           topic: currentTopic, 
           level 
         }),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (!res.ok) {
         if (res.status === 429) throw new Error("LIMITE_CUOTA");
@@ -115,18 +132,41 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
       }
 
       const data = await res.json();
-      const { text, gender } = data.message;
+      const { text, gender, correction } = data.message;
 
-      setMessages((prev) => [...prev, { role: "ai", content: text }]);
-      speak(text, "es", { gender });
+      setMessages((prev) => {
+        const newMessages = [...prev, { role: "ai", content: text } as ChatMessage];
+        
+        if (correction) {
+          newMessages.push({ 
+            role: "ai", 
+            content: `💡 Sugerencia: ${correction}`,
+            // We might need to handle this special styling in the render loop if ChatMessage type supports it, 
+            // or just rely on the content prefix for now if the type is strict.
+            // Assuming ChatMessage is { role: 'user' | 'ai', content: string }.
+            // If we want special styling, we can prefix with emoji or HTML if supported, 
+            // but for now keeping it simple as requested.
+          });
+        }
+        return newMessages;
+      });
+      
+      // Text only mode
+      // setTimeout(() => {
+      //   speak(text, "es", { gender, forceWebSpeech: true });
+      // }, 50);
 
-    } catch (error) {
+    } catch (error: any) {
       let errorMsg = "No pude enviarte la respuesta.";
-      if (error instanceof Error && error.message === "LIMITE_CUOTA") {
+
+      if (error.name === 'AbortError') {
+         errorMsg = "El tutor está tardando mucho en responder. Intenta de nuevo.";
+      } else if (error instanceof Error && error.message === "LIMITE_CUOTA") {
         errorMsg = "⚠️ Límite de mensajes alcanzado. No puedo responder más por hoy.";
       }
       setMessages(prev => [...prev, { role: "ai", content: errorMsg }]);
     } finally {
+      clearTimeout(timeoutId);
       setIsLoading(false);
     }
   };
@@ -138,6 +178,46 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
     setCurrentSessionId(Math.random().toString(36).substring(7));
     setNewTopic("");
     setShowTopicSelector(false);
+  };
+
+  const handleEndConversation = async () => {
+    setIsLoading(true);
+    try {
+      // 1. Collect all user messages
+      const userMessages = messages
+        .filter(m => m.role === 'user')
+        .map(m => m.content)
+        .join("\n");
+
+      if (!userMessages) {
+        // If no messages, just show empty report or close
+         setGrammarReport(null);
+         setShowReport(true);
+         return;
+      }
+
+      // 2. Call API for analysis
+      const res = await fetch("/api/grammar/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          text: userMessages, 
+          context: `Topic: ${currentTopic}, Level: ${level}` 
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to analyze grammar");
+
+      const report = await res.json();
+      setGrammarReport(report);
+      setShowReport(true);
+
+    } catch (error) {
+      console.error("Error ending conversation:", error);
+      // Fallback or error state
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // --- INTERFAZ TRADUCIDA AL ESPAÑOL ---
@@ -182,6 +262,20 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
     );
   }
 
+  if (showReport && grammarReport) {
+    return (
+      <div className="max-w-2xl mx-auto p-4 space-y-4">
+        <button 
+          onClick={() => { setShowReport(false); onBack(); }}
+          className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg transition"
+        >
+          ← Volver al inicio
+        </button>
+        <GrammarReport report={grammarReport} />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-[600px] max-w-2xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
       <div className="bg-indigo-600 p-4 text-white flex justify-between items-center shadow-md">
@@ -193,8 +287,12 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
           <button onClick={() => setShowTopicSelector(true)} className="text-xs bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-md font-medium transition">
             ✨ Nuevo Tema
           </button>
-          <button onClick={() => setShowReport(true)} className="text-xs bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded-md transition">
-            Finalizar
+          <button 
+            onClick={handleEndConversation}
+            disabled={isLoading}
+            className="text-xs bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded-md transition disabled:opacity-50"
+          >
+            {isLoading ? "Analizando..." : "Finalizar"}
           </button>
         </div>
       </div>

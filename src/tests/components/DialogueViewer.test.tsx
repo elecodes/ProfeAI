@@ -12,10 +12,13 @@ vi.mock("../../components/hooks/useTTS", () => ({
 
 describe("DialogueViewer", () => {
   const mockDialogue = {
+    id: "test-dialogue",
     title: "Test Dialogue",
+    difficulty: "beginner",
+    description: "A test dialogue",
     lines: [
-      { speaker: "Person A", text: "Hello", translation: "Hola" },
-      { speaker: "Person B", text: "Hi", translation: "Hola" },
+      { speaker: "Person A", text: "Hello", translation: "Hola", gender: "male" as const },
+      { speaker: "Person B", text: "Hi", translation: "Hola", gender: "female" as const },
     ],
   };
 
@@ -30,7 +33,7 @@ describe("DialogueViewer", () => {
     render(<DialogueViewer dialogue={mockDialogue} />);
     const audioButtons = screen.getAllByTitle("Escuchar");
     fireEvent.click(audioButtons[0]);
-    expect(mockSpeak).toHaveBeenCalledWith("Hello", "es", { gender: undefined });
+    expect(mockSpeak).toHaveBeenCalledWith("Hello", "es", { gender: "male" });
   });
 
   it("toggles translation visibility", () => {

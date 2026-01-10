@@ -1,8 +1,8 @@
-import { StrictMode } from 'react'
+import React, { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import * as Sentry from "@sentry/react";
 import './index.css'
-import App from './App.jsx'
+import App from './App'
 
 const enableSentry = import.meta.env.VITE_ENABLE_SENTRY === 'true';
 
@@ -21,7 +21,11 @@ if (enableSentry) {
   });
 }
 
-const root = createRoot(document.getElementById('root'));
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+    throw new Error("Failed to find the root element");
+}
+const root = createRoot(rootElement);
 
 const app = enableSentry ? (
   <Sentry.ErrorBoundary fallback={<div className="p-4 text-red-500">Ha ocurrido un error inesperado. Por favor recarga la página.</div>}>

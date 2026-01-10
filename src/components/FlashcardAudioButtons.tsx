@@ -1,4 +1,12 @@
-export default function FlashcardAudioButtons({ english, spanish, speak }) {
+import React from 'react';
+
+interface FlashcardAudioButtonsProps {
+  english: string;
+  spanish: string;
+  speak: (text: string, lang: 'en' | 'es') => void;
+}
+
+export default function FlashcardAudioButtons({ english, spanish, speak }: FlashcardAudioButtonsProps) {
   return (
     <div className="flex gap-2">
       <button

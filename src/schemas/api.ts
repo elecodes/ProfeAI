@@ -5,6 +5,8 @@ export const generateDialogueSchema = z.object({
   level: z.enum(["beginner", "intermediate", "advanced"]).optional().default("intermediate"),
 });
 
+export type GenerateDialogueRequest = z.infer<typeof generateDialogueSchema>;
+
 export const ttsSchema = z.object({
   text: z.string().min(1, "Text is required"),
   language: z.string().optional().default("es"),
@@ -17,7 +19,11 @@ export const ttsSchema = z.object({
     .default({}), // Si no viene nada, enviamos un objeto vacío por defecto
 });
 
+export type TTSRequest = z.infer<typeof ttsSchema>;
+
 export const grammarAnalysisSchema = z.object({
   text: z.string().min(1, "Text is required"),
   context: z.string().optional().default("General conversation"),
 });
+
+export type GrammarAnalysisRequest = z.infer<typeof grammarAnalysisSchema>;

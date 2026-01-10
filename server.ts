@@ -15,8 +15,7 @@ const __dirname = path.dirname(__filename);
 
 import DialogueGenerator from "./src/services/DialogueGenerator.ts";
 import ConversationService from "./src/services/ConversationService.ts";
-// @ts-ignore
-import GrammarService from "./src/services/GrammarService.js";
+import GrammarService from "./src/services/GrammarService.ts";
 import { validate } from "./src/middleware/validate.js";
 import {
   generateDialogueSchema,
@@ -59,6 +58,7 @@ app.use(express.json());
 app.post("/api/chat/start", async (req: Request, res: Response) => {
   try {
     const { topic, level, sessionId } = req.body;
+    console.log(`📩 Chat Start Request: topic="${topic}", level="${level}", sessionId="${sessionId}"`);
     // Simple validation
     if (!topic || !level || !sessionId) {
       return res
@@ -230,15 +230,6 @@ app.post("/tts", validate(ttsSchema), async (req: Request, res: Response) => {
   }
 });
 
-// Handle SPA routing - return index.html for any unknown routes
-app.get("*", (req: Request, res: Response) => {
-  // Don't intercept API routes (though they should be matched above)
-  if (req.path.startsWith("/tts") || req.path.startsWith("/api")) {
-    return res.status(404).json({ error: "Not found" });
-  }
-  res.sendFile(path.join(__dirname, "dist", "index.html"));
-});
-
 // Health check endpoint
 app.get("/tts/status", async (req: Request, res: Response) => {
   const status = await TTSService.getProviderStatus();
@@ -246,6 +237,16 @@ app.get("/tts/status", async (req: Request, res: Response) => {
     providers: status,
     available: status.elevenlabs || status.google || status.webSpeech,
   });
+});
+
+// Handle SPA routing - return index.html for any unknown routes
+// IMPORTANT: This must be the LAST route defined
+app.get("*", (req: Request, res: Response) => {
+  // Don't intercept API routes (though they should be matched above)
+  if (req.path.startsWith("/tts") || req.path.startsWith("/api")) {
+    return res.status(404).json({ error: "Not found" });
+  }
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
 
 // Start server and log provider status
@@ -264,7 +265,7 @@ async function startServer() {
     );
   }
 
-  app.listen(env.PORT, () => {
+  app.listen(env.PORT, "0.0.0.0", () => {
     console.log(`🚀 Server running on http://localhost:${env.PORT}`);
   });
 }

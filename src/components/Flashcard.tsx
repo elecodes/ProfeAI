@@ -1,12 +1,18 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useTTS } from "./hooks/useTTS";
 import FlashcardText from "./FlashcardText";
 import FlashcardAudioButtons from "./FlashcardAudioButtons";
 import FlashcardActions from "./FlashcardActions";
 
-export default function Flashcard({ english, spanish, onLearned }) {
-  const [showTranslation, setShowTranslation] = useState(false);
-  const [learned, setLearned] = useState(false);
+interface FlashcardProps {
+  english: string;
+  spanish: string;
+  onLearned: () => void;
+}
+
+export default function Flashcard({ english, spanish, onLearned }: FlashcardProps) {
+  const [showTranslation, setShowTranslation] = useState<boolean>(false);
+  const [learned, setLearned] = useState<boolean>(false);
   const { speak } = useTTS();
 
   return (
