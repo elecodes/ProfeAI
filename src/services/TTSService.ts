@@ -1,3 +1,6 @@
+import fs from "fs";
+import path from "path";
+import crypto from "crypto";
 import fetch from "node-fetch";
 import { PollyClient, SynthesizeSpeechCommand } from "@aws-sdk/client-polly";
 import { env } from "../config/env.js";
@@ -19,8 +22,18 @@ class TTSService {
   private pollyClient: PollyClient | null = null;
   private initialized: boolean = false;
   private voices: Record<string, ProviderVoiceConfig>;
+  private cacheDir: string;
 
   constructor() {
+    this.cacheDir = path.join(process.cwd(), "cache", "tts");
+    if (!fs.existsSync(this.cacheDir)) {
+      try {
+        fs.mkdirSync(this.cacheDir, { recursive: true });
+      } catch (err) {
+        console.warn("⚠️ Could not create TTS cache directory:", err);
+      }
+    }
+
     this.voices = {
       polly: {
         en: {
@@ -88,6 +101,22 @@ class TTSService {
       });
       console.log("✅ Amazon Polly configured");
     }
+  }
+
+  private _getCacheFilePath(text: string, language: string, options: TTSOptions): string {
+    // Determine a safe cache key by including relevant parameters
+    // We should probably normalize text (trim) but let's keep it exact for now
+    const dataDetails = JSON.stringify({ 
+      text, 
+      language, 
+      // Include gender in cache key so male/female variations are cached separately
+      gender: options.gender || 'female',
+      // Include provider if specified, though usually we want best available
+      provider: options.provider
+    });
+    
+    const hash = crypto.createHash("md5").update(dataDetails).digest("hex");
+    return path.join(this.cacheDir, `${hash}.mp3`);
   }
 
   private async generateWithElevenLabs(text: string, language: string, options: TTSOptions = {}): Promise<TTSResult> {
@@ -190,17 +219,37 @@ class TTSService {
   }
 
   /**
-   * MÉTODO PRINCIPAL CON CASCADA (FALLBACK)
+   * MÉTODO PRINCIPAL CON CASCADA (FALLBACK) Y CACHÉ
    */
   async generateSpeech(text: string, language: string = "es", options: TTSOptions = {}): Promise<TTSResult> {
     await this._ensureInitialized();
-    const errors: {provider: string, error: string}[] = [];
 
-    // 1. ElevenLabs (Si hay créditos)
-    if (this.elevenLabsKey) {
+    // 0. Check Cache
+    const cacheFile = this._getCacheFilePath(text, language, options);
+    if (fs.existsSync(cacheFile)) {
+      try {
+        console.log(`💾 Cache HIT: ${cacheFile}`);
+        const audioBuffer = fs.readFileSync(cacheFile);
+        return {
+          audioBuffer,
+          provider: "cache" as any, // "cache" provider
+          contentType: "audio/mpeg",
+        };
+      } catch (err) {
+        console.warn("⚠️ Error reading cache:", err);
+      }
+    } else {
+        console.log(`❌ Cache MISS: ${cacheFile}`);
+    }
+
+    const errors: {provider: string, error: string}[] = [];
+    let result: TTSResult | null = null;
+
+    // 1. ElevenLabs (Si hay créditos) - SOLO SE INTENTA SI HAY KEY
+    if (this.elevenLabsKey && !result) {
       try {
         console.log(`🎙️ TTS: ElevenLabs (${options.gender || "female"})...`);
-        return await this.generateWithElevenLabs(text, language, options);
+        result = await this.generateWithElevenLabs(text, language, options);
       } catch (error: any) {
         console.warn("⚠️ ElevenLabs falló:", error.message);
         errors.push({ provider: "elevenlabs", error: error.message });
@@ -208,10 +257,10 @@ class TTSService {
     }
 
     // 2. Amazon Polly (Económico y natural)
-    if (this.pollyClient) {
+    if (this.pollyClient && !result) {
       try {
         console.log(`🎙️ TTS: Amazon Polly (${options.gender || "female"})...`);
-        return await this.generateWithPolly(text, language, options);
+        result = await this.generateWithPolly(text, language, options);
       } catch (error: any) {
         console.warn("⚠️ Polly falló:", error.message);
         errors.push({ provider: "polly", error: error.message });
@@ -219,14 +268,25 @@ class TTSService {
     }
 
     // 3. Google Cloud
-    if (this.googleApiKey) {
+    if (this.googleApiKey && !result) {
       try {
         console.log(`🎙️ TTS: Google Cloud (${options.gender || "female"})...`);
-        return await this.generateWithGoogle(text, language, options);
+        result = await this.generateWithGoogle(text, language, options);
       } catch (error: any) {
         console.warn("⚠️ Google falló:", error.message);
         errors.push({ provider: "google", error: error.message });
       }
+    }
+
+    if (result) {
+        // Save to cache
+        try {
+            fs.writeFileSync(cacheFile, result.audioBuffer);
+            console.log(`💾 Saved to cache: ${cacheFile}`);
+        } catch (err) {
+            console.warn("⚠️ Could not write to cache:", err);
+        }
+        return result;
     }
 
     throw new Error(
