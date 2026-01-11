@@ -501,11 +501,12 @@ const HomePage = () => {
                     className="p-4 bg-white rounded-2xl shadow hover:shadow-md transition"
                   >
                     <div className="flex items-center justify-between mb-2">
+                       {/* Main Text: Now Spanish (s.translation) */}
                       <p className="text-lg font-semibold text-gray-800">
-                        {s.text}
+                        {s.translation}
                       </p>
                       <button
-                        onClick={() => speakText(s.text, "es")}
+                        onClick={() => speakText(s.translation, "es")}
                         className="text-blue-600 hover:text-blue-800 transition"
                         title="Escuchar frase en español"
                       >
@@ -515,9 +516,10 @@ const HomePage = () => {
 
                     {showTranslation[i] && (
                       <div className="flex items-center justify-between mb-2">
-                        <p className="text-gray-600 italic">{s.translation}</p>
+                        {/* Hidden Text: Now English (s.text) */}
+                        <p className="text-gray-600 italic">{s.text}</p>
                         <button
-                          onClick={() => speakText(s.translation, "en")}
+                          onClick={() => speakText(s.text, "en")}
                           className="text-green-600 hover:text-green-800 transition"
                           title="Escuchar traducción en inglés"
                         >
