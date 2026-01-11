@@ -166,16 +166,23 @@ const HomePage = () => {
 
   const handleMarkLearned = async (sentence: Phrase) => {
     // Adapter for LearnedPhrase type
+    // SWAPPED: Saving Spanish (translation) as 'original' so it appears as primary
     const learnedPhrase: LearnedPhrase = {
-      original: sentence.text,
-      translation: sentence.translation,
+      original: sentence.translation,
+      translation: sentence.text,
       dateLearned: new Date().toISOString(),
       // prompt/context are optional
     };
 
-    // Optimistic update - local state uses Phrase or compatible structure
-    // We cast to any to mix types in local state if needed or keep it clean
-    const newLearned = [...learned, sentence]; 
+    // Optimistic update - local state
+    // We create a new object swapping text/translation for display consistency
+    const displayPhrase = {
+        ...sentence,
+        text: sentence.translation,      // Display Spanish
+        translation: sentence.text       // Translation is English
+    };
+
+    const newLearned = [...learned, displayPhrase]; 
     setLearned(newLearned);
     
     // Save to Firestore
