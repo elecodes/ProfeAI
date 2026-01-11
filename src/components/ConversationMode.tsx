@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import GrammarReport from "./GrammarReport";
 import { ChatMessage } from "../types/chat";
+import { useUserStats } from "../hooks/useUserStats";
 
 interface Props {
   topic: string;
@@ -12,6 +13,7 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { addXP } = useUserStats();
   const [showReport, setShowReport] = useState<boolean>(false);
   const [grammarReport, setGrammarReport] = useState<any>(null);
   const [showTopicSelector, setShowTopicSelector] = useState<boolean>(false);
@@ -211,6 +213,13 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
       const report = await res.json();
       setGrammarReport(report);
       setShowReport(true);
+      
+      // Award XP based on grammar score
+      // Ensure score exists, default to 10 if not (participation points)
+      const earnedXP = typeof report.score === 'number' ? Math.round(report.score) : 10;
+      if (earnedXP > 0) {
+        addXP(earnedXP);
+      }
 
     } catch (error) {
       console.error("Error ending conversation:", error);

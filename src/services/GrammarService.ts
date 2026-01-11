@@ -33,13 +33,28 @@ class GrammarService {
 
     // --- 1. CHECK: Infinitive Verbs ("Yo querer") ---
     // Matches "yo" followed by common infinitives
-    const infinitiveRegex = /\byo\s+(querer|tener|hacer|comer|estar|ser|vivir|ir)\b/gi;
+    const infinitiveRegex = /\byo\s+(querer|tener|hacer|comer|estar|ser|vivir|ir|saber|poder|necesitar|entender|hablar|ver|dar|decir)\b/gi;
     let match;
     while ((match = infinitiveRegex.exec(text)) !== null) {
         corrections.push({
             original: match[0],
-            corrected: match[0].replace(/querer/i, "quiero").replace(/tener/i, "tengo").replace(/hacer/i, "hago").replace(/comer/i, "como").replace(/estar/i, "estoy").replace(/ser/i, "soy").replace(/vivir/i, "vivo").replace(/ir/i, "voy"),
-            explanation: "Debes conjugar los verbos. 'Yo' se usa con la terminación 'o' generalmente.",
+            corrected: match[0].replace(/querer/i, "quiero")
+                              .replace(/tener/i, "tengo")
+                              .replace(/hacer/i, "hago")
+                              .replace(/comer/i, "como")
+                              .replace(/estar/i, "estoy")
+                              .replace(/ser/i, "soy")
+                              .replace(/vivir/i, "vivo")
+                              .replace(/ir/i, "voy")
+                              .replace(/saber/i, "sé")
+                              .replace(/poder/i, "puedo")
+                              .replace(/necesitar/i, "necesito")
+                              .replace(/entender/i, "entiendo")
+                              .replace(/hablar/i, "hablo")
+                              .replace(/ver/i, "veo")
+                              .replace(/dar/i, "doy")
+                              .replace(/decir/i, "digo"),
+            explanation: "Debes conjugar los verbos. 'Yo' se usa con la terminación 'o' generalmente (o formas irregulares como 'sé', 'soy', 'voy').",
             type: "grammar"
         });
         score -= 15;

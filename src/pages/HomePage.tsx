@@ -259,6 +259,8 @@ const HomePage = () => {
     const sessionId = `session_${Date.now()}`;
     const safeTopic = encodeURIComponent(tema || "General Conversation");
     const safeLevel = encodeURIComponent(nivel);
+    
+    // Navigate using URL parameters to match App.tsx route definition
     navigate(`/chat/${safeTopic}/${safeLevel}/${sessionId}`);
   };
 
