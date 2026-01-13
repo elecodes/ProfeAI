@@ -259,7 +259,9 @@ The application follows a **Client-Server** architecture, leveraging modern web 
 -   **Platform**: Firebase.
 -   **Authentication**: Firebase Auth (Email/Password).
 -   **Database**: Cloud Firestore (NoSQL) for user profiles, progress tracking, and learned phrases.
--  **Storage**: Cloudinary (for profile pictures and media).
+
+
+
 
 
 
@@ -326,7 +328,7 @@ The application follows a **Client-Server** architecture, leveraging modern web 
 ### 3.6 User Profile
 -   **Description**: Manage account and view progress.
 -   **Implementation**:
-   -   `Profile.jsx` displays stats, level, and allows profile picture upload.
+   -   `Profile.jsx` displays stats and level.
    -   Data persisted in Firestore `users` collection.
 
 
@@ -339,7 +341,6 @@ Document ID: `uid`
 {
  "email": "user@example.com",
  "displayName": "User Name",
- "photoURL": "https://...",
  "level": "beginner", // beginner, intermediate, advanced
  "createdAt": Timestamp,
  "lastLogin": Timestamp,
