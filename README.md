@@ -21,8 +21,8 @@ AppTutor es una aplicación web interactiva diseñada para ayudar a estudiantes 
 *   **Backend:** Node.js, Express, **Helmet.js**.
 *   **Infraestructura:** **Docker**, **Nginx** (Reverse Proxy), **Certbot** (SSL).
 *   **Base de Datos:** Firebase Firestore & Authentication.
-*   **IA & Servicios:** LangChain, OpenAI, Amazon Polly, Google Cloud TTS, ElevenLabs.
-*   **Calidad:** Sentry, Playwright, Vitest, Lighthouse, **Dependabot**.
+*   **IA & Servicios:** LangChain, **Genkit** (Orchestration), OpenAI, Amazon Polly, Google Cloud TTS, ElevenLabs, **Tavily** (Search).
+*   **Calidad:** Sentry, Playwright, Vitest, Lighthouse, **Snyk**, **Husky**, **Dependabot**.
 
 ## 🚀 Requisitos Previos
 
@@ -52,6 +52,10 @@ AppTutor es una aplicación web interactiva diseñada para ayudar a estudiantes 
     AWS_ACCESS_KEY_ID=...
     AWS_SECRET_ACCESS_KEY=...
     AWS_REGION=us-east-1
+
+    # Genkit & Search
+    GOOGLE_GENAI_API_KEY=...
+    TAVILY_API_KEY=tv-...
     
     # Firebase
     GOOGLE_APPLICATION_CREDENTIALS=./path/to/credentials.json
@@ -101,6 +105,7 @@ Accede a `https://tu-dominio.com`.
 *   **Unitarios:** `npm test`
 *   **E2E:** `npm run test:e2e`
 *   **Linting:** `npm run lint`
+*   **Seguridad:** `npm run test:security` (Snyk)
 
 ## 📄 Licencia
 

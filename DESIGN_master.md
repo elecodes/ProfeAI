@@ -83,6 +83,8 @@ AppTutor integrates with several external services to provide its core features:
 *   **AI Services:**
    *   **OpenAI:** The core of the AI Tutor and Grammar Doctor features.
    *   **LangChain:** Used as a framework to orchestrate interactions with AI models and other data sources.
+   *   **Google Genkit:** Advanced AI orchestration framework used for flexible model management and fallback strategies.
+   *   **Tavily:** Search API used by the AI agents to provide real-time cultural context and facts.
 *   **Text-to-Speech (TTS) Services:**
    *   **Amazon Polly, ElevenLabs, Google Cloud TTS:** Premium TTS services used to generate high-quality, natural-sounding audio for pronunciation practice. The system has a fallback mechanism to ensure availability.
    *   **Web Speech API:** A browser-based API used as a fallback for TTS.
@@ -131,6 +133,7 @@ Security is a key consideration in the AppTutor project.
 *   **Input Validation:** The backend validates and sanitizes all incoming data to prevent XSS and other injection attacks. The use of Zod (`src/schemas/api.js`) provides a structured way to define and enforce data schemas.
 *   **HTTPS:** All communication in production is encrypted using SSL/TLS.
 *   **Dependabot:** Automatically keeps project dependencies up-to-date, patching known vulnerabilities.
+*   **Snyk:** Scans dependencies for known security vulnerabilities.
 
 
 ## 9. Testing and Quality Assurance
@@ -152,6 +155,15 @@ The project has a comprehensive testing and quality assurance strategy.
 *   **Performance Monitoring:**
    *   **Tool:** Lighthouse
    *   **Configuration:** `.lighthouserc.json`
+*   **Error Tracking:**
+   *   **Tool:** Sentry
+   *   **Configuration:** Initialized in `src/main.tsx`
+*   **Vulnerability Scanning:**
+   *   **Tool:** Snyk
+   *   **Command:** `npm run test:security`
+*   **Git Hooks:**
+   *   **Tool:** Husky
+   *   **Usage:** Enforces pre-commit checks (linting, testing).
 
 
 ## 10. Project Structure
@@ -159,6 +171,7 @@ The project has a comprehensive testing and quality assurance strategy.
 
 ```
 /
+├───.genkit/          # Genkit local configuration
 ├───.github/          # GitHub Actions workflows (CI/CD)
 ├───.husky/           # Git hooks
 ├───certbot/          # SSL certificate files
@@ -176,18 +189,23 @@ The project has a comprehensive testing and quality assurance strategy.
 │   ├───data/         # Static data
 │   ├───hooks/        # Custom React hooks
 │   ├───lessons/      # Lesson content in JSON format
+│   ├───lib/          # Core libraries (Genkit)
 │   ├───middleware/   # Express middleware
 │   ├───pages/        # Top-level page components
+│   ├───prompts/      # AI Prompts (Genkit/Dotprompt)
 │   ├───schemas/      # Data validation schemas (Zod)
 │   ├───services/     # Backend service modules
 │   ├───tests/        # Automated tests
-│   └───utils/        # Utility functions
+│   ├───types/        # TypeScript type definitions
+│   ├───utils/        # Utility functions
+│   ├───App.tsx       # Main application component
+│   └───main.tsx      # Entry point
 ├───test/             # Test setup and configuration
 ├───.env.example      # Example environment variables
 ├───docker-compose.yml # Docker Compose for development
 ├───Dockerfile        # Docker configuration for the app
 ├───package.json      # Project metadata and dependencies
-├───server.js         # Backend Express server entry point
+├───server.ts         # Backend Express server entry point
 └───vite.config.js    # Vite configuration
 ```
 
@@ -247,8 +265,9 @@ The application follows a **Client-Server** architecture, leveraging modern web 
 
 
 ### 2.4 AI & Machine Learning Services
--   **LLM Orchestration**: LangChain.
--   **AI Provider**: OpenAI (via LangChain) for conversation and grammar analysis.
+-   **LLM Orchestration:** LangChain & **Google Genkit**.
+-   **AI Provider:** OpenAI (via LangChain) and Gemini (via Genkit) for conversation and grammar analysis.
+-   **Search Tool:** **Tavily** (for real-time cultural data).
 -   **Text-to-Speech (TTS)**: Multi-provider support with fallback strategy:
    1.  **ElevenLabs** (Premium quality).
    2.  **Google Cloud TTS** (High quality).
