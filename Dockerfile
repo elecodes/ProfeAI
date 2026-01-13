@@ -20,6 +20,8 @@ ENV NODE_ENV=production
 RUN npm install -g npm@latest
 
 COPY package*.json ./
+# Disable husky prepare script in production
+RUN npm pkg delete scripts.prepare
 RUN npm install --omit=dev
 
 # Copy backend code
