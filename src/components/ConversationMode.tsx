@@ -19,6 +19,9 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
   const [showTopicSelector, setShowTopicSelector] = useState<boolean>(false);
   const [newTopic, setNewTopic] = useState<string>("");
   
+  // New State for Suggestions
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+
   const [currentTopic, setCurrentTopic] = useState<string>(initialTopic);
   const [currentSessionId, setCurrentSessionId] = useState<string>(() => 
     Math.random().toString(36).substring(7)
@@ -33,7 +36,7 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, suggestions]); // Scroll when messages or suggestions update
 
   useEffect(() => {
     const startChat = async () => {
@@ -42,7 +45,7 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
       setIsLoading(true);
 
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 20000);
+      const timeoutId = setTimeout(() => controller.abort(), 35000);
 
       try {
         const res = await fetch("/api/chat/start", {
@@ -58,7 +61,6 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
 
         clearTimeout(timeoutId);
 
-        // DETECCIÓN MEJORADA DEL LÍMITE DE CUOTA (ERROR 429)
         if (!res.ok) {
           const errorData = await res.json().catch(() => ({}));
           if (res.status === 429 || errorData.code === 'rate_limit_exceeded') {
@@ -69,16 +71,12 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
 
         const data = await res.json();
         const messageData = typeof data.message === 'string' 
-          ? { text: data.message, gender: 'female' } 
+          ? { text: data.message, gender: 'female', suggestions: [] } 
           : data.message;
 
-        const { text, gender } = messageData;
+        const { text, gender, suggestions: newSuggestions } = messageData;
         setMessages([{ role: "ai", content: text }]);
-        
-        // Text only mode
-        // setTimeout(() => {
-        //   speak(text, "es", { gender, forceWebSpeech: true });
-        // }, 50);
+        setSuggestions(newSuggestions || []);
 
       } catch (error: any) {
         console.error("Chat Error:", error);
@@ -101,17 +99,21 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
     startChat();
   }, [currentTopic, level, currentSessionId]);
 
-  const handleSend = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
+  const handleSend = async (e?: React.FormEvent, forcedText?: string) => {
+    e?.preventDefault();
+    const userMsg = forcedText || input;
 
-    const userMsg = input;
+    if (!userMsg.trim() || isLoading) return;
+
+    // Clear suggestions immediately after sending
+    setSuggestions([]);
     setInput("");
+    
     setMessages((prev) => [...prev, { role: "user", content: userMsg }]);
     setIsLoading(true);
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 20000);
+      const timeoutId = setTimeout(() => controller.abort(), 35000);
 
     try {
       const res = await fetch("/api/chat/message", {
@@ -134,7 +136,7 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
       }
 
       const data = await res.json();
-      const { text, gender, correction } = data.message;
+      const { text, gender, correction, suggestions: nextSuggestions } = data.message;
 
       setMessages((prev) => {
         const newMessages = [...prev, { role: "ai", content: text } as ChatMessage];
@@ -143,20 +145,12 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
           newMessages.push({ 
             role: "ai", 
             content: `💡 Sugerencia: ${correction}`,
-            // We might need to handle this special styling in the render loop if ChatMessage type supports it, 
-            // or just rely on the content prefix for now if the type is strict.
-            // Assuming ChatMessage is { role: 'user' | 'ai', content: string }.
-            // If we want special styling, we can prefix with emoji or HTML if supported, 
-            // but for now keeping it simple as requested.
           });
         }
         return newMessages;
       });
       
-      // Text only mode
-      // setTimeout(() => {
-      //   speak(text, "es", { gender, forceWebSpeech: true });
-      // }, 50);
+      setSuggestions(nextSuggestions || []);
 
     } catch (error: any) {
       let errorMsg = "No pude enviarte la respuesta.";
@@ -173,9 +167,14 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
     }
   };
 
+  const handleSuggestionClick = (msg: string) => {
+      handleSend(undefined, msg);
+  };
+
   const handleNewCustomConversation = () => {
     if (!newTopic.trim()) return;
     setMessages([]);
+    setSuggestions([]);
     setCurrentTopic(newTopic);
     setCurrentSessionId(Math.random().toString(36).substring(7));
     setNewTopic("");
@@ -185,20 +184,17 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
   const handleEndConversation = async () => {
     setIsLoading(true);
     try {
-      // 1. Collect all user messages
       const userMessages = messages
         .filter(m => m.role === 'user')
         .map(m => m.content)
         .join("\n");
 
       if (!userMessages) {
-        // If no messages, just show empty report or close
          setGrammarReport(null);
          setShowReport(true);
          return;
       }
 
-      // 2. Call API for analysis
       const res = await fetch("/api/grammar/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -214,8 +210,6 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
       setGrammarReport(report);
       setShowReport(true);
       
-      // Award XP based on grammar score
-      // Ensure score exists, default to 10 if not (participation points)
       const earnedXP = typeof report.score === 'number' ? Math.round(report.score) : 10;
       if (earnedXP > 0) {
         addXP(earnedXP);
@@ -223,13 +217,10 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
 
     } catch (error) {
       console.error("Error ending conversation:", error);
-      // Fallback or error state
     } finally {
       setIsLoading(false);
     }
   };
-
-  // --- INTERFAZ TRADUCIDA AL ESPAÑOL ---
 
   if (showTopicSelector) {
     return (
@@ -330,7 +321,22 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
         <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={handleSend} className="p-4 border-t bg-white flex gap-2">
+      {/* SUGGESTIONS PILLS */}
+      {suggestions.length > 0 && !isLoading && (
+        <div className="px-4 py-2 bg-slate-50 border-t border-gray-100 flex flex-wrap gap-2">
+            {suggestions.map((s, idx) => (
+                <button 
+                  key={idx}
+                  onClick={() => handleSuggestionClick(s)}
+                  className="bg-white border border-indigo-200 text-indigo-600 rounded-full px-4 py-1 text-sm hover:bg-indigo-50 transition shadow-sm text-left"
+                >
+                  {s}
+                </button>
+            ))}
+        </div>
+      )}
+
+      <form onSubmit={(e) => handleSend(e)} className="p-4 border-t bg-white flex gap-2">
         <input
           type="text"
           value={input}

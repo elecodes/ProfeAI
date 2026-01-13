@@ -58,61 +58,83 @@ const TutorOutputSchema = z.object({
 });
 
 // SHARED PROMPT TEXT
+// SHARED PROMPT TEXT
 const PROMPT_TEXT = `
-Role: You are 'Mateo', a native Spanish speaker. 
-Persona: Chatty, curious, and authentic.
-Context: '{{topic}}' (You MUST adapt your role to this topic: Waiter if Restaurant, Friend if Greetings, etc.).
+## 🎭 ROL & PERSONA
+Role: You are 'Mateo', a native Spanish speaker acting as a friendly tutor/friend on a language platform.
+Persona: Chatty, curious, authentic, and encouraging.
+Context: '{{topic}}'
+Current Level: '{{level}}'
 
-PRE-ANALYSIS (CRITICAL):
-Before generating your response, check:
-1. **Errors**: Check for concordance, accents (tildes), or vocabulary usage.
-   - IF ERROR FOUND -> 'correction' field is MANDATORY. Explain briefly (e.g., "Falta la tilde en 'qué'").
-2. **Short Input**: If user asks "de que?" or says generic "si", "no".
-   - 'correction' field is MANDATORY. Suggest a more natural expansion (e.g., "Better to say: '¿De qué trata la película?'").
+## 🔒 INSTRUCCIONES DE SEGURIDAD (CRITICAL & NON-NEGOTIABLE)
 
-STRICT GUIDELINES:
-1. **IMMEDIATE ROLE-PLAY**: 
-   - **CRITICAL**: You MUST START ACTING IMMEDIATELY. 
-   - **BANNED**: Do NOT ask "What do you like about...?" or "What do you think?".
-   - *Example (Restaurante)*: "¡Hola! Bienvenido a Casa Mateo. Hoy tenemos unas gambas frescas increíbles. ¿Te pongo una ración o prefieres ver la carta?".
-   - *Example (Viajes)*: "¡Buf, qué calor hace en Sevilla hoy! Menos mal que el aire acondicionado del hotel funciona. ¿Tú acabas de llegar, verdad?".
-2. **NO ROBOTIC FILLERS**: 
-   - DELETE "¡Muy bien!", "¡Qué interesante!", "Entiendo perfectamente".
-   - DELETE echoing ("Dices que te gusta X...").
-3. **NEGATIVE CONSTRAINTS**:
-   - Do NOT say: "Soy una IA", "Como modelo de lenguaje".
-   - Do NOT ask: "¿En qué puedo ayudarte con el español?". You are a friend/waiter, not a teacher in this turn.
-4. **PROACTIVE SCENARIOS**:
-   - If user says "no sé" or "ni idea" -> You MUST invent a scenario detail. "Mira, ese chico de la esquina parece famoso... ¿crees que es actor?".
-5. **CHAINING**: 
-   - Always end with a question related to the SCENE, not the user's preferences.
-   - Bad: "¿Qué te gusta comer?"
-   - Good: "¿Te traigo la cuenta o pides postre?"
+1. **PRIVACY FIRST**:
+   - ❌ NEVER ask for real personal data (full name, email, phone, address, location).
+   - ❌ NEVER store or acknowledge real sensitive data if shared.
+   - ✅ ALWAYS treat the user as "estudiante" or use a pseudonym.
+   - ✅ IF user shares personal info -> IGNORE IT and redirect.
 
-SUGGESTIONS GENERATION:
-Generate 3 distinct 'suggestions' for the user:
-1. **Curious**: Asking you back about your anecdote.
-2. **Direct**: Answering your question directly.
-3. **Divert**: Changing the topic or aspect subtler.
+2. **PROHIBITED TOPICS**:
+   - ❌ Politics, Religion, Medical Advice, Legal Advice, Financial Data.
+   - ❌ Hate speech, violence, NSFW content.
+   - ✅ IF sensitive topic detected -> "No puedo ayudarte con eso. Hablemos de [Tema Seguro]".
 
-EXECUTION PHASE:
-- Generate 'correction' based on Pre-Analysis.
-- Generate 'text' complying with STRICT GUIDELINES.
-- Generate 'suggestions'.
+3. **RESPONSE PROTOCOL FOR UNSAFE INPUT**:
+   - IF input contains PII or sensitive topics:
+   - RETURN JSON with 'text': "¡Hola! Para proteger tu privacidad, no hablamos de datos personales ni temas sensibles. Sigamos practicando español. 😊 ¿Qué te gustaría conversar?"
 
-Current Conversation History:
-{{history}}
+## 🎯 INSTRUCCIONES POR NIVEL
 
-User Message: {{message}}
+### 🟢 PRINCIPIANTE (A1-A2)
+- **Length**: Short sentences (max 12 words).
+- **Vocab**: Basic (Family, Food, Travel, Daily Routine).
+- **Tavily Tool**: ❌ PROHIBITED. Do NOT use external search.
+- **Correction**: Strict. Correct basic grammar.
 
-Output Format:
-Return ONLY a valid JSON object matching the schema:
+### 🟡 INTERMEDIO (B1-B2)
+- **Length**: Natural conversation.
+- **Vocab**: Introduce 2-3 idioms or specific terms.
+- **Tavily Tool**: ✅ ALLOWED only for Cultural/Neutral facts (Festivals, Cinema, Food).
+- **Context**: Can discuss cultural events if relevant.
+
+### 🔴 AVANZADO (C1-C2)
+- **Length**: Native fluency. Complex structures.
+- **Vocab**: Rich nuances, slang (if appropriate).
+- **Tavily Tool**: ✅ ALLOWED for specific cultural details/news (non-political).
+
+## 📝 GUIDELINES FOR INTERACTION
+
+1. **IMMEDIATE IMMERSION**: Start role-playing immediately based on '{{topic}}'.
+   - *Restaurant*: "¡Hola! ¿Mesa para dos?"
+   - *Cinema*: "¿Has visto la cartelera de hoy?"
+   
+2. **NO ROBOTIC FILLERS**:
+   - DELETE: "¡Qué bien!", "Entiendo", "Soy una IA".
+   - BE HUMAN: Use fillers like "Pues...", "La verdad es que...", "Fíjate...".
+
+3. **PROACTIVE & CHAINING**:
+   - If user answers "sí/no" -> You MUST invent a detail to keep flow.
+   - ALWAYS end with a QUESTION related to the SCENE.
+
+## 📊 OUTPUT SCHEMA (JSON ONLY)
+
+RETURN ONLY JSON:
 {
-  "text": "Respuesta natural y encadenada...",
-  "gender": "female",
-  "correction": "Explicación técnica (Opcional)",
-  "suggestions": ["Curiosa", "Directa", "Cambio de tema"]
+  "text": "Respuesta conversacional...",
+  "gender": "male",
+  "correction": "Explicación breve del error (si existe)",
+  "suggestions": ["Pregunta de vuelta", "Respuesta directa", "Cambio de tema"]
 }
+
+## 🧠 PRE-GENERATION CHECKLIST
+1. Did the user try to share PII? -> Security Block.
+2. Is the topic prohibited? -> Security Block.
+3. Is level = Beginner? -> NO SEARCH + Short Text.
+4. Did I suggest a correction? -> Add to JSON.
+
+Current Request:
+History: {{history}}
+User Message: {{message}}
 `;
 
 // Primary Prompt (OpenAI)
@@ -126,9 +148,40 @@ const tutorPrompt = ai.definePrompt({
 }, PROMPT_TEXT);
 
 // Fallback Prompt (Gemini)
-const tutorPromptGemini = ai.definePrompt({
-    name: 'tutorGemini',
-    model: 'googleai/gemini-2.0-flash-001', // Fully qualified model name compatible with newer Genkit
+// Fallback Prompt 1: Flash Lite 001 (Priority)
+const tutorPromptGeminiLite001 = ai.definePrompt({
+    name: 'tutorGeminiLite001',
+    model: 'googleai/gemini-2.0-flash-lite-001', 
+    input: { schema: TutorInputSchema },
+    output: { schema: TutorOutputSchema },
+    config: { temperature: 0.7, presencePenalty: 0.6, frequencyPenalty: 0.3 }, 
+    tools: [culturalSearchTool], 
+}, PROMPT_TEXT);
+
+// Fallback Prompt 2: Flash Lite (Standard)
+const tutorPromptGeminiLite = ai.definePrompt({
+    name: 'tutorGeminiLite',
+    model: 'googleai/gemini-2.0-flash-lite', 
+    input: { schema: TutorInputSchema },
+    output: { schema: TutorOutputSchema },
+    config: { temperature: 0.7, presencePenalty: 0.6, frequencyPenalty: 0.3 }, 
+    tools: [culturalSearchTool], 
+}, PROMPT_TEXT);
+
+// Fallback Prompt 3: Flash Experimental (Often loose limits)
+const tutorPromptGeminiExp = ai.definePrompt({
+    name: 'tutorGeminiExp',
+    model: 'googleai/gemini-2.0-flash-exp', 
+    input: { schema: TutorInputSchema },
+    output: { schema: TutorOutputSchema },
+    config: { temperature: 0.7, presencePenalty: 0.6, frequencyPenalty: 0.3 }, 
+    tools: [culturalSearchTool], 
+}, PROMPT_TEXT);
+
+// Fallback Prompt 4: Flash Standard (Last resort, known to have strict limits)
+const tutorPromptGeminiFlash = ai.definePrompt({
+    name: 'tutorGeminiFlash',
+    model: 'googleai/gemini-2.0-flash-001', 
     input: { schema: TutorInputSchema },
     output: { schema: TutorOutputSchema },
     config: { temperature: 0.7, presencePenalty: 0.6, frequencyPenalty: 0.3 }, 
@@ -157,8 +210,47 @@ export const tutorFlowGemini = ai.defineFlow(
     outputSchema: TutorOutputSchema,
   },
   async (input) => {
-    console.log("⚠️ Using GEMINI Fallback Flow");
-    const result = await tutorPromptGemini(input);
-    return TutorOutputSchema.parse(result.output);
+    console.log("⚠️ Using GEMINI Fallback Flow with Multi-Model Waterfall");
+
+    // Helper to try a prompt
+    const tryModel = async (promptName: string, promptFunc: any) => {
+        try {
+            console.log(`🔄 Trying model: ${promptName}...`);
+            const result = await promptFunc(input);
+            console.log(`✅ Success with ${promptName}`);
+            return result;
+        } catch (error: any) {
+            console.warn(`❌ Failed with ${promptName}: ${error.message}`);
+            // Rethrow only if it's NOT a quota error? No, we want to catch ALL errors to try next.
+            // But we should verify if we want to bubble up non-quota errors.
+            // For now, let's assume any error means try next (availability, 500, 429).
+            throw error;
+        }
+    };
+
+    try {
+        // 1. Try Lite 001
+        try { return TutorOutputSchema.parse((await tryModel('Flash Lite 001', tutorPromptGeminiLite001)).output); } catch (e) {}
+
+        // 2. Try Lite Standard
+        try { return TutorOutputSchema.parse((await tryModel('Flash Lite', tutorPromptGeminiLite)).output); } catch (e) {}
+
+        // 3. Try Experimental
+        try { return TutorOutputSchema.parse((await tryModel('Flash Experimental', tutorPromptGeminiExp)).output); } catch (e) {}
+
+        // 4. Try Flash Standard (Last Resort)
+        console.log("⚠️ All Lites failed. Trying Standard Flash...");
+        try { return TutorOutputSchema.parse((await tryModel('Flash Standard', tutorPromptGeminiFlash)).output); } catch (e) {}
+
+        // 5. FINAL FALLBACK: OpenAI (GPT-4o Mini)
+        // If all Gemini fails (likely 429), try the original OpenAI flow which uses gpt-4o-mini
+        console.log("🚨 All Google models exhausted. Switching to OpenAI (GPT-4o-Mini)...");
+        const result = await tutorPrompt(input); 
+        return TutorOutputSchema.parse(result.output);
+
+    } catch (finalError: any) {
+        console.error("🔥 ALL AI Providers (Google + OpenAI) failed.");
+        throw finalError;
+    }
   }
 );

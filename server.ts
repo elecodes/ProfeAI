@@ -92,8 +92,16 @@ app.post("/api/chat/start", async (req: Request, res: Response) => {
     }
     
     // Propagate 429 errors
-    if (error.status === 429 || error.message?.includes("429") || error.message?.includes("Quota exceeded")) {
-       return res.status(429).json({ error: "Quota exceeded", code: "rate_limit_exceeded" });
+    if (
+      error.status === 429 ||
+      error.message?.includes("429") ||
+      error.message?.includes("Quota exceeded") ||
+      error.message?.includes("Rate limit reached") ||
+      error.code === "rate_limit_exceeded"
+    ) {
+      return res
+        .status(429)
+        .json({ error: "Quota exceeded", code: "rate_limit_exceeded" });
     }
 
     res.status(500).json({ error: "Failed to start conversation", details: error.message });
@@ -124,8 +132,16 @@ app.post("/api/chat/message", async (req: Request, res: Response) => {
     console.error("Error sending message:", error);
 
     // Propagate 429 errors
-    if (error.status === 429 || error.message?.includes("429") || error.message?.includes("Quota exceeded")) {
-       return res.status(429).json({ error: "Quota exceeded", code: "rate_limit_exceeded" });
+    if (
+      error.status === 429 ||
+      error.message?.includes("429") ||
+      error.message?.includes("Quota exceeded") ||
+      error.message?.includes("Rate limit reached") ||
+      error.code === "rate_limit_exceeded"
+    ) {
+      return res
+        .status(429)
+        .json({ error: "Quota exceeded", code: "rate_limit_exceeded" });
     }
 
     res.status(500).json({ error: "Failed to process message" });

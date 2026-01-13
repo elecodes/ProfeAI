@@ -20,6 +20,8 @@ const envSchema = z.object({
   AWS_ACCESS_KEY_ID: z.string().optional(),
   AWS_SECRET_ACCESS_KEY: z.string().optional(),
   AWS_REGION: z.string().optional(),
+  TAVILY_API_KEY: z.string().optional(),
+  GOOGLE_GENAI_API_KEY: z.string().optional(),
 });
 
 type Env = z.infer<typeof envSchema>;
