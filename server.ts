@@ -52,6 +52,12 @@ app.use(
 app.use(cors());
 app.use(express.json());
 
+// GLOBAL REQUEST LOGGER
+app.use((req, res, next) => {
+  console.log(`📥 [${req.method}] ${req.url}`);
+  next();
+});
+
 // --- Routes ---
 
 // 1. Chat / Roleplay Endpoints
@@ -66,17 +72,11 @@ app.post("/api/chat/start", async (req: Request, res: Response) => {
         .json({ error: "Missing topic, level, or sessionId" });
     }
 
-    let reply;
-    try {
-      reply = await ConversationService.startConversation(
+    const reply = await ConversationService.startConversation(
         sessionId,
         topic,
         level
-      );
-    } catch (serviceError) {
-      console.error("ConversationService error:", serviceError);
-      reply = "Lo siento, hubo un problema al iniciar la conversación.";
-    }
+    );
 
     // Normalize reply and force male gender safely
     const safeReply =
@@ -85,11 +85,18 @@ app.post("/api/chat/start", async (req: Request, res: Response) => {
 
     res.json({ message: finalResponse });
   } catch (error: any) {
-    console.error("Error starting chat:", error);
+    console.error("🔥 ERROR DETALLADO:", error);
+    if (error.stack) console.error("Stack:", error.stack);
     if (error.response) {
-       console.error("OpenAI API Error details:", error.response.data);
+       console.error("API Error details:", error.response.data);
     }
-    res.status(500).json({ error: "Failed to start conversation" });
+    
+    // Propagate 429 errors
+    if (error.status === 429 || error.message?.includes("429") || error.message?.includes("Quota exceeded")) {
+       return res.status(429).json({ error: "Quota exceeded", code: "rate_limit_exceeded" });
+    }
+
+    res.status(500).json({ error: "Failed to start conversation", details: error.message });
   }
 });
 
@@ -100,18 +107,12 @@ app.post("/api/chat/message", async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Missing message or sessionId" });
     }
 
-    let reply;
-    try {
-      reply = await ConversationService.sendMessage(
+    const reply = await ConversationService.sendMessage(
         sessionId,
         message,
         topic,
         level
-      );
-    } catch (serviceError) {
-      console.error("ConversationService error:", serviceError);
-      reply = "Lo siento, hubo un problema al procesar tu mensaje.";
-    }
+    );
 
     // Normalize reply and force male gender safely
     const safeReply =
@@ -119,8 +120,14 @@ app.post("/api/chat/message", async (req: Request, res: Response) => {
     const finalResponse = { ...safeReply, gender: "male" };
 
     res.json({ message: finalResponse });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error sending message:", error);
+
+    // Propagate 429 errors
+    if (error.status === 429 || error.message?.includes("429") || error.message?.includes("Quota exceeded")) {
+       return res.status(429).json({ error: "Quota exceeded", code: "rate_limit_exceeded" });
+    }
+
     res.status(500).json({ error: "Failed to process message" });
   }
 });
