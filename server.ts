@@ -268,7 +268,7 @@ app.get("/tts/status", async (req: Request, res: Response) => {
 
 // Handle SPA routing - return index.html for any unknown routes
 // IMPORTANT: This must be the LAST route defined
-app.get("*", (req: Request, res: Response) => {
+app.get(/.*/, (req: Request, res: Response) => {
   // Don't intercept API routes (though they should be matched above)
   if (req.path.startsWith("/tts") || req.path.startsWith("/api")) {
     return res.status(404).json({ error: "Not found" });
