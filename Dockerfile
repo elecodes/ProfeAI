@@ -23,7 +23,8 @@ COPY package*.json ./
 RUN npm install --omit=dev
 
 # Copy backend code
-COPY server.js ./
+# Copy backend code
+COPY server.ts ./
 COPY src ./src
 
 # Copy built frontend assets from builder stage
@@ -31,4 +32,4 @@ COPY --from=builder /app/dist ./dist
 
 EXPOSE 3001
 
-CMD ["node", "server.js"]
+CMD ["npm", "start"]
