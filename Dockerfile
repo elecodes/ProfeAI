@@ -19,6 +19,9 @@ ENV NODE_ENV=production
 # Update npm to fix vulnerabilities in base image
 RUN npm install -g npm@latest
 
+# Update system packages to fix OS-level vulnerabilities
+RUN apk update && apk upgrade
+
 COPY package*.json ./
 # Disable husky prepare script in production
 RUN npm pkg delete scripts.prepare
