@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 
 import path from "path";
 import { fileURLToPath } from "url";
@@ -54,8 +55,25 @@ app.use(
     },
   })
 );
-app.use(cors());
+app.use(cors({
+  origin: ["http://localhost:5173", "http://127.0.0.1:5173"], // Allow Vite dev server
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  credentials: true
+}));
 app.use(express.json());
+
+// Rate Limiter: 100 requests per 15 minutes
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  message: { error: "Too many requests, please try again later." }
+});
+
+// Apply rate limiting to all API routes
+app.use("/api", limiter);
 
 // GLOBAL REQUEST LOGGER
 app.use((req, res, next) => {
