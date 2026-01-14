@@ -5,10 +5,10 @@ class AudioMock {
   play() {}
   pause() {}
 }
-global.Audio = AudioMock;
+globalThis.Audio = AudioMock;
 
 // mock de fetch
-global.fetch = vi.fn(() =>
+globalThis.fetch = vi.fn(() =>
   Promise.resolve({
     ok: true,
     arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)),
@@ -16,14 +16,18 @@ global.fetch = vi.fn(() =>
 );
 
 // mock de speechSynthesis
-global.speechSynthesis = {
-  onvoiceschanged: null,
-  getVoices: vi.fn(() => []),
-  speak: vi.fn(),
-  cancel: vi.fn(),
-  pause: vi.fn(),
-  resume: vi.fn(),
-};
+Object.defineProperty(globalThis, 'speechSynthesis', {
+  value: {
+    onvoiceschanged: null,
+    getVoices: vi.fn(() => []),
+    speak: vi.fn(),
+    cancel: vi.fn(),
+    pause: vi.fn(),
+    resume: vi.fn(),
+  },
+  writable: true,
+  configurable: true // Allow re-definition
+});
 
 // Mock custom element to prevent hang
 customElements.define("elevenlabs-convai", class extends HTMLElement {});

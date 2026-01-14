@@ -77,6 +77,33 @@
 2.  **Verify Build**: Did `npm run build` complete successfully?
 3.  **Check Docker**: Are static files being served correctly? (`docker-compose restart server`).
 
+### Scenario D: High Rate of 429 Errors (Quota Exceeded)
+**Trigger**: Sentry alert "Rate limit exceeded" or user reports of "LIMITE_CUOTA".
+
+1.  **Check Provider**: Is it our `express-rate-limit` (server.ts) or an external API (OpenAI/Google)?
+    *   *Internal*: Restart server to reset memory cache, or increase limit in `server.ts`.
+    *   *External*: Rotate API keys or switch models.
+2.  **Analyze Traffic**: Is it a DoS attack?
+    *   *Yes*: Block IP at firewall/Cloudflare level.
+
+### Scenario E: CORS Errors
+**Trigger**: Frontend console "Access-Control-Allow-Origin" error.
+
+1.  **Verify Origin**: Is the user accessing from a new domain?
+    *   *Action*: Add domain to `allowedOrigins` in `server.ts`.
+2.  **Verify Environment**: Is it Prod trying to hit Dev?
+
 ---
 
 > **Remember**: In an incident, **Communication > Code**. Tell the team/users what is happening.
+### Scenario F: UI Bugs / Visual Regressions
+**Trigger**: User report "Button looks broken on mobile" or "Colors are wrong".
+
+1.  **Reproduce in Storybook**:
+    *   Run `npm run storybook`.
+    *   Find the component (e.g., `FlashcardText`).
+    *   Tweak controls to match user report.
+2.  **Verify Fix**:
+    *   Fix the CSS.
+    *   Verify in Storybook FIRST.
+    *   Then verify in App.

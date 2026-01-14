@@ -131,3 +131,6 @@ firebase-debug.log*
 
 # Local Cache
 cache/
+
+*storybook.log
+storybook-static

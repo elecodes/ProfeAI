@@ -1,54 +1,79 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+/// <reference types="vitest/config" />
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 import tailwindcss from "@tailwindcss/vite";
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 
-
 // https://vite.dev/config/
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
+import { playwright } from '@vitest/browser-playwright';
+const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
+
+// More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
-  plugins: [
-    react(), 
-    tailwindcss(),
-    ViteImageOptimizer({
-      /* pass your config */
-      png: { quality: 80 },
-      jpeg: { quality: 80 },
-      webp: { quality: 80 },
-      svg: {
-        multipass: true,
-        plugins: [
-          {
-            name: 'preset-default',
-            params: {
-              overrides: {
-                cleanupNumericValues: false,
-              },
-            },
-          },
-          'sortAttrs',
-          {
-            name: 'addAttributesToSVGElement',
-            params: {
-              attributes: [{ xmlns: 'http://www.w3.org/2000/svg' }],
-            },
-          },
-        ],
-      },
-    }),
-  ],
+  plugins: [react(), tailwindcss(), ViteImageOptimizer({
+    /* pass your config */
+    png: {
+      quality: 80
+    },
+    jpeg: {
+      quality: 80
+    },
+    webp: {
+      quality: 80
+    },
+    svg: {
+      multipass: true,
+      plugins: [{
+        name: 'preset-default',
+        params: {
+          overrides: {
+            cleanupNumericValues: false
+          }
+        }
+      }, 'sortAttrs', {
+        name: 'addAttributesToSVGElement',
+        params: {
+          attributes: [{
+            xmlns: 'http://www.w3.org/2000/svg'
+          }]
+        }
+      }]
+    }
+  })],
   test: {
     environment: "happy-dom",
     globals: true,
     setupFiles: "./test/setup.js",
-    include: [
-      "src/tests/**/*.test.{js,jsx,ts,tsx}",
-      "src/tests/**/integration/**/*.integration.test.{js,jsx,ts,tsx}",
-    ],
+    include: ["src/tests/**/*.test.{js,jsx,ts,tsx}", "src/tests/**/integration/**/*.integration.test.{js,jsx,ts,tsx}"],
+    projects: [{
+      extends: true,
+      plugins: [
+      // The plugin will run tests for the stories defined in your Storybook config
+      // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
+      storybookTest({
+        configDir: path.join(dirname, '.storybook')
+      })],
+      test: {
+        name: 'storybook',
+        browser: {
+          enabled: true,
+          headless: true,
+          provider: playwright({}),
+          instances: [{
+            browser: 'chromium'
+          }]
+        },
+        setupFiles: ['.storybook/vitest.setup.js']
+      }
+    }]
   },
   server: {
     proxy: {
       '/api': 'http://127.0.0.1:3001',
-      '/tts': 'http://127.0.0.1:3001',
-    },
-  },
+      '/tts': 'http://127.0.0.1:3001'
+    }
+  }
 });
