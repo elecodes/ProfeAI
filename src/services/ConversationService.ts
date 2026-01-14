@@ -110,7 +110,8 @@ class ConversationService {
     console.log(`⚡ Generating GENKIT response for session ${sessionId}...`);
     
     const history = await this.getHistory(sessionId).getMessages();
-    const historyContext = history.slice(-5).map(m => ({
+    // OPTIMIZATION: Limit history to last 4 messages to save tokens (requested by user)
+    const historyContext = history.slice(-4).map(m => ({
         role: m._getType() === 'human' ? 'user' : 'model',
         content: [{ text: m.content.toString() }]
     }));

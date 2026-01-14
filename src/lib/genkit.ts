@@ -158,6 +158,16 @@ const tutorPromptGeminiLite001 = ai.definePrompt({
     tools: [culturalSearchTool], 
 }, PROMPT_TEXT);
 
+// Fallback Prompt 1.5: Gemini 1.5 Flash (STABLE WORKHORSE)
+const tutorPromptGemini15Flash = ai.definePrompt({
+    name: 'tutorGemini15Flash',
+    model: 'googleai/gemini-flash-latest', 
+    input: { schema: TutorInputSchema },
+    output: { schema: TutorOutputSchema },
+    config: { temperature: 0.7, presencePenalty: 0.6, frequencyPenalty: 0.3 }, 
+    tools: [culturalSearchTool], 
+}, PROMPT_TEXT);
+
 // Fallback Prompt 2: Flash Lite (Standard)
 const tutorPromptGeminiLite = ai.definePrompt({
     name: 'tutorGeminiLite',
@@ -212,6 +222,9 @@ export const tutorFlowGemini = ai.defineFlow(
   async (input) => {
     console.log("⚠️ Using GEMINI Fallback Flow with Multi-Model Waterfall");
 
+    // Helper for delay
+    const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
     // Helper to try a prompt
     const tryModel = async (promptName: string, promptFunc: any) => {
         try {
@@ -221,26 +234,32 @@ export const tutorFlowGemini = ai.defineFlow(
             return result;
         } catch (error: any) {
             console.warn(`❌ Failed with ${promptName}: ${error.message}`);
-            // Rethrow only if it's NOT a quota error? No, we want to catch ALL errors to try next.
-            // But we should verify if we want to bubble up non-quota errors.
-            // For now, let's assume any error means try next (availability, 500, 429).
             throw error;
         }
     };
 
     try {
         // 1. Try Lite 001
-        try { return TutorOutputSchema.parse((await tryModel('Flash Lite 001', tutorPromptGeminiLite001)).output); } catch (e) {}
+        try { return TutorOutputSchema.parse((await tryModel('Flash Lite 001', tutorPromptGeminiLite001)).output); } catch (e) { await delay(2000); }
+
+        // 1.5 Try GEMINI 1.5 FLASH (Stable) - Retry Loop
+        console.log("⚠️ Trying Gemini 1.5 Flash (Robust Retry)...");
+        try { 
+             return TutorOutputSchema.parse((await tryModel('Gemini 1.5 Flash', tutorPromptGemini15Flash)).output); 
+        } catch (e) { 
+             console.log("⚠️ 1.5 Flash failed immediately. Waiting 5s...");
+             await delay(5000); // Wait 5s before next fallback
+        }
 
         // 2. Try Lite Standard
-        try { return TutorOutputSchema.parse((await tryModel('Flash Lite', tutorPromptGeminiLite)).output); } catch (e) {}
+        try { return TutorOutputSchema.parse((await tryModel('Flash Lite', tutorPromptGeminiLite)).output); } catch (e) { await delay(2000); }
 
         // 3. Try Experimental
-        try { return TutorOutputSchema.parse((await tryModel('Flash Experimental', tutorPromptGeminiExp)).output); } catch (e) {}
+        try { return TutorOutputSchema.parse((await tryModel('Flash Experimental', tutorPromptGeminiExp)).output); } catch (e) { await delay(2000); }
 
         // 4. Try Flash Standard (Last Resort)
         console.log("⚠️ All Lites failed. Trying Standard Flash...");
-        try { return TutorOutputSchema.parse((await tryModel('Flash Standard', tutorPromptGeminiFlash)).output); } catch (e) {}
+        try { return TutorOutputSchema.parse((await tryModel('Flash Standard', tutorPromptGeminiFlash)).output); } catch (e) { await delay(5000); }
 
         // 5. FINAL FALLBACK: OpenAI (GPT-4o Mini)
         // If all Gemini fails (likely 429), try the original OpenAI flow which uses gpt-4o-mini

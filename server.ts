@@ -32,7 +32,7 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://unpkg.com"], // React needs unsafe-inline/eval in dev
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://unpkg.com", "https://cdn.tailwindcss.com"], // React needs unsafe-inline/eval in dev
         styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://unpkg.com", "https://elevenlabs.io"],
         fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
         connectSrc: [
@@ -42,6 +42,7 @@ app.use(
           "https://firestore.googleapis.com", // Firestore
           "https://texttospeech.googleapis.com", // Google TTS
           "https://api.elevenlabs.io", // ElevenLabs API
+          "https://api.us.elevenlabs.io", // ElevenLabs US API (Fixed CSP)
           "wss://api.elevenlabs.io", // ElevenLabs WebSockets
           "https://elevenlabs.io", // ElevenLabs General
           "https://polly.us-east-1.amazonaws.com", // AWS Polly
