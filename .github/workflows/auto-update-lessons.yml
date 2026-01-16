@@ -1,0 +1,35 @@
+name: Auto Update Lessons
+
+on:
+  schedule:
+    - cron: '0 0 */14 * *' # Executes every 14 days
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+jobs:
+  update-content:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Create Firebase credentials file
+      run: |
+        echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > firebase-service-account.json
+      env:
+        FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+    - name: Run Content Refresh Script
+      run: npx tsx scripts/refresh-content.ts
+      env:
+        GOOGLE_GENAI_API_KEY: ${{ secrets.GOOGLE_GENAI_API_KEY }}
+        GOOGLE_APPLICATION_CREDENTIALS: ./firebase-service-account.json
