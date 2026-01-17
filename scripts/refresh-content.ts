@@ -145,9 +145,13 @@ async function main() {
     // Note: In ESM (module: type="module"), 'require' is not available globally, so we construct it.
     const serviceAccount = require('../service-account.json');
     
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount)
-    });
+    if (admin.apps.length === 0) {
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount)
+      });
+    } else {
+        console.log('🔥 Firebase Admin already initialized, skipping re-init.');
+    }
 
     const db = admin.firestore();
     // Simple connection test
