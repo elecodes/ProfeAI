@@ -4,6 +4,9 @@ on:
   schedule:
     - cron: '0 0 */14 * *' # Executes every 14 days
   workflow_dispatch: # Allows manual trigger from GitHub UI
+  push:
+    branches:
+      - feature/auto-content-update # Trigger on push for testing
 
 jobs:
   update-content:
