@@ -322,7 +322,16 @@ The application follows a **Client-Server** architecture, leveraging modern web 
 -   **Description**: Analyze user text for grammatical correctness.
 -   **Implementation**:
    -   **Backend**: `/api/grammar/analyze` endpoint.
-   -   **Service**: `GrammarService.js` uses LLM to provide detailed feedback and corrections.
+    -   **Service**: `GrammarService.js` uses LLM to provide detailed feedback and corrections.
+
+
+### 3.7 Automated Content Refresh
+-   **Description**: Bi-weekly generation of new phrases and quizzes to keep content fresh.
+-   **Implementation**:
+    -   **Script**: `scripts/refresh-content.ts` (TypeScript).
+    -   **Orchestrator**: GitHub Actions (`.github/workflows/auto-update-lessons.yml`).
+    -   **AI**: Gemini 2.0 Flash (via `@google/generative-ai`).
+    -   **Storage**: Writes directly to Firestore `*_general` documents.
 
 
 ### 3.6 User Profile
