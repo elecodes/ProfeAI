@@ -1,7 +1,7 @@
-# 🇪🇸 AppTutor - Tu Tutor de Español con IA
+# 🇪🇸 Profe AI - Tu Tutor de Español con IA
 > [Read this document in English 🇺🇸](README_en.md)
 
-AppTutor es una aplicación web interactiva diseñada para ayudar a estudiantes a aprender español mediante lecciones estructuradas, práctica de pronunciación (TTS), cuestionarios y conversaciones dinámicas impulsadas por Inteligencia Artificial.
+Profe AI es una aplicación web interactiva diseñada para ayudar a estudiantes a aprender español mediante lecciones estructuradas, práctica de pronunciación (TTS), cuestionarios y conversaciones dinámicas impulsadas por Inteligencia Artificial.
 
 ![AppTutor Screenshot](https://via.placeholder.com/800x400?text=AppTutor+Preview)
 

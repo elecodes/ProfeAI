@@ -1,10 +1,10 @@
-# AppTutor Master Design Document
+# Profe AI Master Design Document
 
 
 ## 1. Overview
 
 
-AppTutor is an interactive web application designed to help students learn Spanish. It provides a comprehensive learning experience through structured lessons, pronunciation practice, AI-powered conversational role-playing, and grammar analysis. The platform is designed to be dynamic, secure, and scalable, leveraging a modern technology stack.
+Profe AI is an interactive web application designed to help students learn Spanish. It provides a comprehensive learning experience through structured lessons, pronunciation practice, AI-powered conversational role-playing, and grammar analysis. The platform is designed to be dynamic, secure, and scalable, leveraging a modern technology stack.
 
 
 ## 2. System Architecture
@@ -74,7 +74,7 @@ The backend is a Node.js application using the Express framework to provide a RE
 ## 5. AI and External Services
 
 
-AppTutor integrates with several external services to provide its core features:
+Profe AI integrates with several external services to provide its core features:
 
 
 *   **Firebase:**
@@ -125,7 +125,7 @@ The application is designed to be deployed using Docker for consistency across d
 ## 8. Security
 
 
-Security is a key consideration in the AppTutor project.
+Security is a key consideration in the Profe AI project.
 
 
 *   **Helmet.js:** A collection of middleware that sets various HTTP headers to protect against common web vulnerabilities (e.g., Cross-Site Scripting (XSS), clickjacking).
@@ -217,7 +217,7 @@ The project has a comprehensive testing and quality assurance strategy.
 
 Antigravity answer:
 
-# Master Design Document: AppTutor (Tutor de Idiomas)
+# Master Design Document: Profe AI (Tutor de Idiomas)
 
 
 ## 1. Project Overview

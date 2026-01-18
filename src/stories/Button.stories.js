@@ -48,7 +48,7 @@ export const Small = {
   },
 };
 
-export const AppTutor = {
+export const ProfeAI = {
   args: {
     primary: false,
     label: "Button"

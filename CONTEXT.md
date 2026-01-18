@@ -1,6 +1,6 @@
 # Project Context
 
-This document provides context on the technical implementation of the AppTutor project.
+This document provides context on the technical implementation of the Profe AI project.
 
 ## Technologies
 

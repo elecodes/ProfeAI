@@ -1,6 +1,6 @@
-# 🇺🇸 AppTutor - Your AI Spanish Tutor
+# 🇺🇸 Profe AI - Your AI Spanish Tutor
 
-AppTutor is an interactive web application designed to help students learn Spanish through structured lessons, pronunciation practice (TTS), quizzes, and dynamic conversations powered by Artificial Intelligence.
+Profe AI is an interactive web application designed to help students learn Spanish through structured lessons, pronunciation practice (TTS), quizzes, and dynamic conversations powered by Artificial Intelligence.
 
 ![AppTutor Screenshot](https://via.placeholder.com/800x400?text=AppTutor+Preview)
 
