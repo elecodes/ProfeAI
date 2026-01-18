@@ -279,7 +279,7 @@ The application follows a **Client-Server** architecture, leveraging modern web 
 
 ### 2.5 Testing & Quality
 -   **Unit/Integration**: Vitest.
--   **E2E Testing**: Playwright.
+-   **E2E Testing**: Playwright (Running against Vite dev server).
 -   **Accessibility**: Pa11y CI.
 -   **Performance**: Lighthouse CI.
 -   **Linting**: ESLint.

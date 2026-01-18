@@ -335,6 +335,7 @@ const HomePage = () => {
           </button>
 
           <button
+            data-testid="nav-dialogues-btn"
             onClick={() => setMode("dialogues")}
             className={`text-left px-3 py-2 rounded-lg transition ${
               mode === "dialogues"

@@ -112,7 +112,7 @@ Accede a `https://tu-dominio.com`.
 ## 🧪 Tests y Calidad
 
 *   **Unitarios:** `npm test`
-*   **E2E:** `npm run test:e2e`
+*   **E2E:** `npm run test:e2e` (Ejecuta tests con Playwright contra el servidor de desarrollo local `http://localhost:5173`)
 *   **Linting:** `npm run lint`
 *   **Seguridad:** `npm run test:security` (Snyk)
 
