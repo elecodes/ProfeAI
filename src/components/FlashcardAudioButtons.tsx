@@ -8,19 +8,21 @@ interface FlashcardAudioButtonsProps {
 
 export default function FlashcardAudioButtons({ english, spanish, speak }: FlashcardAudioButtonsProps) {
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-4 justify-center mt-2">
       <button
         onClick={() => speak(english, "en")}
-        className="bg-blue-100 text-blue-600 hover:bg-blue-200 px-3 py-1 rounded-lg text-sm font-medium transition"
+        title="Escuchar inglés"
+        className="text-[var(--color-secondary)] hover:text-[var(--color-primary)] hover:scale-110 transition-all p-2"
       >
-        🇺🇸 🔊
+        <span className="text-xl">🇺🇸</span>
       </button>
 
       <button
         onClick={() => speak(spanish, "es")}
-        className="bg-red-100 text-red-600 hover:bg-red-200 px-3 py-1 rounded-lg text-sm font-medium transition"
+        title="Escuchar español"
+        className="text-[var(--color-secondary)] hover:text-[var(--color-primary)] hover:scale-110 transition-all p-2"
       >
-        🇪🇸 🔊
+        <span className="text-xl">🇪🇸</span>
       </button>
     </div>
   );

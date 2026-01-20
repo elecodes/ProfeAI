@@ -277,44 +277,55 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
   }
 
   return (
-    <div className="flex flex-col h-[600px] max-w-2xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
-      <div className="bg-indigo-600 p-4 text-white flex justify-between items-center shadow-md">
-        <div>
-          <h2 className="font-bold text-lg">{currentTopic}</h2>
-          <span className="text-xs opacity-80 uppercase tracking-wider">Nivel: {level}</span>
-        </div>
-        <div className="flex gap-2">
-          <button onClick={() => setShowTopicSelector(true)} className="text-xs bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-md font-medium transition">
-            ✨ Nuevo Tema
-          </button>
+    <div className="flex flex-col h-[600px] max-w-2xl mx-auto glass-panel rounded-[var(--radius-card)] overflow-hidden">
+      {/* Header */}
+        <div className="flex bg-[var(--color-primary)] p-4 text-white justify-between items-center shadow-md pb-6 pt-6">
+            <button 
+                onClick={onBack} 
+                className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-[var(--radius-btn)] transition-all mr-4 font-bold tracking-wide shadow-sm"
+                title="Salir de la conversación"
+            >
+                <span className="text-lg">⬅️</span>
+                <span className="uppercase text-xs">Salir</span>
+            </button>
+            <div className="flex-1">
+                <h2 className="font-display font-bold text-xl tracking-wide truncate">{currentTopic}</h2>
+                <span className="text-xs opacity-60 uppercase tracking-[0.2em] text-[var(--color-accent)]">Nivel: {level}</span>
+            </div>
+            <div className="flex gap-2">
+                <button onClick={() => setShowTopicSelector(true)} className="text-xs border border-white/20 hover:bg-white/10 px-3 py-2 rounded-[var(--radius-btn)] font-medium transition tracking-wide text-[var(--color-accent)] hidden sm:block">
+                    ✨ Nuevo Tema
+                </button>
           <button 
             onClick={handleEndConversation}
             disabled={isLoading}
-            className="text-xs bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded-md transition disabled:opacity-50"
+            className="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 border border-red-500/20 px-4 py-2 rounded-[var(--radius-btn)] transition disabled:opacity-50 tracking-wide"
           >
             {isLoading ? "Analizando..." : "Finalizar"}
           </button>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
+      <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/50">
         {messages.map((msg, idx) => (
           <div key={idx} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-            <div className={`max-w-[85%] rounded-2xl p-3.5 shadow-sm ${
+            <div className={`max-w-[85%] p-5 shadow-sm transition-all ${
               msg.role === "user"
-                ? "bg-indigo-600 text-white rounded-br-none"
-                : "bg-white border border-gray-200 text-gray-800 rounded-bl-none"
+                ? "bg-[var(--color-primary)] text-white rounded-2xl rounded-br-sm"
+                : "bg-white border border-gray-100 text-[var(--color-primary)] rounded-2xl rounded-bl-sm"
             }`}>
-              {msg.content}
+              <p className={msg.role === "user" ? "font-sans leading-relaxed" : "font-serif text-lg leading-relaxed"}>
+                  {msg.content}
+              </p>
             </div>
           </div>
         ))}
         {isLoading && (
           <div className="flex justify-start">
             <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm flex gap-2">
-              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+              <div className="w-2 h-2 bg-[var(--color-secondary)] rounded-full animate-bounce"></div>
+              <div className="w-2 h-2 bg-[var(--color-secondary)] rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+              <div className="w-2 h-2 bg-[var(--color-secondary)] rounded-full animate-bounce [animation-delay:-0.3s]"></div>
             </div>
           </div>
         )}
@@ -323,34 +334,34 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
 
       {/* SUGGESTIONS PILLS */}
       {suggestions.length > 0 && !isLoading && (
-        <div className="px-4 py-2 bg-slate-50 border-t border-gray-100 flex flex-wrap gap-2">
+        <div className="px-6 py-4 bg-white/50 border-t border-gray-100 backdrop-blur-sm flex flex-wrap gap-2">
             {suggestions.map((s, idx) => (
                 <button 
                   key={idx}
                   onClick={() => handleSuggestionClick(s)}
-                  className="bg-white border border-indigo-200 text-indigo-600 rounded-full px-4 py-1 text-sm hover:bg-indigo-50 transition shadow-sm text-left"
+                  className="bg-white border border-[var(--color-accent)]/30 text-[var(--color-primary)] rounded-full px-5 py-2 text-sm hover:bg-[var(--color-accent)]/10 transition shadow-sm hover:shadow-md text-left font-medium"
                 >
-                  {s}
+                  ✨ {s}
                 </button>
             ))}
         </div>
       )}
 
-      <form onSubmit={(e) => handleSend(e)} className="p-4 border-t bg-white flex gap-2">
+      <form onSubmit={(e) => handleSend(e)} className="p-4 border-t border-gray-200 bg-white/80 backdrop-blur-md flex gap-3">
         <input
           type="text"
           value={input}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
           placeholder="Escribe tu respuesta en español..."
-          className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="flex-1 border border-gray-200 bg-gray-50 rounded-[var(--radius-btn)] px-5 py-3 focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] transition"
           disabled={isLoading}
         />
         <button
           type="submit"
           disabled={isLoading || !input.trim()}
-          className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl hover:bg-indigo-700 disabled:opacity-50 font-medium"
+          className="bg-[var(--color-primary)] text-[var(--color-accent)] px-8 py-3 rounded-[var(--radius-btn)] hover:opacity-90 disabled:opacity-50 font-bold tracking-wide transition shadow-lg"
         >
-          Enviar
+          ENVIAR
         </button>
       </form>
     </div>

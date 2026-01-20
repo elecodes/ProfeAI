@@ -5,7 +5,7 @@ import { useAuth } from "../hooks/useAuth";
 import UserService from "../services/UserService";
 import { dialogues } from "../lessons/dialogues";
 import * as Sentry from "@sentry/react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { Lesson, LearnedPhrase } from "../types";
 
 // Lazy load components
@@ -13,7 +13,7 @@ const AuthForm = React.lazy(() => import("../components/auth/AuthForm"));
 const DialogueViewer = React.lazy(() => import("../components/DialogueViewer"));
 const DialogueGenerator = React.lazy(() => import("../components/DialogueGenerator"));
 
-// Local type for items within a lesson (assuming structure from Firestore)
+// Local type for items within a lesson
 interface Phrase {
   text: string;
   translation: string;
@@ -33,6 +33,8 @@ const Loading = () => (
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  
   // Auth State from Hook
   const { user, userProfile, loading: authLoading, signIn, signUp, signOut } = useAuth();
 
@@ -42,7 +44,14 @@ const HomePage = () => {
   const [temasDisponibles, setTemasDisponibles] = useState<Lesson[]>([]);
   const [frases, setFrases] = useState<Phrase[]>([]);
   const [learned, setLearned] = useState<Phrase[]>([]);
-  const [mode, setMode] = useState<string>("study"); // study, learned, quiz, dialogues
+  
+  // Mode derived from URL, default to 'study'
+  const mode = searchParams.get("mode") || "study";
+  
+  const setMode = (newMode: string) => {
+      setSearchParams({ mode: newMode });
+  };
+
   const [showTranslation, setShowTranslation] = useState<Record<number, boolean>>({});
   const [quizIndex, setQuizIndex] = useState<number>(0);
   const [quizScore, setQuizScore] = useState<number>(0);
@@ -140,13 +149,13 @@ const HomePage = () => {
         if (selected.locked) {
           setFrases([]); // No mostrar frases si está bloqueado
         } else {
-          setFrases(selected.items);
+          setFrases(selected.items || []);
         }
       } else {
         // Si el tema actual no existe en este nivel (ej: cambio de nivel),
         // seleccionar el primero disponible
         if (processedWeeks.length > 0) {
-          setTema(processedWeeks[0].weekName);
+          setTema(processedWeeks[0].weekName || "");
           // Opcional: limpiar frases mientras cambia
           setFrases([]); 
         } else {
@@ -212,16 +221,8 @@ const HomePage = () => {
   };
 
   // === Quiz ===
-  const startQuiz = () => {
-    if (!frases.length) return;
-    setQuizIndex(0);
-    setQuizScore(0);
-    setQuizCompleted(false);
-    setMode("quiz");
-    generateOptions(0);
-  };
-
   const generateOptions = (index: number) => {
+    if (!frases[index]) return;
     const correct = frases[index].translation;
     const wrong = frases
       .filter((_, i) => i !== index)
@@ -230,6 +231,24 @@ const HomePage = () => {
       .map((s) => s.translation);
     setQuizOptions([...wrong, correct].sort(() => 0.5 - Math.random()));
   };
+
+  const startQuiz = () => {
+    if (!frases.length) return;
+    setQuizIndex(0);
+    setQuizScore(0);
+    setQuizCompleted(false);
+    // Removed setMode("quiz") to avoid loop if called from effect
+    generateOptions(0);
+  };
+
+  // Effect to initialize quiz when entering quiz mode
+  useEffect(() => {
+    // Only auto-start if we are in quiz mode, having phrases, and quiz seems uninitialized (index 0, no score, or just force reset if needed)
+    // Checking quizOptions.length === 0 is safer to prevent reset on every render if React StrictMode runs twice
+    if (mode === 'quiz' && frases.length > 0 && quizOptions.length === 0) {
+        startQuiz();
+    }
+  }, [mode, frases]);
 
   const handleAnswer = async (option: string) => {
     const correct = frases[quizIndex].translation;
@@ -277,140 +296,97 @@ const HomePage = () => {
 
   // === UI ===
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      {/* ===== Sidebar ===== */}
-      <aside
-        className={`${
-          sidebarOpen ? "w-64" : "w-16"
-        } bg-white border-r border-gray-200 p-4 transition-all duration-300 flex flex-col`}
-      >
-        <button
-          className="text-gray-600 mb-6 hover:text-blue-600 self-start"
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-        >
-          {sidebarOpen ? "⬅️" : "➡️"}
-        </button>
-
-        <nav className="flex flex-col gap-3 flex-1">
-          <button
-            onClick={() => setMode("study")}
-            className={`text-left px-3 py-2 rounded-lg transition ${
-              mode === "study"
-                ? "bg-blue-600 text-white"
-                : "hover:bg-gray-100 text-gray-700"
-            }`}
-          >
-            🧠 {sidebarOpen && "Estudiar"}
-          </button>
-
-          <button
-            onClick={() => setMode("learned")}
-            disabled={!user}
-            className={`text-left px-3 py-2 rounded-lg transition ${
-              mode === "learned"
-                ? "bg-blue-600 text-white"
-                : "hover:bg-gray-100 text-gray-700"
-            } ${!user ? "opacity-50 cursor-not-allowed" : ""}`}
-          >
-            ✅ {sidebarOpen && "Aprendidas"}
-          </button>
-
-          <button
-            onClick={startQuiz}
-            disabled={!user}
-            className={`text-left px-3 py-2 rounded-lg transition ${
-              mode === "quiz"
-                ? "bg-blue-600 text-white"
-                : "hover:bg-gray-100 text-gray-700"
-            } ${!user ? "opacity-50 cursor-not-allowed" : ""}`}
-          >
-            🎯 {sidebarOpen && "Quiz"}
-          </button>
-
-          <button
-            onClick={startConversation}
-            className={`text-left px-3 py-2 rounded-lg transition hover:bg-gray-100 text-gray-700`}
-          >
-            💬 {sidebarOpen && "Conversación"}
-          </button>
-
-          <button
-            data-testid="nav-dialogues-btn"
-            onClick={() => setMode("dialogues")}
-            className={`text-left px-3 py-2 rounded-lg transition ${
-              mode === "dialogues"
-                ? "bg-blue-600 text-white"
-                : "hover:bg-gray-100 text-gray-700"
-            }`}
-          >
-            🗣️ {sidebarOpen && "Diálogos"}
-          </button>
-
-          {user && (
-            <button
-              onClick={handleClearLearned}
-              className="text-left px-3 py-2 rounded-lg text-gray-600 hover:bg-red-100 hover:text-red-600 transition"
-            >
-              🗑️ {sidebarOpen && "Borrar aprendidas"}
-            </button>
-          )}
-        </nav>
-
-        {/* User Info / Logout */}
-        {sidebarOpen && user && (
-          <div className="mt-auto pt-4 border-t border-gray-200">
-            <Link to="/profile" className="block text-sm text-gray-600 mb-2 truncate hover:text-blue-600 font-medium">
-              👤 {(user as any).displayName || (user as any).email}
-            </Link>
-            <button
-              onClick={handleLogout}
-              className="w-full text-left px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition text-sm"
-            >
-              Cerrar sesión
-            </button>
-          </div>
+    <div className="w-full">
+      {/* ===== Main content (Full Width by default in Layout) ===== */}
+      <main className="flex flex-col gap-8">
+        
+        {/* Navigation Tabs (Replacements for Sidebar items) */}
+        {/* Navigation Tabs (Replacements for Sidebar items) */}
+        {!user ? null : (
+            <div className="flex flex-wrap gap-4 border-b border-gray-200 pb-4">
+                <button
+                    onClick={() => setMode("study")}
+                    className={`px-6 py-2 rounded-full font-medium transition-all ${
+                    mode === "study"
+                        ? "bg-[var(--color-primary)] text-white shadow-md"
+                        : "bg-white text-[var(--color-secondary)] hover:text-[var(--color-primary)] border border-gray-200"
+                    }`}
+                >
+                    🧠 Estudiar
+                </button>
+                <button
+                    onClick={() => setMode("learned")}
+                    className={`px-6 py-2 rounded-full font-medium transition-all ${
+                    mode === "learned"
+                        ? "bg-[var(--color-primary)] text-white shadow-md"
+                        : "bg-white text-[var(--color-secondary)] hover:text-[var(--color-primary)] border border-gray-200"
+                    }`}
+                >
+                    ✅ Aprendidas
+                </button>
+                <button
+                    onClick={() => setMode("quiz")}
+                    className={`px-6 py-2 rounded-full font-medium transition-all ${
+                    mode === "quiz"
+                        ? "bg-[var(--color-primary)] text-white shadow-md"
+                        : "bg-white text-[var(--color-secondary)] hover:text-[var(--color-primary)] border border-gray-200"
+                    }`}
+                >
+                    🎯 Quiz
+                </button>
+                <button
+                    onClick={() => setMode("dialogues")}
+                    className={`px-6 py-2 rounded-full font-medium transition-all ${
+                    mode === "dialogues"
+                        ? "bg-[var(--color-primary)] text-white shadow-md"
+                        : "bg-white text-[var(--color-secondary)] hover:text-[var(--color-primary)] border border-gray-200"
+                    }`}
+                >
+                    🗣️ Diálogos
+                </button>
+            </div>
         )}
-      </aside>
 
-      {/* ===== Main content ===== */}
-      <main className="flex-1 p-6 flex flex-col">
+
         {/* Barra superior */}
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-bold text-blue-600">
+            <h1 className="text-3xl font-serif font-bold text-[var(--color-primary)]">
               🇪🇸 Aprende Español
             </h1>
           </div>
 
-          <div className="flex items-center gap-3">
-            <label htmlFor="nivel" className="text-sm text-gray-700">
-              Nivel:
-            </label>
-            <select
-              id="nivel"
-              value={nivel}
-              onChange={(e) => {
-                const newLevel = e.target.value as any;
-                setNivel(newLevel);
-                if (user) UserService.updateUserProgress((user as any).uid, { level: newLevel });
-              }}
-              className="border rounded-lg px-2 py-1"
-            >
-              <option value="beginner">Principiante</option>
-              <option value="intermediate">Intermedio</option>
-              <option value="advanced">Avanzado</option>
-            </select>
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2">
+                <label htmlFor="nivel" className="text-sm font-bold uppercase tracking-widest text-[var(--color-secondary)]">
+                Nivel:
+                </label>
+                <select
+                id="nivel"
+                value={nivel}
+                onChange={(e) => {
+                    const newLevel = e.target.value as any;
+                    setNivel(newLevel);
+                    if (user) UserService.updateUserProgress((user as any).uid, { level: newLevel });
+                }}
+                className="border border-gray-200 bg-white rounded-[var(--radius-btn)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--color-primary)]"
+                >
+                <option value="beginner">Principiante</option>
+                <option value="intermediate">Intermedio</option>
+                <option value="advanced">Avanzado</option>
+                </select>
+            </div>
 
             {mode === "study" && (
-              <>
-                <label htmlFor="tema" className="text-sm text-gray-700">
+              <div className="flex items-center gap-2">
+                <label htmlFor="tema" className="text-sm font-bold uppercase tracking-widest text-[var(--color-secondary)]">
                   Tema:
                 </label>
                 <select
                   id="tema"
                   value={tema}
                   onChange={(e) => setTema(e.target.value)}
-                  className="border rounded-lg px-2 py-1"
+                  className="border border-gray-200 bg-white rounded-[var(--radius-btn)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--color-primary)] max-w-[200px]"
                 >
                   {temasDisponibles.map((t) => (
                     <option key={t.weekName} value={t.weekName}>
@@ -418,13 +394,13 @@ const HomePage = () => {
                     </option>
                   ))}
                 </select>
-              </>
+              </div>
             )}
             
             {mode === "dialogues" && (
               <>
                 <div className="flex items-center gap-2">
-                  <label htmlFor="dialogue" className="text-sm text-gray-700">
+                  <label htmlFor="dialogue" className="text-sm font-bold uppercase tracking-widest text-[var(--color-secondary)]">
                     Diálogo:
                   </label>
                   <select
@@ -435,7 +411,7 @@ const HomePage = () => {
                       setSelectedDialogue(d);
                       setShowGenerator(false);
                     }}
-                    className="border rounded-lg px-2 py-1"
+                    className="border border-gray-200 bg-white rounded-[var(--radius-btn)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--color-primary)] max-w-[200px]"
                   >
                     {getDialoguesForLevel(nivel).map((d: any) => (
                       <option key={d.id} value={d.id}>
@@ -451,10 +427,10 @@ const HomePage = () => {
                   
                   <button
                     onClick={() => setShowGenerator(!showGenerator)}
-                    className={`px-3 py-1 rounded-lg text-sm transition ${
+                    className={`px-4 py-2 rounded-[var(--radius-btn)] text-sm font-bold tracking-wide transition ${
                       showGenerator 
-                        ? 'bg-purple-100 text-purple-700' 
-                        : 'bg-gray-100 text-gray-600 hover:bg-purple-50 hover:text-purple-600'
+                        ? 'bg-[var(--color-accent)] text-white' 
+                        : 'bg-white border border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white'
                     }`}
                   >
                     {showGenerator ? 'Cancelar' : '✨ Generar Nuevo'}
@@ -467,16 +443,14 @@ const HomePage = () => {
 
         {/* === Contenido dinámico === */}
         {!user ? (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="w-full max-w-md">
-              <div className="text-center mb-8">
-                <h2 className="text-xl font-semibold text-gray-800 mb-2">
+          <div className="flex-1 flex items-center justify-center py-20">
+            <div className="w-full max-w-md bg-white p-8 rounded-[var(--radius-card)] shadow-lg text-center">
+                <h2 className="text-2xl font-serif font-bold text-[var(--color-primary)] mb-4">
                   🔒 Acceso Restringido
                 </h2>
-                <p className="text-gray-600">
-                  Inicia sesión para acceder a las lecciones y guardar tu progreso.
+                <p className="text-[var(--color-secondary)] mb-8">
+                  Inicia sesión para acceder a las lecciones personalizadas y guardar tu progreso con la IA.
                 </p>
-              </div>
               <Suspense fallback={<Loading />}>
                 <AuthForm onSignIn={handleSignIn} onSignUp={handleSignUp} />
               </Suspense>
@@ -486,13 +460,13 @@ const HomePage = () => {
           <Suspense fallback={<Loading />}>
             {/* Locked Content Message */}
             {mode === "study" && temasDisponibles.find(t => t.weekName === tema)?.locked && (
-              <div className="flex-1 flex items-center justify-center">
-                <div className="text-center p-8 bg-gray-100 rounded-2xl">
-                  <span className="text-4xl mb-4 block">🔒</span>
-                  <h2 className="text-xl font-bold text-gray-800 mb-2">
+              <div className="flex-1 flex items-center justify-center py-20">
+                <div className="text-center p-10 bg-gray-100 rounded-[var(--radius-card)] border border-gray-200">
+                  <span className="text-5xl mb-6 block">🔒</span>
+                  <h2 className="text-2xl font-bold text-[var(--color-primary)] mb-3">
                     Contenido Bloqueado
                   </h2>
-                  <p className="text-gray-600">
+                  <p className="text-[var(--color-secondary)]">
                     Esta lección estará disponible la próxima semana.
                     <br/>
                     ¡Sigue practicando las lecciones anteriores!
@@ -502,53 +476,53 @@ const HomePage = () => {
             )}
 
             {mode === "study" && !temasDisponibles.find(t => t.weekName === tema)?.locked && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {frases.map((s, i) => (
                   <div
                     key={i}
-                    className="p-4 bg-white rounded-2xl shadow hover:shadow-md transition"
+                    className="glass-panel p-6 rounded-[var(--radius-card)] flex flex-col gap-4 hover:shadow-lg transition-all duration-300"
                   >
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center justify-between">
                        {/* Main Text: Now Spanish (s.translation) */}
-                      <p className="text-lg font-semibold text-gray-800">
+                      <p className="text-2xl font-serif font-medium text-[var(--color-primary)]">
                         {s.translation}
                       </p>
                       <button
                         onClick={() => speakText(s.translation, "es")}
-                        className="text-blue-600 hover:text-blue-800 transition"
+                        className="text-[var(--color-secondary)] hover:text-[var(--color-primary)] hover:scale-110 transition p-2"
                         title="Escuchar frase en español"
                       >
-                        🔊
+                        🇪🇸 🔊
                       </button>
                     </div>
 
                     {showTranslation[i] && (
-                      <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center justify-between border-t border-gray-100 pt-4">
                         {/* Hidden Text: Now English (s.text) */}
-                        <p className="text-gray-600 italic">{s.text}</p>
+                        <p className="text-[var(--color-secondary)] italic font-sans">{s.text}</p>
                         <button
                           onClick={() => speakText(s.text, "en")}
-                          className="text-green-600 hover:text-green-800 transition"
+                          className="text-[var(--color-secondary)] hover:text-[var(--color-primary)] hover:scale-110 transition p-2"
                           title="Escuchar traducción en inglés"
                         >
-                          🔊
+                          🇺🇸 🔊
                         </button>
                       </div>
                     )}
 
-                    <div className="flex gap-2">
+                    <div className="flex gap-3 mt-auto pt-2">
                       <button
                         onClick={() => handleToggleTranslation(i)}
-                        className="px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition"
+                        className="px-4 py-2 border border-[var(--color-accent)] text-[var(--color-accent)] rounded-[var(--radius-btn)] hover:bg-[var(--color-accent)] hover:text-white transition text-sm font-semibold"
                       >
                         {showTranslation[i] ? "Ocultar" : "Ver traducción"}
                       </button>
                       <button
                         onClick={() => handleMarkLearned(s)}
                         data-testid={`learned-btn-${i}`}
-                        className="px-3 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 transition"
+                        className="px-4 py-2 bg-[var(--color-success)] text-white rounded-[var(--radius-btn)] hover:opacity-90 transition text-sm font-semibold shadow-sm"
                       >
-                        Aprendida ✅
+                        Marcar Aprendida
                       </button>
                     </div>
                   </div>
@@ -558,15 +532,26 @@ const HomePage = () => {
 
             {/* Aprendidas */}
             {mode === "learned" && (
-              <div>
-                <h2 className="text-xl font-semibold mb-4">Frases aprendidas</h2>
+              <div className="glass-panel p-8 rounded-[var(--radius-card)]">
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-serif font-bold text-[var(--color-primary)]">Frases Aprendidas</h2>
+                    {learned.length > 0 && (
+                        <button
+                            onClick={handleClearLearned}
+                            className="text-red-500 hover:text-red-700 hover:bg-red-50 px-4 py-2 rounded-[var(--radius-btn)] transition-colors text-sm font-medium border border-red-200"
+                        >
+                            🗑️ Borrar Todo
+                        </button>
+                    )}
+                </div>
                 {learned.length === 0 ? (
-                  <p className="text-gray-600">Aún no has marcado ninguna frase.</p>
+                  <p className="text-[var(--color-secondary)] italic">Aún no has marcado ninguna frase.</p>
                 ) : (
-                  <ul className="list-disc pl-5 space-y-1">
+                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {learned.map((l, i) => (
-                      <li key={i} className="text-gray-800">
-                        {l.text}
+                      <li key={i} className="bg-white/50 p-4 rounded-[var(--radius-btn)] border border-gray-100 flex items-center gap-3">
+                         <span className="text-green-500">✅</span>
+                        <span className="text-[var(--color-primary)] font-medium">{l.text}</span>
                       </li>
                     ))}
                   </ul>
@@ -576,43 +561,43 @@ const HomePage = () => {
 
             {/* === Quiz === */}
             {mode === "quiz" && frases.length > 0 && (
-              <div className="w-full max-w-md bg-white p-6 rounded-2xl shadow text-center mx-auto">
+              <div className="w-full max-w-lg glass-panel p-10 rounded-[var(--radius-card)] text-center mx-auto shadow-xl">
                 {!quizCompleted ? (
                   <>
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                    <h2 className="text-3xl font-serif font-bold text-[var(--color-primary)] mb-8">
                       Traduce:{" "}
-                      <span className="text-blue-600">
+                      <span className="text-[var(--color-accent)] block mt-2">
                         {frases[quizIndex].text}
                       </span>
                     </h2>
-                    <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-4">
                       {quizOptions.map((opt, i) => (
                         <button
                           key={i}
                           onClick={() => handleAnswer(opt)}
-                          className="bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 hover:bg-blue-100 transition"
+                          className="bg-white border border-gray-200 rounded-[var(--radius-btn)] px-6 py-4 hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white transition-all duration-300 text-lg font-medium shadow-sm"
                         >
                           {opt}
                         </button>
                       ))}
                     </div>
-                    <p className="mt-4 text-gray-600 text-sm">
+                    <p className="mt-8 text-[var(--color-secondary)] text-sm font-bold uppercase tracking-widest">
                       Pregunta {quizIndex + 1} / {frases.length}
                     </p>
                   </>
                 ) : (
                   <div>
-                    <h2 className="text-2xl font-semibold text-green-600 mb-3">
-                      🎉 ¡Quiz completado!
+                    <h2 className="text-4xl font-display font-bold text-[var(--color-success)] mb-6">
+                      🎉 ¡Quiz Completado!
                     </h2>
-                    <p className="text-lg mb-4">
-                      Puntuación: {quizScore} / {frases.length}
-                    </p>
+                    <div className="text-6xl font-black text-[var(--color-primary)] mb-8">
+                        {quizScore} <span className="text-2xl text-[var(--color-secondary)] font-normal">/ {frases.length}</span>
+                    </div>
                     <button
                       onClick={startQuiz}
-                      className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition"
+                      className="bg-[var(--color-primary)] text-white px-8 py-3 rounded-[var(--radius-btn)] shadow-lg hover:bg-black transition font-bold tracking-wide"
                     >
-                      Repetir quiz 🔁
+                      Repetir Quiz 🔁
                     </button>
                   </div>
                 )}
@@ -630,6 +615,41 @@ const HomePage = () => {
                   )}
                 </Suspense>
               </>
+            )}
+
+            {/* === Chat Mode === */}
+            {mode === "chat" && (
+                <div className="glass-panel p-10 rounded-[var(--radius-card)] text-center max-w-2xl mx-auto shadow-lg">
+                    <h2 className="text-3xl font-serif font-bold text-[var(--color-primary)] mb-6">
+                        💬 Conversación con IA
+                    </h2>
+                    <p className="text-[var(--color-secondary)] mb-8 text-lg">
+                        Elige un tema y empieza a practicar tu español con correcciones en tiempo real.
+                    </p>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {['Cafetería', 'Aeropuerto', 'Restaurante', 'Hotel', 'Trabajo', 'Hobbies'].map(topic => (
+                             <button
+                                key={topic}
+                                onClick={() => {
+                                    const sessionId = `session_${Date.now()}`;
+                                    const safeTopic = encodeURIComponent(topic);
+                                    const safeLevel = encodeURIComponent(nivel);
+                                    navigate(`/chat/${safeTopic}/${safeLevel}/${sessionId}`);
+                                }}
+                                className="bg-white border border-gray-200 p-6 rounded-[var(--radius-btn)] hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white transition-all shadow-sm font-medium text-lg"
+                             >
+                                {topic}
+                             </button>
+                        ))}
+                         <button
+                                onClick={startConversation}
+                                className="col-span-1 sm:col-span-2 bg-[var(--color-accent)] text-white p-6 rounded-[var(--radius-btn)] hover:opacity-90 transition-all shadow-md font-bold text-lg"
+                             >
+                                ✨ Tema General / Libre
+                             </button>
+                    </div>
+                </div>
             )}
           </Suspense>
         )}

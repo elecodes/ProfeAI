@@ -9,11 +9,21 @@ interface FlashcardTextProps {
 export default function FlashcardText({ english, spanish, showTranslation }: FlashcardTextProps) {
   return (
     <>
-      <h2 className="text-xl font-semibold text-gray-800">{english}</h2>
+      <div className="mb-2">
+         {/* Label */}
+         <span className="text-xs uppercase tracking-[0.2em] text-[var(--color-accent)] font-semibold">
+            English Phrase
+         </span>
+      </div>
+      <h2 className="text-4xl font-serif text-[var(--color-primary)] font-medium leading-tight my-4">
+        {english}
+      </h2>
 
-      {showTranslation && (
-        <p className="text-gray-600 text-lg mb-2">{spanish}</p>
-      )}
+      <div className={`transition-all duration-300 overflow-hidden ${showTranslation ? 'max-h-20 opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
+         <p className="text-[var(--color-secondary)] text-lg font-sans border-t border-gray-200 pt-4">
+            {spanish}
+         </p>
+      </div>
     </>
   );
 }

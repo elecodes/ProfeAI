@@ -5,5 +5,7 @@ export interface Lesson {
   description?: string;
   content?: any; // Flexible content structure
   order?: number;
+  weekName?: string;
+  items?: any[];
   [key: string]: any;
 }

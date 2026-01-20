@@ -16,7 +16,7 @@ export default function Flashcard({ english, spanish, onLearned }: FlashcardProp
   const { speak } = useTTS();
 
   return (
-    <div className="p-6 bg-white shadow-md rounded-2xl border border-gray-200 w-full max-w-lg mx-auto text-center">
+    <div className="glass-panel rounded-[var(--radius-card)] p-8 w-full max-w-lg mx-auto text-center flex flex-col gap-6">
       <div className="flex justify-between items-center mb-3">
         <FlashcardText
           english={english}

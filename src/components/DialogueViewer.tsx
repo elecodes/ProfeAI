@@ -41,23 +41,25 @@ const DialogueViewer: React.FC<Props> = ({ dialogue }) => {
             }`}
           >
             <div
-              className={`max-w-[80%] rounded-2xl p-4 shadow-sm ${
+              className={`max-w-[80%] p-6 shadow-sm transition-all ${
                 index % 2 === 0
-                  ? "bg-white rounded-tl-none border border-gray-100"
-                  : "bg-blue-50 rounded-tr-none border border-blue-100"
+                  ? "bg-white border border-gray-100 rounded-[24px] rounded-tl-sm text-[var(--color-primary)]"
+                  : "bg-[var(--color-primary)] text-white rounded-[24px] rounded-tr-sm"
               }`}
             >
-              <div className="flex items-center justify-between mb-2 gap-4">
-                <span className="font-bold text-sm text-gray-500">
+              <div className="flex items-center justify-between mb-3 gap-6">
+                <span className={`text-xs font-bold uppercase tracking-widest ${
+                    index % 2 === 0 ? "text-[var(--color-secondary)]" : "text-[var(--color-accent)]"
+                }`}>
                   {line.speaker}
                 </span>
                 <button
                   onClick={() => handlePlay(line.text, index, line.gender as "male" | "female")}
                   disabled={playingIndex !== null}
-                  className={`p-2 rounded-full transition ${
+                  className={`p-2 rounded-full transition hover:scale-110 ${
                     playingIndex === index
-                      ? "bg-blue-100 text-blue-600 animate-pulse"
-                      : "hover:bg-gray-100 text-gray-600"
+                      ? "text-[var(--color-accent)] animate-pulse"
+                      : index % 2 === 0 ? "text-[var(--color-secondary)] hover:text-[var(--color-primary)]" : "text-white/70 hover:text-white"
                   }`}
                   title="Escuchar"
                 >
@@ -65,17 +67,23 @@ const DialogueViewer: React.FC<Props> = ({ dialogue }) => {
                 </button>
               </div>
 
-              <p className="text-lg text-gray-800 mb-2">{line.text}</p>
+              <p className={`text-xl leading-relaxed ${index % 2 === 0 ? "font-serif" : "font-sans"}`}>
+                  {line.text}
+              </p>
 
               {showTranslation[index] && (
-                <p className="text-gray-600 italic border-t pt-2 mt-2 text-sm">
+                <p className={`italic border-t pt-3 mt-3 text-sm ${
+                    index % 2 === 0 ? "border-gray-100 text-[var(--color-secondary)]" : "border-white/20 text-white/80"
+                }`}>
                   {line.translation}
                 </p>
               )}
 
               <button
                 onClick={() => toggleTranslation(index)}
-                className="text-xs text-blue-500 hover:text-blue-700 mt-2"
+                className={`text-xs mt-3 block font-medium hover:underline ${
+                    index % 2 === 0 ? "text-[var(--color-secondary)]" : "text-[var(--color-accent)]"
+                }`}
               >
                 {showTranslation[index] ? "Ocultar traducción" : "Ver traducción"}
               </button>

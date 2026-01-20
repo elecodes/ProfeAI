@@ -16,12 +16,12 @@ export default function FlashcardActions({
   onLearned,
 }: FlashcardActionsProps) {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-4 mt-2">
       <button
         onClick={() => setShowTranslation((v) => !v)}
-        className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200 px-4 py-2 rounded-lg text-sm font-medium"
+        className="text-[var(--color-accent)] hover:bg-[var(--color-accent)]/5 px-6 py-3 rounded-[var(--radius-btn)] text-sm font-semibold tracking-wide transition-colors border border-[var(--color-accent)]/20"
       >
-        {showTranslation ? "👀 Ocultar traducción" : "💡 Ver traducción"}
+        {showTranslation ? "Ocultar traducción" : "Ver traducción"}
       </button>
 
       <button
@@ -32,11 +32,11 @@ export default function FlashcardActions({
         disabled={learned}
         className={
           learned
-            ? "bg-green-500 text-white px-4 py-2 rounded-lg cursor-not-allowed"
-            : "bg-green-100 text-green-700 hover:bg-green-200 px-4 py-2 rounded-lg"
+            ? "bg-[var(--color-success)] text-white px-6 py-3 rounded-[var(--radius-btn)] font-medium cursor-not-allowed opacity-80"
+            : "bg-[var(--color-primary)] text-white hover:bg-gray-800 px-6 py-3 rounded-[var(--radius-btn)] font-medium transition-all shadow-lg shadow-gray-200"
         }
       >
-        {learned ? "✔️ Aprendida" : "✅ Marcar como aprendida"}
+        {learned ? "¡Aprendida!" : "Marcar como aprendida"}
       </button>
     </div>
   );
