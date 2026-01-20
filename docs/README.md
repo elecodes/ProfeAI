@@ -11,8 +11,10 @@ Welcome to the **AppTutor Safe** documentation hub.
 
 ## 🎨 UI & Component Library
 - **Storybook**: We use Storybook to develop components in isolation.
-  - Run: `npm run storybook`
+  - Run: `npm run storybook` (Runs on port 6006)
   - Location: `src/stories/`
+  - **Mocked Components**: `ConversationMode` and `DialogueGenerator` run with a **mocked backend** in Storybook, allowing you to test chat flows and loading states without valid API keys.
+  - **Core Components**: `Flashcard`, `Navbar`, `GrammarReport` are also available.
 
 ## 🔒 Security
 - **Rate Limiting**: Configured in `server.ts` (100 req/15min).

@@ -101,9 +101,9 @@
 
 1.  **Reproduce in Storybook**:
     *   Run `npm run storybook`.
-    *   Find the component (e.g., `FlashcardText`).
-    *   Tweak controls to match user report.
+    *   **Simple Components**: Check `Flashcard`, `Navbar`, `GrammarReport`.
+    *   **Complex Flows**: Use `ConversationMode` or `DialogueGenerator`. These use **mocked network calls**, so you can reproduce "Loading" or "Error" states just by selecting the story args, without needing the real backend.
 2.  **Verify Fix**:
-    *   Fix the CSS.
-    *   Verify in Storybook FIRST.
-    *   Then verify in App.
+    *   Fix the CSS/Component.
+    *   Verify locally in Storybook (it auto-reloads).
+    *   Commit.
