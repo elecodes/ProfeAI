@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import ProfilePage from "./pages/ProfilePage";
 import ChatPage from "./pages/ChatPage";
-import Navbar from "./components/Navbar";
+import Layout from "./components/Layout";
 
 const Loading = () => (
   <div className="flex items-center justify-center min-h-screen">
@@ -25,14 +25,13 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-gray-50">
-        <Navbar />
+      <Layout>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/chat/:topic/:level/:sessionId" element={<ChatPage />} />
           <Route path="/profile" element={<ProfilePage />} />
         </Routes>
-      </div>
+      </Layout>
     </BrowserRouter>
   );
 }
