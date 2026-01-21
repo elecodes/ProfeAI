@@ -28,7 +28,7 @@ const DialogueViewer: React.FC<Props> = ({ dialogue }) => {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <h2 className="text-2xl font-bold text-blue-600 mb-6 text-center">
+      <h2 className="text-2xl font-bold text-slate-700 mb-6 text-center">
         {dialogue.title}
       </h2>
 
@@ -44,7 +44,7 @@ const DialogueViewer: React.FC<Props> = ({ dialogue }) => {
               className={`max-w-[80%] p-6 shadow-sm transition-all ${
                 index % 2 === 0
                   ? "bg-white border border-gray-100 rounded-[24px] rounded-tl-sm text-[var(--color-primary)]"
-                  : "bg-[var(--color-primary)] text-white rounded-[24px] rounded-tr-sm"
+                  : "bg-slate-600 text-white rounded-[24px] rounded-tr-sm shadow-md"
               }`}
             >
               <div className="flex items-center justify-between mb-3 gap-6">

@@ -308,8 +308,8 @@ const HomePage = () => {
                     onClick={() => setMode("study")}
                     className={`px-6 py-2 rounded-full font-medium transition-all ${
                     mode === "study"
-                        ? "bg-[var(--color-primary)] text-white shadow-md"
-                        : "bg-white text-[var(--color-secondary)] hover:text-[var(--color-primary)] border border-gray-200"
+                        ? "bg-slate-700 text-white shadow-md"
+                        : "bg-white text-[var(--color-secondary)] hover:text-slate-700 border border-gray-200"
                     }`}
                 >
                     🧠 Estudiar
@@ -318,8 +318,8 @@ const HomePage = () => {
                     onClick={() => setMode("learned")}
                     className={`px-6 py-2 rounded-full font-medium transition-all ${
                     mode === "learned"
-                        ? "bg-[var(--color-primary)] text-white shadow-md"
-                        : "bg-white text-[var(--color-secondary)] hover:text-[var(--color-primary)] border border-gray-200"
+                        ? "bg-slate-700 text-white shadow-md"
+                        : "bg-white text-[var(--color-secondary)] hover:text-slate-700 border border-gray-200"
                     }`}
                 >
                     ✅ Aprendidas
@@ -328,8 +328,8 @@ const HomePage = () => {
                     onClick={() => setMode("quiz")}
                     className={`px-6 py-2 rounded-full font-medium transition-all ${
                     mode === "quiz"
-                        ? "bg-[var(--color-primary)] text-white shadow-md"
-                        : "bg-white text-[var(--color-secondary)] hover:text-[var(--color-primary)] border border-gray-200"
+                        ? "bg-slate-700 text-white shadow-md"
+                        : "bg-white text-[var(--color-secondary)] hover:text-slate-700 border border-gray-200"
                     }`}
                 >
                     🎯 Quiz
@@ -338,8 +338,8 @@ const HomePage = () => {
                     onClick={() => setMode("dialogues")}
                     className={`px-6 py-2 rounded-full font-medium transition-all ${
                     mode === "dialogues"
-                        ? "bg-[var(--color-primary)] text-white shadow-md"
-                        : "bg-white text-[var(--color-secondary)] hover:text-[var(--color-primary)] border border-gray-200"
+                        ? "bg-slate-700 text-white shadow-md"
+                        : "bg-white text-[var(--color-secondary)] hover:text-slate-700 border border-gray-200"
                     }`}
                 >
                     🗣️ Diálogos
@@ -520,7 +520,7 @@ const HomePage = () => {
                       <button
                         onClick={() => handleMarkLearned(s)}
                         data-testid={`learned-btn-${i}`}
-                        className="px-4 py-2 bg-[var(--color-success)] text-white rounded-[var(--radius-btn)] hover:opacity-90 transition text-sm font-semibold shadow-sm"
+                        className="px-4 py-2 bg-emerald-600 text-white rounded-[var(--radius-btn)] hover:bg-emerald-700 hover:scale-105 active:scale-95 transition-all duration-200 text-sm font-bold shadow-md tracking-wide"
                       >
                         Marcar Aprendida
                       </button>

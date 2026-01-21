@@ -311,7 +311,7 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
           <div key={idx} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
             <div className={`max-w-[85%] p-5 shadow-sm transition-all ${
               msg.role === "user"
-                ? "bg-[var(--color-primary)] text-white rounded-2xl rounded-br-sm"
+                ? "bg-slate-600 text-white rounded-2xl rounded-br-sm shadow-md"
                 : "bg-white border border-gray-100 text-[var(--color-primary)] rounded-2xl rounded-bl-sm"
             }`}>
               <p className={msg.role === "user" ? "font-sans leading-relaxed" : "font-serif text-lg leading-relaxed"}>
@@ -353,13 +353,13 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
           value={input}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
           placeholder="Escribe tu respuesta en español..."
-          className="flex-1 border border-gray-200 bg-gray-50 rounded-[var(--radius-btn)] px-5 py-3 focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] transition"
+          className="flex-1 border border-gray-200 bg-gray-50 rounded-[var(--radius-btn)] px-5 py-3 focus:outline-none focus:ring-1 focus:ring-slate-400 transition"
           disabled={isLoading}
         />
         <button
           type="submit"
           disabled={isLoading || !input.trim()}
-          className="bg-[var(--color-primary)] text-[var(--color-accent)] px-8 py-3 rounded-[var(--radius-btn)] hover:opacity-90 disabled:opacity-50 font-bold tracking-wide transition shadow-lg"
+          className="bg-slate-700 text-white px-8 py-3 rounded-[var(--radius-btn)] hover:bg-slate-800 disabled:opacity-50 font-bold tracking-wide transition shadow-lg"
         >
           ENVIAR
         </button>

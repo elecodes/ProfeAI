@@ -24,7 +24,7 @@ const ProfilePage = () => {
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row justify-between items-center mb-10 pb-8 border-b border-gray-100">
                     <div className="flex items-center gap-6 mb-4 md:mb-0 w-full">
-                        <div className="w-20 h-20 bg-[var(--color-primary)] rounded-full flex items-center justify-center text-3xl text-white shadow-md">
+                        <div className="w-20 h-20 bg-slate-700 rounded-full flex items-center justify-center text-3xl text-white shadow-md">
                             👤
                         </div>
                         <div className="flex-1">
@@ -37,12 +37,12 @@ const ProfilePage = () => {
                                         className="border-b-2 border-[var(--color-accent)] bg-transparent focus:outline-none text-3xl font-serif font-bold text-[var(--color-primary)] py-1 w-full max-w-xs"
                                         autoFocus
                                     />
-                                    <button onClick={handleSave} className="text-sm bg-[var(--color-primary)] text-white px-4 py-2 rounded-[var(--radius-btn)] hover:bg-black transition">Guardar</button>
-                                    <button onClick={() => setIsEditing(false)} className="text-sm text-[var(--color-secondary)] hover:text-[var(--color-primary)]">Cancelar</button>
+                                    <button onClick={handleSave} className="text-sm bg-slate-700 text-white px-4 py-2 rounded-[var(--radius-btn)] hover:bg-slate-800 transition">Guardar</button>
+                                    <button onClick={() => setIsEditing(false)} className="text-sm text-[var(--color-secondary)] hover:text-slate-700">Cancelar</button>
                                 </div>
                             ) : (
                                 <div className="flex items-center gap-3 group">
-                                    <h1 className="text-3xl font-serif font-bold text-[var(--color-primary)]">{stats.username || 'Estudiante'}</h1>
+                                    <h1 className="text-3xl font-serif font-bold text-slate-800">{stats.username || 'Estudiante'}</h1>
                                     <button 
                                         onClick={() => {
                                             setTempName(stats.username || 'Estudiante');
@@ -81,12 +81,12 @@ const ProfilePage = () => {
                 {/* Stats Cards */}
                 <div className="grid grid-cols-2 gap-8 mb-10">
                     <div className="bg-white/50 p-8 rounded-[var(--radius-card)] border border-gray-100 flex flex-col items-center hover:shadow-md transition-shadow">
-                        <div className="text-5xl font-display font-bold text-[var(--color-primary)] mb-2">{stats.xp}</div>
+                        <div className="text-5xl font-display font-bold text-slate-800 mb-2">{stats.xp}</div>
                         <div className="text-xs font-bold text-[var(--color-secondary)] uppercase tracking-[0.2em]">Total XP</div>
                     </div>
                     
                     <div className="bg-white/50 p-8 rounded-[var(--radius-card)] border border-gray-100 flex flex-col items-center hover:shadow-md transition-shadow">
-                        <div className="text-5xl font-display font-bold text-[var(--color-primary)] mb-2">{stats.streak}</div>
+                        <div className="text-5xl font-display font-bold text-slate-800 mb-2">{stats.streak}</div>
                         <div className="text-xs font-bold text-[var(--color-secondary)] uppercase tracking-[0.2em]">Racha Días</div>
                     </div>
                 </div>
@@ -94,7 +94,7 @@ const ProfilePage = () => {
                 <div className="mt-8 pt-8 border-t border-gray-100 flex flex-col gap-4">
                     <Link 
                         to="/" 
-                        className="block w-full text-center py-4 bg-[var(--color-primary)] text-white font-medium hover:bg-black rounded-[var(--radius-btn)] transition shadow-lg tracking-wide"
+                        className="block w-full text-center py-4 bg-slate-700 text-white font-medium hover:bg-slate-800 rounded-[var(--radius-btn)] transition shadow-lg tracking-wide"
                     >
                         ← VOLVER AL INICIO
                     </Link>
