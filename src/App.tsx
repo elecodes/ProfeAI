@@ -1,15 +1,13 @@
-import React, { Suspense, useEffect } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import HomePage from "./pages/HomePage";
-import ProfilePage from "./pages/ProfilePage";
-import ChatPage from "./pages/ChatPage";
+import React, { Suspense, useEffect, lazy } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
+import { SkeletonLoader } from "./components/SkeletonLoader";
 
-const Loading = () => (
-  <div className="flex items-center justify-center min-h-screen">
-    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-  </div>
-);
+// Lazy Load Pages for Progressive Upload / Performance
+// This splits the code into separate chunks, so the user only downloads what they need.
+const HomePage = lazy(() => import("./pages/HomePage"));
+const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+const ChatPage = lazy(() => import("./pages/ChatPage"));
 
 function App() {
   useEffect(() => {
@@ -26,11 +24,13 @@ function App() {
   return (
     <BrowserRouter>
       <Layout>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/chat/:topic/:level/:sessionId" element={<ChatPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-        </Routes>
+        <Suspense fallback={<SkeletonLoader />}>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/chat/:topic/:level/:sessionId" element={<ChatPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+          </Routes>
+        </Suspense>
       </Layout>
     </BrowserRouter>
   );
