@@ -500,6 +500,7 @@ const HomePage = () => {
                         <button
                             onClick={handleClearLearned}
                             className="text-red-500 hover:text-red-700 hover:bg-red-50 px-4 py-2 rounded-[var(--radius-btn)] transition-colors text-sm font-medium border border-red-200"
+                            aria-label="Borrar todas las frases aprendidas"
                         >
                             🗑️ Borrar Todo
                         </button>

@@ -36,6 +36,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Global Focus Styles for Keyboard Navigation */
+:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
 /* Utilities for Glassmorphism */
 .glass-panel {
   background: var(--color-surface);

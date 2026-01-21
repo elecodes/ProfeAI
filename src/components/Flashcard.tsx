@@ -18,8 +18,25 @@ export const Flashcard: React.FC<FlashcardProps> = ({
   // ISO-LATED STATE: uniquely confined to this component instance
   const [isOpen, setIsOpen] = useState(false);
 
+  // Keyboard handler
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+    }
+    if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault(); // Prevent scrolling on Space
+        setIsOpen(!isOpen);
+    }
+  };
+
   return (
-    <div className="glass-panel p-6 rounded-[var(--radius-card)] flex flex-col gap-4 hover:shadow-lg transition-all duration-300 notranslate">
+    <div 
+        className="glass-panel p-6 rounded-[var(--radius-card)] flex flex-col gap-4 hover:shadow-lg transition-all duration-300 notranslate focus:ring-2 focus:ring-[var(--color-accent)] outline-none"
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
+        role="button"
+        aria-expanded={isOpen}
+    >
       
       {/* Primary Side (Spanish) */}
       <div className="flex items-center justify-between">
@@ -30,6 +47,7 @@ export const Flashcard: React.FC<FlashcardProps> = ({
           onClick={() => onSpeak(translation, langCode.target)}
           className="text-[var(--color-secondary)] hover:text-[var(--color-primary)] hover:scale-110 transition p-2"
           title="Escuchar frase"
+          aria-label="Escuchar frase en español"
         >
           🇪🇸 🔊
         </button>
@@ -45,6 +63,7 @@ export const Flashcard: React.FC<FlashcardProps> = ({
             onClick={() => onSpeak(text, langCode.native)}
             className="text-[var(--color-secondary)] hover:text-[var(--color-primary)] hover:scale-110 transition p-2"
             title="Escuchar traducción"
+            aria-label="Escuchar traducción en inglés"
           >
              🇺🇸 🔊
           </button>

@@ -62,6 +62,7 @@ const DialogueViewer: React.FC<Props> = ({ dialogue }) => {
                       : index % 2 === 0 ? "text-[var(--color-secondary)] hover:text-[var(--color-primary)]" : "text-white/70 hover:text-white"
                   }`}
                   title="Escuchar"
+                  aria-label={`Escuchar línea de ${line.speaker}`}
                 >
                   🔊
                 </button>

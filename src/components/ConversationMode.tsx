@@ -224,7 +224,12 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
 
   if (showTopicSelector) {
     return (
-      <div className="max-w-2xl mx-auto p-4">
+      <div 
+        className="max-w-2xl mx-auto p-4"
+        onKeyDown={(e) => {
+            if (e.key === 'Escape') setShowTopicSelector(false);
+        }}
+      >
         <div className="bg-white rounded-xl shadow-lg p-6">
           <h3 className="text-xl font-bold text-gray-800 mb-4">✨ Crear Conversación Personalizada</h3>
           <p className="text-gray-600 mb-4">Introduce un tema para practicar. La IA creará un escenario basado en lo que escribas.</p>
@@ -284,6 +289,7 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
                 onClick={onBack} 
                 className="flex items-center gap-2 bg-white border border-gray-200 hover:bg-gray-50 text-slate-600 px-4 py-2 rounded-[var(--radius-btn)] transition-all mr-4 font-medium tracking-wide shadow-sm hover:shadow"
                 title="Salir de la conversación"
+                aria-label="Salir de la conversación y volver al menú principal"
             >
                 <span className="text-lg">⬅️</span>
                 <span className="uppercase text-xs font-bold">Salir</span>

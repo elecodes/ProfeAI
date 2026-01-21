@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useUserStats } from '../hooks/useUserStats';
+import { useAuth } from '../hooks/useAuth';
+import UserService from '../services/UserService';
 
 const ProfilePage = () => {
     const { stats, updateProfile, resetStats } = useUserStats();
+    const { user } = useAuth();
     const [isEditing, setIsEditing] = useState(false);
     const [tempName, setTempName] = useState(stats.username || 'Estudiante');
 
@@ -100,8 +103,19 @@ const ProfilePage = () => {
                     </Link>
                     
                     <button 
-                        onClick={() => {
+                        onClick={async () => {
                             if (window.confirm("¿Estás seguro de que quieres reiniciar tu progreso? Esta acción no se puede deshacer.")) {
+                                // 1. Reset backend if logged in
+                                if (user) {
+                                  await UserService.updateUserProgress((user as any).uid, {
+                                    xp: 0,
+                                    level: 'beginner',
+                                    streak: 0,
+                                    learnedPhrases: [],
+                                    history: []
+                                  });
+                                }
+                                // 2. Reset local state
                                 resetStats();
                             }
                         }}
