@@ -1,43 +1,71 @@
-import React, { useState } from "react";
-import { useTTS } from "./hooks/useTTS";
-import FlashcardText from "./FlashcardText";
-import FlashcardAudioButtons from "./FlashcardAudioButtons";
-import FlashcardActions from "./FlashcardActions";
+import React, { useState } from 'react';
 
 interface FlashcardProps {
-  english: string;
-  spanish: string;
-  onLearned: () => void;
+  text: string;           // The English text (hidden initially)
+  translation: string;    // The Spanish text (shown initially)
+  onSpeak: (text: string, lang: string) => void;
+  onMarkLearned: () => void;
+  langCode?: { target: string; native: string }; // e.g., 'es', 'en'
 }
 
-export default function Flashcard({ english, spanish, onLearned }: FlashcardProps) {
-  const [showTranslation, setShowTranslation] = useState<boolean>(false);
-  const [learned, setLearned] = useState<boolean>(false);
-  const { speak } = useTTS();
+export const Flashcard: React.FC<FlashcardProps> = ({ 
+  text, 
+  translation, 
+  onSpeak, 
+  onMarkLearned,
+  langCode = { target: 'es', native: 'en' }
+}) => {
+  // ISO-LATED STATE: uniquely confined to this component instance
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="glass-panel rounded-[var(--radius-card)] p-8 w-full max-w-lg mx-auto text-center flex flex-col gap-6">
-      <div className="flex justify-between items-center mb-3">
-        <FlashcardText
-          english={english}
-          spanish={spanish}
-          showTranslation={showTranslation}
-        />
-
-        <FlashcardAudioButtons
-          english={english}
-          spanish={spanish}
-          speak={speak}
-        />
+    <div className="glass-panel p-6 rounded-[var(--radius-card)] flex flex-col gap-4 hover:shadow-lg transition-all duration-300 notranslate">
+      
+      {/* Primary Side (Spanish) */}
+      <div className="flex items-center justify-between">
+        <p className="text-2xl font-serif font-medium text-[var(--color-primary)]">
+          {translation}
+        </p>
+        <button
+          onClick={() => onSpeak(translation, langCode.target)}
+          className="text-[var(--color-secondary)] hover:text-[var(--color-primary)] hover:scale-110 transition p-2"
+          title="Escuchar frase"
+        >
+          🇪🇸 🔊
+        </button>
       </div>
 
-      <FlashcardActions
-        showTranslation={showTranslation}
-        setShowTranslation={setShowTranslation}
-        learned={learned}
-        setLearned={setLearned}
-        onLearned={onLearned}
-      />
+      {/* Secondary Side (English - Toggled) */}
+      {isOpen && (
+        <div className="flex items-center justify-between border-t border-gray-100 pt-4">
+          <p className="text-[var(--color-secondary)] italic font-sans">
+            {text || "Translation missing"}
+          </p>
+          <button
+            onClick={() => onSpeak(text, langCode.native)}
+            className="text-[var(--color-secondary)] hover:text-[var(--color-primary)] hover:scale-110 transition p-2"
+            title="Escuchar traducción"
+          >
+             🇺🇸 🔊
+          </button>
+        </div>
+      )}
+
+      {/* Actions */}
+      <div className="flex gap-3 mt-auto pt-2">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="px-4 py-2 border border-[var(--color-accent)] text-[var(--color-accent)] rounded-[var(--radius-btn)] hover:bg-[var(--color-accent)] hover:text-white transition text-sm font-semibold"
+        >
+          {isOpen ? "Ocultar" : "Mostrar Inglés"}
+        </button>
+        <button
+          onClick={onMarkLearned}
+          className="px-4 py-2 bg-emerald-600 text-white rounded-[var(--radius-btn)] hover:bg-emerald-700 hover:scale-105 active:scale-95 transition-all duration-200 text-sm font-bold shadow-md tracking-wide"
+        >
+          Marcar Aprendida
+        </button>
+      </div>
     </div>
   );
-}
+};

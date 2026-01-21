@@ -12,9 +12,11 @@ import { Lesson, LearnedPhrase } from "../types";
 const AuthForm = React.lazy(() => import("../components/auth/AuthForm"));
 const DialogueViewer = React.lazy(() => import("../components/DialogueViewer"));
 const DialogueGenerator = React.lazy(() => import("../components/DialogueGenerator"));
+import { Flashcard } from "../components/Flashcard";
 
 // Local type for items within a lesson
 interface Phrase {
+  id?: string;
   text: string;
   translation: string;
 }
@@ -52,7 +54,7 @@ const HomePage = () => {
       setSearchParams({ mode: newMode });
   };
 
-  const [showTranslation, setShowTranslation] = useState<Record<number, boolean>>({});
+  const [showTranslation, setShowTranslation] = useState<Record<string, boolean>>({});
   const [quizIndex, setQuizIndex] = useState<number>(0);
   const [quizScore, setQuizScore] = useState<number>(0);
   const [quizCompleted, setQuizCompleted] = useState<boolean>(false);
@@ -208,10 +210,10 @@ const HomePage = () => {
     }
   };
 
-  const handleToggleTranslation = (index: number) => {
-    setShowTranslation((prev: Record<number, boolean>) => ({
+  const handleToggleTranslation = (id: string) => {
+    setShowTranslation((prev: Record<string, boolean>) => ({
       ...prev,
-      [index]: !prev[index],
+      [id]: !prev[id],
     }));
   };
 
@@ -476,56 +478,15 @@ const HomePage = () => {
             )}
 
             {mode === "study" && !temasDisponibles.find(t => t.weekName === tema)?.locked && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                 {frases.map((s, i) => (
-                  <div
-                    key={i}
-                    className="glass-panel p-6 rounded-[var(--radius-card)] flex flex-col gap-4 hover:shadow-lg transition-all duration-300"
-                  >
-                    <div className="flex items-center justify-between">
-                       {/* Main Text: Now Spanish (s.translation) */}
-                      <p className="text-2xl font-serif font-medium text-[var(--color-primary)]">
-                        {s.translation}
-                      </p>
-                      <button
-                        onClick={() => speakText(s.translation, "es")}
-                        className="text-[var(--color-secondary)] hover:text-[var(--color-primary)] hover:scale-110 transition p-2"
-                        title="Escuchar frase en español"
-                      >
-                        🇪🇸 🔊
-                      </button>
-                    </div>
-
-                    {showTranslation[i] && (
-                      <div className="flex items-center justify-between border-t border-gray-100 pt-4">
-                        {/* Hidden Text: Now English (s.text) */}
-                        <p className="text-[var(--color-secondary)] italic font-sans">{s.text}</p>
-                        <button
-                          onClick={() => speakText(s.text, "en")}
-                          className="text-[var(--color-secondary)] hover:text-[var(--color-primary)] hover:scale-110 transition p-2"
-                          title="Escuchar traducción en inglés"
-                        >
-                          🇺🇸 🔊
-                        </button>
-                      </div>
-                    )}
-
-                    <div className="flex gap-3 mt-auto pt-2">
-                      <button
-                        onClick={() => handleToggleTranslation(i)}
-                        className="px-4 py-2 border border-[var(--color-accent)] text-[var(--color-accent)] rounded-[var(--radius-btn)] hover:bg-[var(--color-accent)] hover:text-white transition text-sm font-semibold"
-                      >
-                        {showTranslation[i] ? "Ocultar" : "Ver traducción"}
-                      </button>
-                      <button
-                        onClick={() => handleMarkLearned(s)}
-                        data-testid={`learned-btn-${i}`}
-                        className="px-4 py-2 bg-emerald-600 text-white rounded-[var(--radius-btn)] hover:bg-emerald-700 hover:scale-105 active:scale-95 transition-all duration-200 text-sm font-bold shadow-md tracking-wide"
-                      >
-                        Marcar Aprendida
-                      </button>
-                    </div>
-                  </div>
+                  <Flashcard
+                    key={`${s.id || 'missing'}-${i}`} // Strict unique key
+                    text={s.text}
+                    translation={s.translation}
+                    onSpeak={speakText}
+                    onMarkLearned={() => handleMarkLearned(s)}
+                  />
                 ))}
               </div>
             )}
@@ -637,7 +598,7 @@ const HomePage = () => {
                                     const safeLevel = encodeURIComponent(nivel);
                                     navigate(`/chat/${safeTopic}/${safeLevel}/${sessionId}`);
                                 }}
-                                className="bg-white border border-gray-200 p-6 rounded-[var(--radius-btn)] hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white transition-all shadow-sm font-medium text-lg"
+                                className="bg-white border border-gray-200 p-6 rounded-[var(--radius-btn)] hover:border-slate-600 hover:bg-slate-600 hover:text-white transition-all shadow-sm font-medium text-lg"
                              >
                                 {topic}
                              </button>

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import Flashcard from '../components/Flashcard';
+import { Flashcard } from '../components/Flashcard';
 
 const meta = {
   title: 'Components/Flashcard',
@@ -9,9 +9,10 @@ const meta = {
   },
   tags: ['autodocs'],
   argTypes: {
-    english: { control: 'text' },
-    spanish: { control: 'text' },
-    onLearned: { action: 'learned' },
+    text: { control: 'text' },
+    translation: { control: 'text' },
+    onMarkLearned: { action: 'learned' },
+    onSpeak: { action: 'speak' },
   },
 } satisfies Meta<typeof Flashcard>;
 
@@ -20,14 +21,18 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    english: 'Hello',
-    spanish: 'Hola',
+    text: 'Hello',
+    translation: 'Hola',
+    onSpeak: () => {},
+    onMarkLearned: () => {},
   },
 };
 
 export const LongText: Story = {
   args: {
-    english: 'The quick brown fox jumps over the lazy dog',
-    spanish: 'El veloz zorro marrón salta sobre el perro perezoso',
+    text: 'The quick brown fox jumps over the lazy dog',
+    translation: 'El veloz zorro marrón salta sobre el perro perezoso',
+    onSpeak: () => {},
+    onMarkLearned: () => {},
   },
 };
