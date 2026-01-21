@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import GrammarReport from "./GrammarReport";
+import { ThinkingIndicator } from "./ThinkingIndicator";
 import { ChatMessage } from "../types/chat";
 import { useUserStats } from "../hooks/useUserStats";
 
@@ -327,13 +328,9 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
           </div>
         ))}
         {isLoading && (
-          <div className="flex justify-start">
-            <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm flex gap-2">
-              <div className="w-2 h-2 bg-[var(--color-secondary)] rounded-full animate-bounce"></div>
-              <div className="w-2 h-2 bg-[var(--color-secondary)] rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-              <div className="w-2 h-2 bg-[var(--color-secondary)] rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+            <div className="flex justify-start">
+               <ThinkingIndicator />
             </div>
-          </div>
         )}
         <div ref={messagesEndRef} />
       </div>
