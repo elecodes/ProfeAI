@@ -14,7 +14,11 @@ Profe AI es una aplicación web interactiva diseñada para ayudar a estudiantes 
 *   **🔄 Contenido Fresco Automático:** Script automatizado (Github Actions) que genera nuevas frases y quizzes cada 2 semanas usando **Gemini 2.0**.
 *   **🔒 Seguridad Reforzada:** Protección con **Helmet.js** (CSP), **HTTPS** automático (Let's Encrypt) y actualizaciones automáticas (**Dependabot**).
 *   **💬 Modo Conversación Híbrido:** Chat de texto y voz fluido.
-*   **✅ Seguimiento de Progreso:** Visualiza tu avance por semanas y niveles.
+*   **✅ Seguimiento de Progreso:** Visualiza tu avance por semanas y niveles (con opción de reinicio completo).
+*   **♿ Accesibilidad y Heurística (UX):**
+    *   **Navegación por Teclado:** Uso completo sin ratón (Tab, Enter, Escape).
+    *   **Lectores de Pantalla:** Etiquetas ARIA descriptivas en todos los botones.
+    *   **Indicadores de Estado:** Animaciones de "Pensando..." durante la generación de IA para reducir la espera percibida.
 *   **🔐 Autenticación:** Registro seguro con Firebase Auth.
 
 ## 🛠️ Tecnologías Utilizadas

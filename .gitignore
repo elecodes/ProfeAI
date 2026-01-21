@@ -135,3 +135,6 @@ cache/
 
 *storybook.log
 storybook-static
+
+# Documentation backups
+README_original*

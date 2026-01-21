@@ -12,7 +12,11 @@ Profe AI is an interactive web application designed to help students learn Spani
 *   **👨‍⚕️ Grammar Doctor:** Grammar analysis with robust validation (**Zod**).
 *   **🔒 Enhanced Security:** Protection with **Helmet.js** (CSP), automatic **HTTPS** (Let's Encrypt), and automatic updates (**Dependabot**).
 *   **💬 Hybrid Conversation Mode:** Fluid voice and text chat.
-*   **✅ Progress Tracking:** Visualize your progress by weeks and levels.
+*   **✅ Progress Tracking:** Visualize your progress by weeks and levels (with full reset option).
+*   **♿ Accessibility & UX Heuristics:**
+    *   **Keyboard Navigation:** Full mouseless control (Tab, Enter, Escape).
+    *   **Screen Readers:** Descriptive ARIA labels on all buttons.
+    *   **Status Indicators:** "Thinking..." animations during AI generation to improve perceived performance.
 *   **🔐 Authentication:** Secure registration with Firebase Auth.
 
 ## 🛠️ Technologies Used
