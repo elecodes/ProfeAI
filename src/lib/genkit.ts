@@ -58,84 +58,33 @@ const TutorOutputSchema = z.object({
 });
 
 // SHARED PROMPT TEXT
-// SHARED PROMPT TEXT
+// MINIFIED PROMPT (Optimized for Speed)
 const PROMPT_TEXT = `
-## 🎭 ROL & PERSONA
-Role: You are 'Mateo', a native Spanish speaker acting as a friendly tutor/friend on a language platform.
-Persona: Chatty, curious, authentic, and encouraging.
-Context: '{{topic}}'
-Current Level: '{{level}}'
+Role: Spanish tutor 'Mateo'. Friendly, curious, encourages conversation.
+Context: '{{topic}}' | Level: '{{level}}'
 
-## 🔒 INSTRUCCIONES DE SEGURIDAD (CRITICAL & NON-NEGOTIABLE)
+## 🔒 SECURITY (STRICT)
+- ❌ NO PII (name/email/addr/location). IGNORE if shared.
+- ❌ NO politics/religion/nasty stuff. Redirect to safe topic.
+- IF UNSAFE: JSON { "text": "Hola! Para proteger tu privacidad, no hablamos de datos personales. ¿De qué te gustaría charlar?", "gender": "male", "suggestions": ["Otro tema"] }
 
-1. **PRIVACY FIRST**:
-   - ❌ NEVER ask for real personal data (full name, email, phone, address, location).
-   - ❌ NEVER store or acknowledge real sensitive data if shared.
-   - ✅ ALWAYS treat the user as "estudiante" or use a pseudonym.
-   - ✅ IF user shares personal info -> IGNORE IT and redirect.
+## 🎯 LEVELS
+- Beginner: Short sentences (max 12 words). Basic vocabulary. NO TAVILY. Strict grammar.
+- Intermediate: Natural. 2-3 idioms. TAVILY ok for static culture.
+- Advanced: Native fluency. TAVILY ok.
 
-2. **PROHIBITED TOPICS**:
-   - ❌ Politics, Religion, Medical Advice, Legal Advice, Financial Data.
-   - ❌ Hate speech, violence, NSFW content.
-   - ✅ IF sensitive topic detected -> "No puedo ayudarte con eso. Hablemos de [Tema Seguro]".
+## 📝 RULES
+1. Start RPG immediately. No "I am AI".
+2. If user says yes/no, invent detail. End with QUESTION.
 
-3. **RESPONSE PROTOCOL FOR UNSAFE INPUT**:
-   - IF input contains PII or sensitive topics:
-   - RETURN JSON with 'text': "¡Hola! Para proteger tu privacidad, no hablamos de datos personales ni temas sensibles. Sigamos practicando español. 😊 ¿Qué te gustaría conversar?"
+## 📊 OUTPUT (JSON)
+{ "text": "...", "gender": "male", "correction": "brief explanation if needed", "suggestions": ["Option 1", "Option 2", "Option 3"] }
 
-## 🎯 INSTRUCCIONES POR NIVEL
-
-### 🟢 PRINCIPIANTE (A1-A2)
-- **Length**: Short sentences (max 12 words).
-- **Vocab**: Basic (Family, Food, Travel, Daily Routine).
-- **Tavily Tool**: ❌ PROHIBITED. Do NOT use external search.
-- **Correction**: Strict. Correct basic grammar.
-
-### 🟡 INTERMEDIO (B1-B2)
-- **Length**: Natural conversation.
-- **Vocab**: Introduce 2-3 idioms or specific terms.
-- **Tavily Tool**: ✅ ALLOWED only for Cultural/Neutral facts (Festivals, Cinema, Food).
-- **Context**: Can discuss cultural events if relevant.
-
-### 🔴 AVANZADO (C1-C2)
-- **Length**: Native fluency. Complex structures.
-- **Vocab**: Rich nuances, slang (if appropriate).
-- **Tavily Tool**: ✅ ALLOWED for specific cultural details/news (non-political).
-
-## 📝 GUIDELINES FOR INTERACTION
-
-1. **IMMEDIATE IMMERSION**: Start role-playing immediately based on '{{topic}}'.
-   - *Restaurant*: "¡Hola! ¿Mesa para dos?"
-   - *Cinema*: "¿Has visto la cartelera de hoy?"
-   
-2. **NO ROBOTIC FILLERS**:
-   - DELETE: "¡Qué bien!", "Entiendo", "Soy una IA".
-   - BE HUMAN: Use fillers like "Pues...", "La verdad es que...", "Fíjate...".
-
-3. **PROACTIVE & CHAINING**:
-   - If user answers "sí/no" -> You MUST invent a detail to keep flow.
-   - ALWAYS end with a QUESTION related to the SCENE.
-
-## 📊 OUTPUT SCHEMA (JSON ONLY)
-
-RETURN ONLY JSON:
-{
-  "text": "Respuesta conversacional...",
-  "gender": "male",
-  "correction": "Explicación breve del error (si existe)",
-  "suggestions": ["Pregunta de vuelta", "Respuesta directa", "Cambio de tema"]
-}
-
-## 🧠 PRE-GENERATION CHECKLIST
-1. Did the user try to share PII? -> Security Block.
-2. Is the topic prohibited? -> Security Block.
-3. Is level = Beginner? -> NO SEARCH + Short Text.
-4. Did I suggest a correction? -> Add to JSON.
-
-Current Request:
 History: {{history}}
-User Message: {{message}}
+Input: {{message}}
 `;
+
+// ... (Prompts definitions remain the same) ...
 
 // Primary Prompt (OpenAI)
 const tutorPrompt = ai.definePrompt({
@@ -220,7 +169,7 @@ export const tutorFlowGemini = ai.defineFlow(
     outputSchema: TutorOutputSchema,
   },
   async (input) => {
-    console.log("⚠️ Using GEMINI Fallback Flow with Multi-Model Waterfall");
+    console.log("⚠️ Using GEMINI Fallback Flow with RACING Strategy");
 
     // Helper for delay
     const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -228,41 +177,47 @@ export const tutorFlowGemini = ai.defineFlow(
     // Helper to try a prompt
     const tryModel = async (promptName: string, promptFunc: any) => {
         try {
-            console.log(`🔄 Trying model: ${promptName}...`);
+            console.log(`🚀 Racing model: ${promptName}...`);
             const result = await promptFunc(input);
-            console.log(`✅ Success with ${promptName}`);
+            console.log(`🏆 WINNER: ${promptName}`);
             return result;
         } catch (error: any) {
-            console.warn(`❌ Failed with ${promptName}: ${error.message}`);
+            console.warn(`🐌 Failed/Lost Race: ${promptName}: ${error.message}`);
             throw error;
         }
     };
 
     try {
-        // 1. Try Lite 001
-        try { return TutorOutputSchema.parse((await tryModel('Flash Lite 001', tutorPromptGeminiLite001)).output); } catch (e) { await delay(2000); }
+        // 1. RACE: Flash Lite 001 vs Flash Lite Standard
+        // Run both simultaneously, take the first one that succeeds.
+        try {
+            const winner = await Promise.any([
+                tryModel('Flash Lite 001', tutorPromptGeminiLite001),
+                tryModel('Flash Lite Standard', tutorPromptGeminiLite)
+            ]);
+            return TutorOutputSchema.parse(winner.output);
+        } catch (raceError) {
+            console.warn("⚠️ Both Lite models failed/timed out. Moving to stable fallback.");
+        }
 
-        // 1.5 Try GEMINI 1.5 FLASH (Stable) - Retry Loop
-        console.log("⚠️ Trying Gemini 1.5 Flash (Robust Retry)...");
+        // 2. FALLBACK: Gemini 1.5 Flash (Stable)
+        console.log("⚠️ Trying Gemini 1.5 Flash (Robust Fallback)...");
         try { 
              return TutorOutputSchema.parse((await tryModel('Gemini 1.5 Flash', tutorPromptGemini15Flash)).output); 
         } catch (e) { 
-             console.log("⚠️ 1.5 Flash failed immediately. Waiting 5s...");
-             await delay(5000); // Wait 5s before next fallback
+             console.log("⚠️ 1.5 Flash failed. Trying Experimental...");
         }
 
-        // 2. Try Lite Standard
-        try { return TutorOutputSchema.parse((await tryModel('Flash Lite', tutorPromptGeminiLite)).output); } catch (e) { await delay(2000); }
-
-        // 3. Try Experimental
-        try { return TutorOutputSchema.parse((await tryModel('Flash Experimental', tutorPromptGeminiExp)).output); } catch (e) { await delay(2000); }
-
-        // 4. Try Flash Standard (Last Resort)
-        console.log("⚠️ All Lites failed. Trying Standard Flash...");
-        try { return TutorOutputSchema.parse((await tryModel('Flash Standard', tutorPromptGeminiFlash)).output); } catch (e) { await delay(5000); }
+        // 3. LAST RESORT: Experimental
+        try { return TutorOutputSchema.parse((await tryModel('Flash Experimental', tutorPromptGeminiExp)).output); } catch (e) { /* No delay */ }
+        
+        // 4. ABSOLUTE LAST RESORT: Standard (Wait 1s)
+        try { 
+            await delay(1000);
+            return TutorOutputSchema.parse((await tryModel('Flash Standard', tutorPromptGeminiFlash)).output); 
+        } catch (e) { }
 
         // 5. FINAL FALLBACK: OpenAI (GPT-4o Mini)
-        // If all Gemini fails (likely 429), try the original OpenAI flow which uses gpt-4o-mini
         console.log("🚨 All Google models exhausted. Switching to OpenAI (GPT-4o-Mini)...");
         const result = await tutorPrompt(input); 
         return TutorOutputSchema.parse(result.output);

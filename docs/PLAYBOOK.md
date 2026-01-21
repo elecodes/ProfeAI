@@ -66,9 +66,19 @@
     *   [OpenAI Status](https://status.openai.com/)
     *   [Google Cloud Status](https://status.cloud.google.com/)
     *   [ElevenLabs Status](https://status.elevenlabs.io/)
-2.  **Switch Provider**:
-    *   If ElevenLabs is down -> System automatically falls back to Google/WebSpeech (verify this is happening).
-    *   If OpenAI is down -> Disable "Generate Dialogue" button or show maintenance message.
+2.  **Model Racing & Fallback**:
+    *   The system uses **"Model Racing"** (calling multiple Gemini Flash Lite models simultaneously).
+    *   If *both* race participants fail, it falls back to `Gemini 1.5 Flash` (Stable).
+    *   Check server logs for `🏆 WINNER:` or `🐌 Failed/Lost Race:` to see which models are responding.
+
+### Scenario G: CSP Violations (Security Policy)
+**Trigger**: Browser console red errors "Refused to load... violates Content Security Policy".
+
+1.  **Identify Source**: Note the blocked URL (e.g., `apis.google.com`).
+2.  **Update Config**:
+    *   **Backend**: Add domain to `server.ts` (Helmet config).
+    *   **Frontend**: Add domain to `index.html` (Meta tag) for local Dev.
+3.  **Restart**: Backend changes (`server.ts`) REQUIRE a server restart (`npm start`). Frontend changes just need a refresh.
 
 ### Scenario C: Frontend Assets 404
 **Trigger**: White screen, "Loading chunk failed".

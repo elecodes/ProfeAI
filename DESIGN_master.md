@@ -245,8 +245,8 @@ The application follows a **Client-Server** architecture, leveraging modern web 
 -   **Styling**: TailwindCSS (v4).
 -   **State Management**: React Hooks (`useState`, `useEffect`, `useContext`).
 -   **Routing**: Single Page Application (SPA) handled by React (conditional rendering in `App.jsx`).
+-   **Performance**: **Lazy Loading** (`React.lazy`) for route splitting and **Skeleton Screens** for perceived performance.
 -   **Build Tool**: Vite.
-
 
 ### 2.2 Backend
 -   **Server**: Node.js with Express (v4).
@@ -254,20 +254,16 @@ The application follows a **Client-Server** architecture, leveraging modern web 
 -   **API**: RESTful endpoints for AI and TTS services.
 -   **Hosting**: Serves static frontend assets (`dist`) and API routes.
 
-
 ### 2.3 Database & Authentication
 -   **Platform**: Firebase.
 -   **Authentication**: Firebase Auth (Email/Password).
 -   **Database**: Cloud Firestore (NoSQL) for user profiles, progress tracking, and learned phrases.
 
-
-
-
-
-
-
 ### 2.4 AI & Machine Learning Services
 -   **LLM Orchestration:** LangChain & **Google Genkit**.
+-   **Latency Optimization:**
+    -   **Model Racing:** Parallel execution of multiple lightweight models (`Flash Lite`) to minimize TTFT (Time To First Token).
+    -   **Prompt Minification:** Optimized system prompts to reduce input token count.
 -   **AI Provider:** OpenAI (via LangChain) and Gemini (via Genkit) for conversation and grammar analysis.
 -   **Search Tool:** **Tavily** (for real-time cultural data).
 -   **Text-to-Speech (TTS)**: Multi-provider support with fallback strategy:
@@ -392,7 +388,7 @@ Document ID: `uid`
 ## 6. Security Measures
 
 
--   **Helmet**: Configures HTTP headers for security (CSP, HSTS, etc.).
+-   **Helmet**: Configures HTTP headers for security, including a robust **Content Security Policy (CSP)** that validates images, scripts, and authentication frames (`firebaseapp.com`, `googleapis.com`).
 -   **CORS**: Restricts cross-origin requests to allowed domains.
 -   **Rate Limiting**: Prevents abuse (DoS protection) on API endpoints.
 -   **Input Validation**: `zod` schemas used to validate API request bodies.

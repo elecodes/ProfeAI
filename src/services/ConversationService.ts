@@ -150,7 +150,7 @@ class ConversationService {
     // Initial Trigger for the AI to introduce itself
     return await this._generateResponse(
       sessionId, 
-      "Start the conversation and introduce yourself regarding the topic.", 
+      "Start conversation. Topic: " + topic, 
       topic, 
       level
     );

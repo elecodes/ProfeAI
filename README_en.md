@@ -17,6 +17,9 @@ Profe AI is an interactive web application designed to help students learn Spani
     *   **Keyboard Navigation:** Full mouseless control (Tab, Enter, Escape).
     *   **Screen Readers:** Descriptive ARIA labels on all buttons.
     *   **Status Indicators:** "Thinking..." animations during AI generation to improve perceived performance.
+*   **⚡ Advanced Performance:**
+    *   **Lazy Loading:** Progressive page loading for instant startup.
+    *   **AI Model Racing:** Parallel execution of AI models to ensure the fastest possible response (minimal latency).
 *   **🔐 Authentication:** Secure registration with Firebase Auth.
 
 ## 🛠️ Technologies Used
