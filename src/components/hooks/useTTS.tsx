@@ -535,7 +535,7 @@ export const useTTS = (): UseTTSReturn => {
 
         // More aggressive gender differentiation
         if (isMale) {
-          utterance.rate = options.speed || 0.8; // Slower for male voices (more authoritative)
+          utterance.rate = options.speed || 1.0; // Normal speed for male voices (was too slow at 0.8)
           utterance.pitch = 0.7; // Much lower pitch for male voices
           console.log(`👨 Male voice parameters: rate=${utterance.rate}, pitch=${utterance.pitch}`);
         } else {
