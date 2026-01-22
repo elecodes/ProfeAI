@@ -46,6 +46,33 @@ export default defineConfig({
   test: {
     environment: "happy-dom",
     globals: true,
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      exclude: [
+        '**/node_modules/**',
+        '**/dist/**',
+        '**/storybook-static/**',
+        '**/.{idea,git,cache,output,temp}/**',
+        '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
+        'src/types/**',
+        'src/config/**',
+        'src/schemas/**',
+        'src/vite-env.d.ts',
+        'src/main.tsx',
+        'src/App.tsx',
+        '**/*.d.ts',
+        'src/stories/**',
+        '**/*.stories.{js,jsx,ts,tsx}',
+        'test/**'
+      ],
+      thresholds: {
+        global: { statements: 50, branches: 50, functions: 50, lines: 50 },
+        'src/services/**': { statements: 100, branches: 100, functions: 100, lines: 100 },
+        'src/lib/**': { statements: 100, branches: 100, functions: 100, lines: 100 },
+        'src/utils/**': { statements: 100, branches: 100, functions: 100, lines: 100 }
+      }
+    },
     setupFiles: "./test/setup.js",
     include: ["src/tests/**/*.test.{js,jsx,ts,tsx}", "src/tests/**/integration/**/*.integration.test.{js,jsx,ts,tsx}"],
     projects: [

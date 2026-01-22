@@ -1,11 +1,26 @@
 import React, { useState } from 'react';
 import { Dialogue } from '../types/dialogue';
 
+/**
+ * Props for the DialogueGenerator component.
+ */
 interface Props {
+  /** Callback fired when a dialogue is successfully generated. */
   onGenerate: (dialogue: Dialogue) => void;
+  /** The target proficiency level for generation. */
   level: string;
 }
 
+/**
+ * UI Component that allows users to generate new AI conversational scenarios.
+ * 
+ * Features:
+ * - Text input for custom topics.
+ * - Loading state with spinner.
+ * - Error handling and display.
+ * 
+ * @param props - {@link Props}
+ */
 const DialogueGenerator: React.FC<Props> = ({ onGenerate, level }) => {
   const [topic, setTopic] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);

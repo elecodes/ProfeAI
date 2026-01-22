@@ -1,13 +1,32 @@
 import React, { useState } from 'react';
 
+/**
+ * Properties for the Flashcard component.
+ */
 interface FlashcardProps {
-  text: string;           // The English text (hidden initially)
-  translation: string;    // The Spanish text (shown initially)
+  /** The hidden text (generally native language) to be revealed. */
+  text: string;           
+  /** The visible text (generally target language) shown initially. */
+  translation: string;    
+  /** Callback to trigger text-to-speech. */
   onSpeak: (text: string, lang: string) => void;
+  /** Callback to mark the card as "known" or "learned". */
   onMarkLearned: () => void;
+  /** Language codes for TTS. Defaults to es/en. */
   langCode?: { target: string; native: string }; // e.g., 'es', 'en'
 }
 
+/**
+ * A detailed, interactive Flashcard component.
+ * 
+ * Behavior:
+ * - Shows the target language (translation) primarily.
+ * - Allows flipping/revealing the native text.
+ * - Supports keyboard navigation (Enter/Space to flip, Escape to close).
+ * - Provides audio buttons for both languages.
+ * 
+ * @param props - {@link FlashcardProps}
+ */
 export const Flashcard: React.FC<FlashcardProps> = ({ 
   text, 
   translation, 

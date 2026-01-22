@@ -1,5 +1,9 @@
 import React from 'react';
 
+/**
+ * A loading placeholder component mimicking the structure of a grid layout of cards.
+ * Used to improve perceived performance during data fetching.
+ */
 export const SkeletonLoader: React.FC = () => {
   return (
     <div className="w-full max-w-4xl mx-auto p-6 space-y-8 animate-pulse">

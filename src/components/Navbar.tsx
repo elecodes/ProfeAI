@@ -2,6 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useUserStats } from '../hooks/useUserStats';
 
+/**
+ * Top navigation bar (currently used on specific pages or mobile).
+ * Displays user stats (streak) and profile link.
+ */
 const Navbar = () => {
     const { stats } = useUserStats();
 

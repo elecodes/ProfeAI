@@ -22,9 +22,11 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:security": "snyk test",
+    "test:coverage:check": "vitest run --coverage",
     "prepare": "husky",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "doc": "typedoc"
   },
   "dependencies": {
     "@aws-sdk/client-polly": "^3.940.0",
@@ -95,6 +97,8 @@
     "storybook": "^10.1.11",
     "svgo": "^4.0.0",
     "tailwindcss": "^4.1.16",
+    "typedoc": "^0.28.16",
+    "typescript": "^5.9.3",
     "vite": "^7.2.4",
     "vite-plugin-image-optimizer": "^2.0.3",
     "vitest": "^4.0.13"

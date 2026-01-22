@@ -9,6 +9,10 @@ const MESSAGES = [
   "Pensando..."
 ];
 
+/**
+ * A visual indicator showing that the AI is processing the request.
+ * Cycles through different status messages (e.g., "Translating...", "Thinking...") to keep the user engaged.
+ */
 export const ThinkingIndicator = () => {
   const [messageIndex, setMessageIndex] = useState(0);
 

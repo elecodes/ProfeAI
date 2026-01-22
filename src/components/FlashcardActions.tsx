@@ -1,13 +1,26 @@
 import React from 'react';
 
+/**
+ * Props for FlashcardActions.
+ */
 interface FlashcardActionsProps {
+  /** Current visibility state of the translation. */
   showTranslation: boolean;
+  /** Setter for translation visibility. */
   setShowTranslation: React.Dispatch<React.SetStateAction<boolean>>;
+  /** Whether the card has been marked as learned. */
   learned: boolean;
+  /** Setter for learned state. */
   setLearned: React.Dispatch<React.SetStateAction<boolean>>;
+  /** Callback fired when "Mark as learned" is clicked. */
   onLearned: () => void;
 }
 
+/**
+ * Action buttons for a Flashcard (Toggle Translation, Mark Learned).
+ * 
+ * @param props - {@link FlashcardActionsProps}
+ */
 export default function FlashcardActions({
   showTranslation,
   setShowTranslation,

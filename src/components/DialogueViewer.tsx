@@ -2,10 +2,24 @@ import React, { useState } from "react";
 import { useTTS } from "./hooks/useTTS";
 import { Dialogue } from "../types/dialogue";
 
+/**
+ * Props for DialogueViewer.
+ */
 interface Props {
+  /** The dialogue object containing lines, title, and metadata. */
   dialogue: Dialogue | null;
 }
 
+/**
+ * Displays a full conversation/dialogue between two AI speakers.
+ * 
+ * Features:
+ * - Alternates styling for speakers (Left/Right alignment).
+ * - Plays individual lines using TTS.
+ * - Collapsible translation for each line.
+ * 
+ * @param props - {@link Props}
+ */
 const DialogueViewer: React.FC<Props> = ({ dialogue }) => {
   const { speak } = useTTS();
   const [showTranslation, setShowTranslation] = useState<Record<number, boolean>>({});

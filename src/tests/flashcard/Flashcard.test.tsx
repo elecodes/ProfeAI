@@ -1,13 +1,29 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 
-import Flashcard from "../../components/Flashcard";
+import { Flashcard } from "../../components/Flashcard";
 
 describe("Flashcard", () => {
   it("renderiza el contenido correctamente", () => {
-    render(<Flashcard english="Apple" spanish="Manzana" onLearned={vi.fn()} />);
+    // text = English (Native), translation = Spanish (Target)
+    render(
+      <Flashcard 
+        text="Apple" 
+        translation="Manzana" 
+        onMarkLearned={vi.fn()} 
+        onSpeak={vi.fn()}
+      />
+    );
 
-    // Verifica que se muestra el texto en inglés
+    // Initial view shows translation (Manzana)
+    expect(screen.getByText("Manzana")).toBeTruthy();
+    
+    // Check if toggle button exists
+    const toggleBtn = screen.getByText(/Mostrar Inglés/i);
+    expect(toggleBtn).toBeTruthy();
+
+    // Reveal English
+    fireEvent.click(toggleBtn);
     expect(screen.getByText("Apple")).toBeTruthy();
   }); 
 
@@ -15,26 +31,16 @@ describe("Flashcard", () => {
     const mockOnLearned = vi.fn();
 
     render(
-      <Flashcard english="Hello" spanish="Hola" onLearned={mockOnLearned} />
+      <Flashcard 
+        text="Hello" 
+        translation="Hola" 
+        onMarkLearned={mockOnLearned} 
+        onSpeak={vi.fn()}
+      />
     );
 
-    // Buscamos el botón de aprendido (ajusta el selector según tu UI)
-    // Si usas un emoji ✅:
-    // const learnedButton = screen.getByText("✅");
-
-    // Si no estás seguro del texto, buscamos todos los botones y cogemos el segundo (suponiendo que el 1º es audio)
-    const buttons = screen.getAllByRole("button");
-    // Ajusta el índice [1] si es necesario
-    const learnedButton =
-      buttons.find((btn) => btn.textContent?.includes("✅")) ||
-      buttons[buttons.length - 1];
-
-    if (learnedButton) {
-      fireEvent.click(learnedButton);
-      expect(mockOnLearned).toHaveBeenCalled();
-    } else {
-      // Si no encuentra el botón, fallamos el test con un mensaje útil
-      throw new Error("No se encontró el botón de marcar como aprendida");
-    }
+    const learnButton = screen.getByText(/Marcar Aprendida/i);
+    fireEvent.click(learnButton);
+    expect(mockOnLearned).toHaveBeenCalled();
   });
 });

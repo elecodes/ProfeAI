@@ -1,0 +1,5 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🛡️ Running Quality Gate: Honest Coverage Check..."
+npm run test:coverage:check

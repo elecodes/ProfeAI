@@ -1,10 +1,30 @@
 import React, { useState } from "react";
 import { useFormValidation } from "./hooks/useFormValidation";
 
+/**
+ * Props for the SignInForm component.
+ */
 interface SignInFormProps {
+  /**
+   * Callback function triggered when the form is submitted with valid data.
+   * returning a Promise that resolves when the submission is handled.
+   */
   onSubmit: (data: any) => Promise<void>;
 }
 
+/**
+ * A reusable Sign In form component.
+ * 
+ * Features:
+ * - Email and Password fields with validation.
+ * - Password visibility toggle.
+ * - "Forgot Password" placeholder link.
+ * - Loading state handling.
+ * - Custom error mapping for common Firebase auth errors.
+ * 
+ * @param props - Component properties.
+ * @returns The rendered form component.
+ */
 export default function SignInForm({ onSubmit }: SignInFormProps) {
   const [showPassword, setShowPassword] = useState(false);
 

@@ -1,6 +1,13 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
+/**
+ * The main side navigation menu.
+ * 
+ * Features:
+ * - Dynamic active state handling (supports both URL paths and query params like `?mode=study`).
+ * - Responsive layout adaptation (though primarily designed for desktop).
+ */
 const Sidebar = () => {
   const navItems = [
     { 

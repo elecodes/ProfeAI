@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, lazy } from "react";
+import { Suspense, useEffect, lazy } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import { SkeletonLoader } from "./components/SkeletonLoader";

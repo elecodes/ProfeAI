@@ -1,6 +1,17 @@
 import { useState, useEffect } from "react";
 import { TTSOptions, ManualVoiceConfig, UseTTSReturn } from "../../types/tts";
 
+/**
+ * Custom hook to handle Text-to-Speech (TTS) functionality.
+ * 
+ * Features:
+ * - Supports both Web Speech API (client-side) and Backend TTS.
+ * - Auto-detects "best" voices (e.g., favoring natural sounding ones).
+ * - Provides debug tools (VoiceDebugger).
+ * - Handles gender-specific pitch/rate adjustments.
+ * 
+ * @returns `{ speak, VoiceDebugger, ... }` utilities.
+ */
 export const useTTS = (): UseTTSReturn => {
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const [currentProvider, setCurrentProvider] = useState<string | null>(null);

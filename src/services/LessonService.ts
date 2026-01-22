@@ -1,9 +1,13 @@
-import { db } from "../../firebase/firebase";
+import { db } from "../../firebase/firebase.js";
 import { collection, getDocs, query, where, doc, setDoc } from "firebase/firestore";
 import { Lesson } from "../types";
 
 const COLLECTION_NAME = "lessons";
 
+/**
+ * Service to manage educational content (Lessons) in Firestore.
+ * Handles fetching curriculum content based on proficiency levels.
+ */
 export const LessonService = {
   /**
    * Fetch all lessons for a specific level

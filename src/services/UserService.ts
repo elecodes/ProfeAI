@@ -1,15 +1,19 @@
-import { doc, setDoc, getDoc, updateDoc, serverTimestamp, arrayUnion, DocumentData, Timestamp } from "firebase/firestore";
-import { db } from "../../firebase/firebase";
+import { doc, setDoc, getDoc, updateDoc, serverTimestamp, arrayUnion } from "firebase/firestore";
+import { db } from "../../firebase/firebase.js";
 import { AppUser, LearnedPhrase, StudySession } from "../types";
 
 /**
- * Service to handle user data in Firestore
+ * Service to handle user data in Firestore.
+ * Manages profiles, progress tracking, and study history.
  */
 const UserService = {
   /**
-   * Create or update user profile in Firestore
-   * @param {any} user - Firebase Auth user object (using any for now as auth types are external)
-   * @param {Object} additionalData - Extra data to save
+   * Create or update user profile in Firestore.
+   * If usage already exists, updates the `lastActive` timestamp.
+   * 
+   * @param user - Firebase Auth user object.
+   * @param additionalData - Extra fields to merge into the profile.
+   * @returns Reference to the user document.
    */
   async createUserProfile(user: any, additionalData: any = {}): Promise<any> {
     if (!user) return;
@@ -54,8 +58,10 @@ const UserService = {
   },
 
   /**
-   * Get user profile data
-   * @param {string} uid - User ID
+   * Retrieves the full user profile data.
+   * 
+   * @param uid - The User ID to fetch.
+   * @returns User profile data or null if not found.
    */
   async getUserProfile(uid: string): Promise<AppUser | null> {
     if (!uid) return null;
@@ -72,9 +78,11 @@ const UserService = {
   },
 
   /**
-   * Update user progress (level, learned phrases, etc.)
-   * @param {string} uid - User ID
-   * @param {Partial<AppUser>} data - Data to update
+   * Updates specific fields in the user's progress.
+   * Automatically updates `lastActive`.
+   * 
+   * @param uid - User ID.
+   * @param data - Partial data to update (e.g. level, theme).
    */
   async updateUserProgress(uid: string, data: Partial<AppUser>): Promise<void> {
     if (!uid) return;
@@ -90,9 +98,11 @@ const UserService = {
   },
 
   /**
-   * Add a learned phrase to the user's list
-   * @param {string} uid - User ID
-   * @param {LearnedPhrase} phrase - Phrase object
+   * Adds a new phrase to the user's "Learned" collection.
+   * Uses `arrayUnion` to prevent duplicates.
+   * 
+   * @param uid - User ID.
+   * @param phrase - The phrase object to add.
    */
   async addLearnedPhrase(uid: string, phrase: LearnedPhrase): Promise<void> {
     if (!uid) return;
@@ -108,9 +118,10 @@ const UserService = {
   },
 
   /**
-   * Record a study session in history
-   * @param {string} uid - User ID
-   * @param {StudySession} sessionData - Session details
+   * Records a completed study session (Quiz, Dialogue, etc.).
+   * 
+   * @param uid - User ID.
+   * @param sessionData - details of the session (score, type, duration).
    */
   async recordSession(uid: string, sessionData: StudySession): Promise<void> {
     if (!uid) return;
@@ -128,9 +139,11 @@ const UserService = {
     }
   },
   /**
-   * Calculate unlocked weeks based on user creation date
-   * @param {AppUser} user - User object with createdAt timestamp
-   * @returns {number} Max unlocked week number
+   * Calculates how many weeks/levels are unlocked based on user account age.
+   * Unlocks 1 new week every 7 days.
+   * 
+   * @param user - User profile containing `createdAt`.
+   * @returns The number of weeks currently available.
    */
   getUnlockedWeeks(user: AppUser): number {
     if (!user || !user.createdAt) return 1;

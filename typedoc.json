@@ -1,0 +1,15 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "./src/services",
+    "./src/components",
+    "./src/lib",
+    "./src/hooks"
+  ],
+  "entryPointStrategy": "expand",
+  "out": "docs/api",
+  "name": "ProfeAI API Documentation",
+  "includeVersion": true,
+  "readme": "./README.md",
+  "skipErrorChecking": true
+}

@@ -126,6 +126,14 @@ Accede a `https://tu-dominio.com`.
 *   **E2E:** `npm run test:e2e` (Ejecuta tests con Playwright contra el servidor de desarrollo local `http://localhost:5173`)
 *   **Linting:** `npm run lint`
 *   **Seguridad:** `npm run test:security` (Snyk)
+*   **Documentación:** `npm run doc` (Genera documentación técnica con TypeDoc en `docs/api`)
+135: 
+136: ### 🛡️ Estrategia de Testing "Core First"
+137: 
+138: Este proyecto sigue una estrategia de calidad estricta pero pragmática:
+139: *   **Core Services (100%)**:  La lógica de negocio (`src/services/`) debe tener una cobertura del 100%. Esto incluye `UserService`, `LessonService`, `TTSService`, `GrammarService`, `DialogueGenerator` y `ConversationService`.
+140: *   **Global Threshold (80%)**: El objetivo general del proyecto es mantener un 80% de cobertura.
+141: *   **Verificación Automática**: Ejecuta `npm run test:coverage:check` antes de cada push para asegurar que no se introducen regresiones.
 
 ## 📄 Licencia
 

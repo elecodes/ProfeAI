@@ -1,8 +1,16 @@
-import React, { StrictMode } from 'react'
+import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import * as Sentry from "@sentry/react";
 import './index.css'
 import App from './App'
+
+/**
+ * Application Entry Point.
+ * 
+ * - Initializes Sentry for error tracking (if enabled via env).
+ * - Mounts the React application into the DOM root.
+ * - Wraps App in StrictMode and Sentry ErrorBoundary.
+ */
 
 const enableSentry = import.meta.env.VITE_ENABLE_SENTRY === 'true';
 
@@ -35,6 +43,9 @@ const app = enableSentry ? (
   <App />
 );
 
+/**
+ * Render the app.
+ */
 root.render(
   <StrictMode>
     {app}

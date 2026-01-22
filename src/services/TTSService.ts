@@ -6,16 +6,23 @@ import { PollyClient, SynthesizeSpeechCommand } from "@aws-sdk/client-polly";
 import { env } from "../config/env.js";
 import { TTSOptions, TTSResult, TTSProvider } from "../types/tts";
 
+/** Configuration structure for Gender-based voices. */
 interface VoiceConfig {
   female: any;
   male: any;
 }
 
+/** Voice configuration per language. */
 interface ProviderVoiceConfig {
   en: VoiceConfig;
   es: VoiceConfig;
 }
 
+/**
+ * Service to handle Text-to-Speech (TTS) operations.
+ * Supports multiple providers: ElevenLabs, Amazon Polly, Google Cloud, and Web Speech API (client-side fallback).
+ * Uses local filesystem caching to reduce API costs.
+ */
 class TTSService {
   private elevenLabsKey: string | null = null;
   private googleApiKey: string | null = null;
@@ -219,7 +226,18 @@ class TTSService {
   }
 
   /**
-   * MÉTODO PRINCIPAL CON CASCADA (FALLBACK) Y CACHÉ
+   * Generates speech from text using a cascade of available providers.
+   * 
+   * Priority:
+   * 1. Cache (Local filesystem)
+   * 2. ElevenLabs (High quality, expensive) - Requires API Key
+   * 3. Amazon Polly (Good quality, cheaper) - Requires AWS Credentials
+   * 4. Google Cloud (Standard quality) - Requires API Key
+   * 
+   * @param text - The text to synthesize.
+   * @param language - Target language code ('es', 'en').
+   * @param options - Additional options like gender or specific provider force.
+   * @returns Promise resolving to audio buffer and metadata.
    */
   async generateSpeech(text: string, language: string = "es", options: TTSOptions = {}): Promise<TTSResult> {
     await this._ensureInitialized();

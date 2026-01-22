@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import App from "../../../App";
-import { loadLessons } from "../../../../utils/loadLessons";
+import { loadLessons } from "../../../utils/loadLessons";
 
 // Mock useAuth to simulate a logged-in user
 vi.mock("../../../hooks/useAuth", () => ({
@@ -17,7 +17,7 @@ vi.mock("../../../hooks/useAuth", () => ({
 }));
 
 // Mock loadLessons
-vi.mock("../../../../utils/loadLessons", () => ({
+vi.mock("../../../utils/loadLessons", () => ({
   loadLessons: vi.fn(),
 }));
 

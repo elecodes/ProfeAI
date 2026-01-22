@@ -22,5 +22,6 @@ export const Default: Story = {
   args: {
     english: 'Hello',
     spanish: 'Hola',
+    speak: () => {}, // Mock function to satisfy required prop
   },
 };

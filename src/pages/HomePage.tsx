@@ -1,11 +1,11 @@
 import React, { useState, useEffect, Suspense } from "react";
-import { loadLessons } from "../../utils/loadLessons.js";
+import { loadLessons } from "../utils/loadLessons";
 import { useTTS } from "../components/hooks/useTTS";
 import { useAuth } from "../hooks/useAuth";
 import UserService from "../services/UserService";
 import { dialogues } from "../lessons/dialogues";
 import * as Sentry from "@sentry/react";
-import { useNavigate, Link, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Lesson, LearnedPhrase } from "../types";
 
 // Lazy load components
@@ -38,7 +38,7 @@ const HomePage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   
   // Auth State from Hook
-  const { user, userProfile, loading: authLoading, signIn, signUp, signOut } = useAuth();
+  const { user, userProfile, loading: authLoading, signIn, signUp } = useAuth();
 
   // App State
   const [nivel, setNivel] = useState<string>("beginner");
@@ -54,12 +54,10 @@ const HomePage = () => {
       setSearchParams({ mode: newMode });
   };
 
-  const [showTranslation, setShowTranslation] = useState<Record<string, boolean>>({});
   const [quizIndex, setQuizIndex] = useState<number>(0);
   const [quizScore, setQuizScore] = useState<number>(0);
   const [quizCompleted, setQuizCompleted] = useState<boolean>(false);
   const [quizOptions, setQuizOptions] = useState<string[]>([]);
-  const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
   const [selectedDialogue, setSelectedDialogue] = useState<any>(null);
   const [showGenerator, setShowGenerator] = useState<boolean>(false);
 
@@ -91,12 +89,6 @@ const HomePage = () => {
 
   const handleSignUp = async (formData: any) => {
     await signUp(formData.email, formData.password);
-  };
-
-  const handleLogout = async () => {
-    await signOut();
-    setMode("study");
-    setLearned([]); // Clear local state on logout
   };
 
   // === Sync with User Profile ===
@@ -136,7 +128,7 @@ const HomePage = () => {
       }
 
       // Mark lessons as locked/unlocked
-      const processedWeeks = todasLasSemanas.map(lesson => ({
+      const processedWeeks = todasLasSemanas.map((lesson: any) => ({
         ...lesson,
         locked: (lesson.week || 1) > unlockedCount
       }));
@@ -145,7 +137,7 @@ const HomePage = () => {
       setTemasDisponibles(processedWeeks);
 
       // Cargar frases de la semana seleccionada
-      const selected = processedWeeks.find((s) => s.weekName === tema);
+      const selected = processedWeeks.find((s: any) => s.weekName === tema);
       
       if (selected) {
         if (selected.locked) {
@@ -208,13 +200,6 @@ const HomePage = () => {
     if (user) {
       await UserService.updateUserProgress((user as any).uid, { learnedPhrases: [] });
     }
-  };
-
-  const handleToggleTranslation = (id: string) => {
-    setShowTranslation((prev: Record<string, boolean>) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
   };
 
   const handleDialogueGenerated = (newDialogue: any) => {

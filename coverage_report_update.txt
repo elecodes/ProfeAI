@@ -1,0 +1,313 @@
+
+> profe-ai@1.0.0 test:coverage:check
+> vitest run --coverage
+
+Warning: Starting in Storybook 8.5.0-alpha.18, the "test.include" option in Vitest is discouraged in favor of just using the "stories" field in your Storybook configuration.
+
+The values you passed to "test.include" will be ignored, please remove them from your Vitest configuration where the Storybook plugin is applied.
+
+More info: https://github.com/storybookjs/storybook/blob/next/MIGRATION.md#addon-test-indexing-behavior-of-storybookaddon-test-is-changed
+
+[1m[46m RUN [49m[22m [36mv4.0.17 [39m[90m/Users/elena/Developer/ProfeAI[39m
+      [2mCoverage enabled with [22m[33mv8[39m
+
+Warning: Starting in Storybook 8.5.0-alpha.18, the "test.include" option in Vitest is discouraged in favor of just using the "stories" field in your Storybook configuration.
+
+The values you passed to "test.include" will be ignored, please remove them from your Vitest configuration where the Storybook plugin is applied.
+
+More info: https://github.com/storybookjs/storybook/blob/next/MIGRATION.md#addon-test-indexing-behavior-of-storybookaddon-test-is-changed
+[90mstdout[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2musa backend TTS cuando está disponible
+[22m[39m🎙️ Attempting backend TTS...
+
+[90mstderr[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2musa backend TTS cuando está disponible
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/Users/elena/Developer/ProfeAI/node_modules/@testing-library/react/dist/pure.js:329:5)
+Warning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/Users/elena/Developer/ProfeAI/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2musa backend TTS cuando está disponible
+[22m[39m✅ TTS successful using elevenlabs
+
+[90mstdout[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2mhace fallback a Web Speech API cuando el backend falla
+[22m[39m🎙️ Attempting backend TTS...
+
+ [32m✓[39m [30m[43m 0 [49m[39m src/tests/flashcard/FlashcardTranslation.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 17[2mms[22m[39m
+[90mstderr[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2mhace fallback a Web Speech API cuando el backend falla
+[22m[39m⚠️ Backend TTS failed. Status: [90mundefined[39m
+Warning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/Users/elena/Developer/ProfeAI/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2mhace fallback a Web Speech API cuando el backend falla
+[22m[39mAvailable Spanish voices: 1
+⚠️ Using any premium voice (may not match gender): Google español
+🎤 Browser Voice Selected: Google español (es-ES) - Gender: female
+👩 Female voice parameters: rate=0.95, pitch=1.1
+
+[90mstdout[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2mhace fallback a Web Speech API cuando el backend falla
+[22m[39m✅ Using Web Speech API fallback
+
+[90mstdout[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2mhace fallback a Web Speech API cuando el servidor no está disponible
+[22m[39m🎙️ Attempting backend TTS...
+
+[90mstdout[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2mhace fallback a Web Speech API cuando el servidor no está disponible
+[22m[39mAvailable Spanish voices: 1
+⚠️ Using any premium voice (may not match gender): Google español
+🎤 Browser Voice Selected: Google español (es-ES) - Gender: female
+👩 Female voice parameters: rate=0.95, pitch=1.1
+
+[90mstderr[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2mhace fallback a Web Speech API cuando el servidor no está disponible
+[22m[39m⚠️ Backend unreachable: Network error
+Warning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/Users/elena/Developer/ProfeAI/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2mhace fallback a Web Speech API cuando el servidor no está disponible
+[22m[39m✅ Using Web Speech API fallback
+
+[90mstderr[2m | src/tests/components/DialogueViewer.test.tsx[2m > [22m[2mDialogueViewer[2m > [22m[2mcalls speak when the audio button is clicked
+[22m[39mWarning: An update to DialogueViewer inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at DialogueViewer (/Users/elena/Developer/ProfeAI/src/components/DialogueViewer.tsx:8:27)
+
+[90mstdout[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2mactualiza currentProvider según el proveedor usado
+[22m[39m🎙️ Attempting backend TTS...
+
+[90mstdout[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2mactualiza currentProvider según el proveedor usado
+[22m[39m✅ TTS successful using google
+
+[90mstderr[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2mactualiza currentProvider según el proveedor usado
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/Users/elena/Developer/ProfeAI/node_modules/@testing-library/react/dist/pure.js:329:5)
+Warning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/Users/elena/Developer/ProfeAI/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+ [32m✓[39m [30m[43m 0 [49m[39m src/tests/flashcard/Flashcard.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 54[2mms[22m[39m
+ [32m✓[39m [30m[43m 0 [49m[39m src/tests/flashcard/FlashcardActions.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 57[2mms[22m[39m
+ [32m✓[39m [30m[43m 0 [49m[39m src/tests/components/DialogueViewer.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 67[2mms[22m[39m
+[90mstdout[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2mdetiene el audio actual antes de reproducir uno nuevo
+[22m[39m🎙️ Attempting backend TTS...
+
+[90mstdout[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2mdetiene el audio actual antes de reproducir uno nuevo
+[22m[39m✅ TTS successful using elevenlabs
+
+[90mstderr[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2mdetiene el audio actual antes de reproducir uno nuevo
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/Users/elena/Developer/ProfeAI/node_modules/@testing-library/react/dist/pure.js:329:5)
+Warning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/Users/elena/Developer/ProfeAI/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+ [32m✓[39m [30m[43m 0 [49m[39m src/tests/flashcard/useTTS.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 109[2mms[22m[39m
+ [32m✓[39m [30m[43m 0 [49m[39m src/tests/components/auth/AuthForms.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 191[2mms[22m[39m
+ [32m✓[39m [30m[43m 0 [49m[39m src/tests/pages/ProfilePage.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 32[2mms[22m[39m
+[90mstdout[2m | src/tests/services/LessonService.test.ts[2m > [22m[2mLessonService[2m > [22m[2msetLesson[2m > [22m[2mshould write lesson data
+[22m[39mLesson lesson_id written successfully.
+
+ [32m✓[39m [30m[43m 0 [49m[39m src/tests/services/UserService.test.ts [2m([22m[2m20 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m [30m[43m 0 [49m[39m src/tests/services/LessonService.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m [30m[43m 0 [49m[39m src/tests/flashcard/FlashcardAudioButtons.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+[90mstdout[2m | src/tests/services/TTSService.test.ts[2m > [22m[2mTTSService[2m > [22m[2mCaching Logic[2m > [22m[2mshould return cached audio if file exists
+[22m[39m✅ Amazon Polly configured
+
+[90mstdout[2m | src/tests/services/TTSService.test.ts[2m > [22m[2mTTSService[2m > [22m[2mCaching Logic[2m > [22m[2mshould return cached audio if file exists
+[22m[39m💾 Cache HIT: /Users/elena/Developer/ProfeAI/cache/tts/b14030b989bc025d4760c1405609d369.mp3
+
+[90mstdout[2m | src/tests/services/TTSService.test.ts[2m > [22m[2mTTSService[2m > [22m[2mCaching Logic[2m > [22m[2mshould save to cache after generating audio (Cache MISS)
+[22m[39m✅ Amazon Polly configured
+
+[90mstdout[2m | src/tests/services/TTSService.test.ts[2m > [22m[2mTTSService[2m > [22m[2mCaching Logic[2m > [22m[2mshould save to cache after generating audio (Cache MISS)
+[22m[39m❌ Cache MISS: /Users/elena/Developer/ProfeAI/cache/tts/b14030b989bc025d4760c1405609d369.mp3
+🎙️ TTS: ElevenLabs (female)...
+Using ElevenLabs Voice ID: t5ztDJA7pj9EyW9QIcJ2 (female)
+
+[90mstdout[2m | src/tests/services/TTSService.test.ts[2m > [22m[2mTTSService[2m > [22m[2mCaching Logic[2m > [22m[2mshould save to cache after generating audio (Cache MISS)
+[22m[39m💾 Saved to cache: /Users/elena/Developer/ProfeAI/cache/tts/b14030b989bc025d4760c1405609d369.mp3
+
+[90mstdout[2m | src/tests/services/TTSService.test.ts[2m > [22m[2mTTSService[2m > [22m[2mgenerateWithElevenLabs[2m > [22m[2mgenera audio exitosamente con ElevenLabs
+[22m[39m✅ Amazon Polly configured
+
+[90mstdout[2m | src/tests/services/TTSService.test.ts[2m > [22m[2mTTSService[2m > [22m[2mgenerateWithElevenLabs[2m > [22m[2mgenera audio exitosamente con ElevenLabs
+[22m[39mUsing ElevenLabs Voice ID: t5ztDJA7pj9EyW9QIcJ2 (female)
+
+[90mstdout[2m | src/tests/services/TTSService.test.ts[2m > [22m[2mTTSService[2m > [22m[2mgenerateSpeech (fallback logic)[2m > [22m[2mintenta ElevenLabs primero cuando está disponible
+[22m[39m✅ Amazon Polly configured
+
+[90mstdout[2m | src/tests/services/TTSService.test.ts[2m > [22m[2mTTSService[2m > [22m[2mgenerateSpeech (fallback logic)[2m > [22m[2mintenta ElevenLabs primero cuando está disponible
+[22m[39m❌ Cache MISS: /Users/elena/Developer/ProfeAI/cache/tts/b14030b989bc025d4760c1405609d369.mp3
+🎙️ TTS: ElevenLabs (female)...
+Using ElevenLabs Voice ID: t5ztDJA7pj9EyW9QIcJ2 (female)
+
+[90mstdout[2m | src/tests/services/TTSService.test.ts[2m > [22m[2mTTSService[2m > [22m[2mgenerateSpeech (fallback logic)[2m > [22m[2mintenta ElevenLabs primero cuando está disponible
+[22m[39m💾 Saved to cache: /Users/elena/Developer/ProfeAI/cache/tts/b14030b989bc025d4760c1405609d369.mp3
+
+[90mstdout[2m | src/tests/services/TTSService.test.ts[2m > [22m[2mTTSService[2m > [22m[2mgenerateSpeech (fallback logic)[2m > [22m[2mhace fallback a Polly cuando ElevenLabs falla
+[22m[39m✅ Amazon Polly configured
+
+[90mstdout[2m | src/tests/services/TTSService.test.ts[2m > [22m[2mTTSService[2m > [22m[2mgenerateSpeech (fallback logic)[2m > [22m[2mhace fallback a Polly cuando ElevenLabs falla
+[22m[39m❌ Cache MISS: /Users/elena/Developer/ProfeAI/cache/tts/b14030b989bc025d4760c1405609d369.mp3
+🎙️ TTS: ElevenLabs (female)...
+Using ElevenLabs Voice ID: t5ztDJA7pj9EyW9QIcJ2 (female)
+
+[90mstdout[2m | src/tests/services/TTSService.test.ts[2m > [22m[2mTTSService[2m > [22m[2mgenerateSpeech (fallback logic)[2m > [22m[2mhace fallback a Polly cuando ElevenLabs falla
+[22m[39m🎙️ TTS: Amazon Polly (female)...
+
+[90mstderr[2m | src/tests/services/TTSService.test.ts[2m > [22m[2mTTSService[2m > [22m[2mgenerateSpeech (fallback logic)[2m > [22m[2mhace fallback a Polly cuando ElevenLabs falla
+[22m[39m⚠️ ElevenLabs falló: ElevenLabs error: Something went wrong
+
+[90mstdout[2m | src/tests/services/TTSService.test.ts[2m > [22m[2mTTSService[2m > [22m[2mgenerateSpeech (fallback logic)[2m > [22m[2mhace fallback a Polly cuando ElevenLabs falla
+[22m[39m💾 Saved to cache: /Users/elena/Developer/ProfeAI/cache/tts/b14030b989bc025d4760c1405609d369.mp3
+
+ [32m✓[39m [30m[43m 0 [49m[39m src/tests/services/TTSService.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [2m[90m↓[39m[22m [30m[43m 0 [49m[39m src/tests/flashcard/integration/FlashcardFlow.integration.test.tsx [2m([22m[2m3 tests[22m[2m | [22m[33m3 skipped[39m[2m)[22m
+ [32m✓[39m [30m[45m storybook (chromium) [49m[39m src/stories/FlashcardActions.stories.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 480[2mms[22m[39m
+   [33m[2m✓[22m[39m Default [33m 397[2mms[22m[39m
+ [32m✓[39m [30m[45m storybook (chromium) [49m[39m src/stories/FlashcardText.stories.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 475[2mms[22m[39m
+   [33m[2m✓[22m[39m Hidden [33m 400[2mms[22m[39m
+ [32m✓[39m [30m[45m storybook (chromium) [49m[39m src/stories/Page.stories.js [2m([22m[2m2 tests[22m[2m)[22m[33m 520[2mms[22m[39m
+   [33m[2m✓[22m[39m Logged Out [33m 416[2mms[22m[39m
+ [32m✓[39m [30m[45m storybook (chromium) [49m[39m src/stories/GrammarReport.stories.tsx [2m([22m[2m3 tests[22m[2m)[22m[33m 648[2mms[22m[39m
+   [33m[2m✓[22m[39m With Results [33m 415[2mms[22m[39m
+ [32m✓[39m [30m[45m storybook (chromium) [49m[39m src/stories/Flashcard.stories.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 652[2mms[22m[39m
+   [33m[2m✓[22m[39m Default [33m 416[2mms[22m[39m
+ [32m✓[39m [30m[45m storybook (chromium) [49m[39m src/stories/AuthForms.stories.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 639[2mms[22m[39m
+   [33m[2m✓[22m[39m Login [33m 500[2mms[22m[39m
+ [32m✓[39m [30m[45m storybook (chromium) [49m[39m src/stories/Button.stories.js [2m([22m[2m5 tests[22m[2m)[22m[33m 788[2mms[22m[39m
+   [33m[2m✓[22m[39m Primary [33m 456[2mms[22m[39m
+ [32m✓[39m [30m[45m storybook (chromium) [49m[39m src/stories/Header.stories.js [2m([22m[2m2 tests[22m[2m)[22m[32m 179[2mms[22m[39m
+[90mstderr[2m | src/stories/ConversationMode.stories.tsx[2m > [22m[2mDefault
+[22m[39mChat Error: [TypeError: res.json is not a function]
+ [32m✓[39m [30m[45m storybook (chromium) [49m[39m src/stories/DialogueGenerator.stories.tsx [2m([22m[2m1 test[22m[2m)[22m[32m 136[2mms[22m[39m
+ [32m✓[39m [30m[45m storybook (chromium) [49m[39m src/stories/TailwindTest.stories.jsx [2m([22m[2m1 test[22m[2m)[22m[32m 113[2mms[22m[39m
+ [32m✓[39m [30m[45m storybook (chromium) [49m[39m src/stories/Sidebar.stories.tsx [2m([22m[2m1 test[22m[2m)[22m[32m 132[2mms[22m[39m
+ [32m✓[39m [30m[45m storybook (chromium) [49m[39m src/stories/ConversationMode.stories.tsx [2m([22m[2m1 test[22m[2m)[22m[32m 105[2mms[22m[39m
+ [32m✓[39m [30m[45m storybook (chromium) [49m[39m src/stories/Navbar.stories.tsx [2m([22m[2m1 test[22m[2m)[22m[32m 106[2mms[22m[39m
+ [32m✓[39m [30m[45m storybook (chromium) [49m[39m src/stories/FlashcardAudioButtons.stories.tsx [2m([22m[2m1 test[22m[2m)[22m[32m 52[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m25 passed[39m[22m[2m | [22m[33m1 skipped[39m[90m (26)[39m
+[2m      Tests [22m [1m[32m80 passed[39m[22m[2m | [22m[33m3 skipped[39m[90m (83)[39m
+[2m   Start at [22m 17:14:55
+[2m   Duration [22m 5.57s[2m (transform 635ms, setup 7.06s, import 3.86s, tests 5.59s, environment 2.66s)[22m
+
+[34m % [39m[2mCoverage report from [22m[33mv8[39m
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   51.87 |    41.24 |   42.52 |   53.68 |                   
+ .storybook        |     100 |      100 |     100 |     100 |                   
+  preview.js       |     100 |      100 |     100 |     100 |                   
+ firebase          |   69.23 |      100 |       0 |   81.81 |                   
+  firebase.js      |   69.23 |      100 |       0 |   81.81 | 40,43             
+ src               |       0 |        0 |       0 |       0 |                   
+  index.css        |       0 |        0 |       0 |       0 |                   
+ src/components    |   55.39 |       50 |      50 |   58.13 |                   
+  ...ationMode.tsx |   37.06 |       24 |   23.33 |   40.76 | ...93,321,360-375 
+  ...Generator.tsx |   34.78 |    38.88 |      25 |   36.36 | 30-54,68-72       
+  ...gueViewer.tsx |   94.11 |     90.9 |     100 |     100 | 41,91             
+  Flashcard.tsx    |   53.33 |       40 |      40 |      50 | 42-47,66-82       
+  ...rdActions.tsx |   83.33 |       50 |      75 |     100 | 37-52             
+  ...ioButtons.tsx |     100 |      100 |     100 |     100 |                   
+  ...hcardText.tsx |     100 |      100 |     100 |     100 |                   
+  ...marReport.tsx |    92.3 |     87.5 |     100 |      90 | 30                
+  Layout.tsx       |      50 |      100 |       0 |      50 | 22                
+  Navbar.tsx       |     100 |      100 |     100 |     100 |                   
+  Sidebar.tsx      |     100 |      100 |     100 |     100 |                   
+  ...tonLoader.tsx |   33.33 |      100 |       0 |   33.33 | 8-19              
+  ...Indicator.tsx |   83.33 |      100 |      60 |      90 | 21                
+ ...omponents/auth |   58.73 |    48.68 |   68.75 |   60.41 |                   
+  SignInForm.tsx   |      75 |    60.71 |    87.5 |   78.26 | 41,62-70,150      
+  SignUpForm.tsx   |   45.71 |    41.66 |      50 |      44 | ...-32,50,107-154 
+ ...nts/auth/hooks |      80 |       50 |   81.81 |    87.5 |                   
+  ...Validation.ts |      80 |       50 |   81.81 |    87.5 | 48,89,96-98       
+ ...mponents/hooks |   29.67 |    20.85 |   16.88 |   30.43 |                   
+  useTTS.tsx       |   29.67 |    20.85 |   16.88 |   30.43 | ...49-803,827-831 
+ src/hooks         |   58.82 |       25 |      50 |   66.66 |                   
+  useUserStats.ts  |   58.82 |       25 |      50 |   66.66 | ...48-50,59,66-74 
+ src/pages         |   54.16 |    28.57 |   28.57 |   54.16 |                   
+  ProfilePage.tsx  |   54.16 |    28.57 |   28.57 |   54.16 | 15-16,40-120,135  
+ src/services      |    82.6 |    70.58 |   88.23 |   83.44 |                   
+  LessonService.ts |     100 |      100 |     100 |     100 |                   
+  TTSService.ts    |   70.21 |    62.02 |      75 |   72.22 | ...95,305,310-317 
+  UserService.ts   |     100 |      100 |     100 |     100 |                   
+-------------------|---------|----------|---------|---------|-------------------
+ERROR: Coverage for lines (83.44%) does not meet "src/services/**" threshold (100%)
+ERROR: Coverage for functions (88.23%) does not meet "src/services/**" threshold (100%)
+ERROR: Coverage for statements (82.6%) does not meet "src/services/**" threshold (100%)
+ERROR: Coverage for branches (70.58%) does not meet "src/services/**" threshold (100%)

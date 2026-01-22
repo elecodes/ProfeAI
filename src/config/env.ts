@@ -22,6 +22,7 @@ const envSchema = z.object({
   AWS_REGION: z.string().optional(),
   TAVILY_API_KEY: z.string().optional(),
   GOOGLE_GENAI_API_KEY: z.string().optional(),
+  GOOGLE_CLOUD_API_KEY: z.string().optional(), // Used for Google TTS
 });
 
 type Env = z.infer<typeof envSchema>;

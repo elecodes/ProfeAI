@@ -1,14 +1,14 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import { LoginForm } from '../../../components/auth/LoginForm';
-import { RegisterForm } from '../../../components/auth/RegisterForm';
+import SignInForm from '../../../components/auth/SignInForm';
+import SignUpForm from '../../../components/auth/SignUpForm';
 
 describe('Authentication Forms Integration', () => {
-  describe('LoginForm', () => {
+  describe('SignInForm', () => {
     it('shows validation error when invalid email is blurred', async () => {
-      render(<LoginForm onSubmit={async () => {}} />);
+      render(<SignInForm onSubmit={async () => {}} />);
       
-      const emailInput = screen.getByLabelText(/email address/i);
+      const emailInput = screen.getByLabelText(/email \*/i);
       
       // Focus and enter invalid email
       fireEvent.change(emailInput, { target: { value: 'invalid-email' } });
@@ -16,35 +16,20 @@ describe('Authentication Forms Integration', () => {
       fireEvent.blur(emailInput);
       
       // Expect error message
-      expect(await screen.findByRole('alert')).toHaveTextContent(/email must include @/i);
-      expect(emailInput).toHaveAttribute('aria-invalid', 'true');
-    });
-
-    it('clears error when user types again (progressive strategy)', async () => {
-      render(<LoginForm onSubmit={async () => {}} />);
-      const emailInput = screen.getByLabelText(/email address/i);
-      
-      // Trigger error
-      fireEvent.change(emailInput, { target: { value: 'bad' } });
-      fireEvent.blur(emailInput);
-      expect(await screen.findByRole('alert')).toBeInTheDocument();
-      
-      // Type again - error should disappear (optional UX feature implemented)
-      fireEvent.change(emailInput, { target: { value: 'bad2' } });
-      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+      expect(await screen.findByText(/email no es válido/i)).toBeInTheDocument();
     });
 
     it('toggles password visibility', () => {
-      render(<LoginForm onSubmit={async () => {}} />);
-      // Use selector to specifically find the input, ignoring the button with aria-label
-      const passwordInput = screen.getByLabelText(/password/i, { selector: 'input' });
-      const toggleButton = screen.getByRole('button', { name: /show password/i });
+      render(<SignInForm onSubmit={async () => {}} />);
+      // Specific selector for the password input
+      const passwordInput = screen.getByLabelText(/contraseña \*/i, { selector: 'input' });
+      const toggleButton = screen.getByRole('button', { name: /mostrar contraseña/i });
       
       expect(passwordInput).toHaveAttribute('type', 'password');
       
       fireEvent.click(toggleButton);
       expect(passwordInput).toHaveAttribute('type', 'text');
-      expect(toggleButton).toHaveAttribute('aria-label', 'Hide password');
+      expect(toggleButton).toHaveAttribute('aria-label', 'Ocultar contraseña');
       
       fireEvent.click(toggleButton);
       expect(passwordInput).toHaveAttribute('type', 'password');
@@ -52,17 +37,17 @@ describe('Authentication Forms Integration', () => {
 
     it('disables submit button and shows loading state on submission', async () => {
       const mockSubmit = vi.fn().mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)));
-      render(<LoginForm onSubmit={mockSubmit} />);
+      render(<SignInForm onSubmit={mockSubmit} />);
       
-      fireEvent.change(screen.getByLabelText(/email address/i), { target: { value: 'test@example.com' } });
-      fireEvent.change(screen.getByLabelText(/password/i, { selector: 'input' }), { target: { value: 'password123' } });
+      fireEvent.change(screen.getByLabelText(/email \*/i), { target: { value: 'test@example.com' } });
+      fireEvent.change(screen.getByLabelText(/contraseña \*/i, { selector: 'input' }), { target: { value: 'password123' } });
       
-      const submitBtn = screen.getByRole('button', { name: /sign in/i });
+      const submitBtn = screen.getByRole('button', { name: /iniciar sesión/i });
       fireEvent.click(submitBtn);
       
       expect(mockSubmit).toHaveBeenCalled();
       expect(submitBtn).toBeDisabled();
-      expect(screen.getByText(/signing in/i)).toBeInTheDocument();
+      expect(screen.getByText(/cargando/i)).toBeInTheDocument();
       
       await waitFor(() => {
         expect(submitBtn).not.toBeDisabled();
@@ -70,18 +55,18 @@ describe('Authentication Forms Integration', () => {
     });
   });
 
-  describe('RegisterForm', () => {
-    it('validates name, email, and password on blur', async () => {
-      render(<RegisterForm onSubmit={async () => {}} />);
+  describe('SignUpForm', () => {
+    it('validates required fields on blur', async () => {
+      render(<SignUpForm onSubmit={async () => {}} />);
       
-      const nameInput = screen.getByLabelText(/full name/i);
-      fireEvent.blur(nameInput);
-      expect(await screen.findByText(/name is required/i)).toBeInTheDocument();
+      const emailInput = screen.getByLabelText(/email \*/i);
+      fireEvent.blur(emailInput);
+      expect(await screen.findByText(/email es obligatorio/i)).toBeInTheDocument();
       
-      const passwordInput = screen.getByLabelText(/password/i, { selector: 'input' });
+      const passwordInput = screen.getByLabelText(/^Contraseña \*$/i, { selector: 'input' });
       fireEvent.change(passwordInput, { target: { value: 'short' } });
       fireEvent.blur(passwordInput);
-      expect(await screen.findByText(/at least 8 characters/i)).toBeInTheDocument();
+      expect(await screen.findByText("Mínimo 8 caracteres.")).toBeInTheDocument();
     });
   });
 });

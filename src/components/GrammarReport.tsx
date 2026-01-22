@@ -1,10 +1,24 @@
 import React from 'react';
 import { GrammarReport as IGrammarReport } from '../types/grammar';
 
+/**
+ * Props for the GrammarReport component.
+ */
 interface GrammarReportProps {
+  /** The specific report object containing score, feedback, and corrections. */
   report: IGrammarReport | null;
 }
 
+/**
+ * Displays a detailed analysis of the user's grammar usage.
+ * 
+ * Features:
+ * - Overall score display with color coding.
+ * - General AI feedback summary.
+ * - Itemized list of corrections (diff view showing Original vs Corrected).
+ * 
+ * @param props - {@link GrammarReportProps}
+ */
 const GrammarReport: React.FC<GrammarReportProps> = ({ report }) => {
   if (!report) return null;
 

@@ -11,6 +11,10 @@ const ResponseSchema = z.object({
 
 type Response = z.infer<typeof ResponseSchema>;
 
+/**
+ * Singleton service that manages chat sessions, history, and AI interaction.
+ * Handles rate limiting, history truncation, and Spanglish detection locally before hitting the API.
+ */
 class ConversationService {
   private messageHistories: Map<string, InMemoryChatMessageHistory>;
   private lastRateLimitTimestamp: number = 0;
@@ -31,6 +35,9 @@ class ConversationService {
 
   private lastUsedFallback: string = "";
 
+  /**
+   * Initializes the ConversationService with an empty history map.
+   */
   constructor() {
     this.messageHistories = new Map();
   }
@@ -144,6 +151,14 @@ class ConversationService {
     return output;
   }
 
+  /**
+   * Starts a new conversation session.
+   * 
+   * @param sessionId - Unique identifier for the session.
+   * @param topic - Theoretical topic or context (trigger for the system prompt).
+   * @param level - Difficulty level.
+   * @returns Initial AI response introducing the roleplay.
+   */
   async startConversation(sessionId: string, topic: string, level: string) {
     this.messageHistories.set(sessionId, new InMemoryChatMessageHistory());
     
@@ -156,7 +171,31 @@ class ConversationService {
     );
   }
 
+  /**
+   * Sends a user message to the AI and gets a response.
+   * 
+   * @param sessionId - Session ID to retrieve history.
+   * @param message - User's input text.
+   * @param topic - Current topic context.
+   * @param level - Difficulty level.
+   * @returns AI response with potential corrections and suggestions.
+   */
   async sendMessage(sessionId: string, message: string, topic: string, level: string) {
+    // 0. Check for content corrections (Spanglish/Grammar) locally
+    const correction = this.checkCorrections(message);
+    if (correction) {
+        // Save to history so context is kept?
+        // Usually corrections stop the flow, but let's record it so the AI knows.
+        // Actually, for this feature, we just return the correction immediately.
+        await this.getHistory(sessionId).addUserMessage(message);
+        await this.getHistory(sessionId).addAIMessage(correction.text);
+        return {
+            text: correction.text,
+            gender: "female", // Default
+            correction: correction.correction
+        } as Response;
+    }
+
     return await this._generateResponse(sessionId, message, topic, level);
   }
 }

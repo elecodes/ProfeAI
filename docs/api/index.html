@@ -1,0 +1,143 @@
+<!DOCTYPE html><html class="default" lang="en" data-base="./"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>ProfeAI API Documentation - v1.0.0</title><meta name="description" content="Documentation for ProfeAI API Documentation"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script defer src="assets/main.js"></script><script async src="assets/icons.js" id="tsd-icons-script"></script><script async src="assets/search.js" id="tsd-search-script"></script><script async src="assets/navigation.js" id="tsd-nav-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => window.app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar"><div class="tsd-toolbar-contents container"><a href="index.html" class="title">ProfeAI API Documentation - v1.0.0</a><div id="tsd-toolbar-links"></div><button id="tsd-search-trigger" class="tsd-widget" aria-label="Search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-search"></use></svg></button><dialog id="tsd-search" aria-label="Search"><input role="combobox" id="tsd-search-input" aria-controls="tsd-search-results" aria-autocomplete="list" aria-expanded="true" autocapitalize="off" autocomplete="off" placeholder="Search the docs" maxLength="100"/><ul role="listbox" id="tsd-search-results"></ul><div id="tsd-search-status" aria-live="polite" aria-atomic="true"><div>Preparing search index...</div></div></dialog><a href="#" class="tsd-widget menu" id="tsd-toolbar-menu-trigger" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-menu"></use></svg></a></div></header><div class="container container-main"><div class="col-content"><div class="tsd-page-title"><h1>ProfeAI API Documentation - v1.0.0</h1></div><div class="tsd-panel tsd-typography"><h1 id="🇪🇸-profe-ai-tu-tutor-de-español-con-ia" class="tsd-anchor-link">🇪🇸 Profe AI - Tu Tutor de Español con IA<a href="#🇪🇸-profe-ai-tu-tutor-de-español-con-ia" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1>
+<blockquote>
+<p><a href="media/README_en.md">Read this document in English 🇺🇸</a></p>
+</blockquote>
+<p>Profe AI es una aplicación web interactiva diseñada para ayudar a estudiantes a aprender español mediante lecciones estructuradas, práctica de pronunciación (TTS), cuestionarios y conversaciones dinámicas impulsadas por Inteligencia Artificial.</p>
+<p><img src="https://via.placeholder.com/800x400?text=AppTutor+Preview" alt="AppTutor Screenshot"></p>
+<h2 id="✨-características-principales" class="tsd-anchor-link">✨ Características Principales<a href="#✨-características-principales" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<ul>
+<li><strong>📚 Lecciones Dinámicas:</strong> Contenido gestionado en <strong>Firestore</strong> que permite actualizaciones sin redesepliegue.</li>
+<li><strong>🗣️ Texto a Voz (TTS) Premium:</strong> Prioriza <strong>Amazon Polly</strong> y <strong>ElevenLabs</strong> para una voz natural, con fallback automático a Google Cloud y Web Speech API.</li>
+<li><strong>🤖 Tutor de IA (Roleplay):</strong> Practica situaciones reales (ej. &quot;En el restaurante&quot;) con un tutor de IA que se adapta a tu nivel.</li>
+<li><strong>👨‍⚕️ Doctor Gramática:</strong> Análisis gramatical con validación robusta (<strong>Zod</strong>).</li>
+<li><strong>🔄 Contenido Fresco Automático:</strong> Script automatizado (Github Actions) que genera nuevas frases y quizzes cada 2 semanas usando <strong>Gemini 2.0</strong>.</li>
+<li><strong>🔒 Seguridad Reforzada:</strong> Protección con <strong>Helmet.js</strong> (CSP), <strong>HTTPS</strong> automático (Let's Encrypt) y actualizaciones automáticas (<strong>Dependabot</strong>).</li>
+<li><strong>💬 Modo Conversación Híbrido:</strong> Chat de texto y voz fluido.</li>
+<li><strong>✅ Seguimiento de Progreso:</strong> Visualiza tu avance por semanas y niveles (con opción de reinicio completo).</li>
+<li><strong>♿ Accesibilidad y Heurística (UX):</strong>
+<ul>
+<li><strong>Navegación por Teclado:</strong> Uso completo sin ratón (Tab, Enter, Escape).</li>
+<li><strong>Lectores de Pantalla:</strong> Etiquetas ARIA descriptivas en todos los botones.</li>
+<li><strong>Indicadores de Estado:</strong> Animaciones de &quot;Pensando...&quot; durante la generación de IA para reducir la espera percibida.</li>
+</ul>
+</li>
+<li><strong>⚡ Rendimiento Avanzado:</strong>
+<ul>
+<li><strong>Lazy Loading:</strong> Carga progresiva de páginas para un inicio instantáneo.</li>
+<li><strong>AI Model Racing:</strong> Ejecución paralela de modelos de IA para obtener la respuesta más rápida posible (mínima latencia).</li>
+<li><strong>Fallback Inteligente:</strong> Uso de <strong>Gemini 2.0 Flash Lite</strong> con fallback automático a <strong>Gemini 1.5 Flash</strong> para garantizar disponibilidad.</li>
+</ul>
+</li>
+<li><strong>🔐 Autenticación Mejorada:</strong>
+<ul>
+<li>Registro seguro con validación estricta de contraseñas.</li>
+<li>Detección de &quot;Cuenta no encontrada&quot; con sugerencia de registro.</li>
+<li>Enlace de recuperación de contraseña.</li>
+</ul>
+</li>
+</ul>
+<h2 id="🛠️-tecnologías-utilizadas" class="tsd-anchor-link">🛠️ Tecnologías Utilizadas<a href="#🛠️-tecnologías-utilizadas" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<ul>
+<li><strong>Frontend:</strong> React, Vite, Tailwind CSS.</li>
+<li><strong>Backend:</strong> Node.js, Express, <strong>Helmet.js</strong>.</li>
+<li><strong>Infraestructura:</strong> <strong>Docker</strong>, <strong>Nginx</strong> (Reverse Proxy), <strong>Certbot</strong> (SSL).</li>
+<li><strong>Base de Datos:</strong> Firebase Firestore &amp; Authentication.</li>
+<li><strong>IA &amp; Servicios:</strong> LangChain, <strong>Genkit</strong> (Orchestration), OpenAI, Amazon Polly, Google Cloud TTS, ElevenLabs, <strong>Tavily</strong> (Search).</li>
+<li><strong>Calidad:</strong> Sentry, Playwright, Vitest, Lighthouse, <strong>Snyk</strong>, <strong>Husky</strong>, <strong>Dependabot</strong>.</li>
+</ul>
+<h2 id="🚀-requisitos-previos" class="tsd-anchor-link">🚀 Requisitos Previos<a href="#🚀-requisitos-previos" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<ul>
+<li><a href="https://nodejs.org/">Node.js</a> (v18+)</li>
+<li><a href="https://www.docker.com/">Docker</a> (para despliegue y HTTPS)</li>
+<li>Cuenta de Firebase (Firestore y Auth habilitados)</li>
+<li>Claves de API: OpenAI, AWS (Polly), Google Cloud, ElevenLabs.</li>
+</ul>
+<h2 id="📥-instalación" class="tsd-anchor-link">📥 Instalación<a href="#📥-instalación" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<ol>
+<li>
+<p><strong>Clonar el repositorio:</strong></p>
+<pre><code class="bash"><span class="hl-0">git</span><span class="hl-1"> </span><span class="hl-2">clone</span><span class="hl-1"> </span><span class="hl-2">https://github.com/tu-usuario/apptutor.git</span><br/><span class="hl-0">cd</span><span class="hl-1"> </span><span class="hl-2">apptutor</span>
+</code><button type="button">Copy</button></pre>
+
+</li>
+<li>
+<p><strong>Instalar dependencias:</strong></p>
+<pre><code class="bash"><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">install</span>
+</code><button type="button">Copy</button></pre>
+
+</li>
+<li>
+<p><strong>Configurar variables de entorno:</strong>
+Crea un archivo <code>.env</code> basado en <code>.env.example</code>:</p>
+<pre><code class="env"># IA & Voz
+OPENAI_API_KEY=sk-...
+AWS_ACCESS_KEY_ID=...
+AWS_SECRET_ACCESS_KEY=...
+AWS_REGION=us-east-1
+
+# Genkit & Search
+GOOGLE_GENAI_API_KEY=...
+TAVILY_API_KEY=tv-...
+
+# Firebase
+GOOGLE_APPLICATION_CREDENTIALS=./path/to/credentials.json
+
+# Seguridad
+PORT=3001
+</code><button type="button">Copy</button></pre>
+
+</li>
+<li>
+<p><strong>Cargar Contenido (Seed):</strong>
+Sube las lecciones iniciales a Firestore:</p>
+<pre><code class="bash"><span class="hl-0">node</span><span class="hl-1"> </span><span class="hl-2">scripts/seedLessons.js</span>
+</code><button type="button">Copy</button></pre>
+
+</li>
+<li>
+<p><strong>Actualizar Contenido con IA (Opcional):</strong>
+Para generar contenido fresco manualmente:</p>
+<pre><code class="bash"><span class="hl-3"># Requiere service-account.json en la raíz</span><br/><span class="hl-0">npx</span><span class="hl-1"> </span><span class="hl-2">tsx</span><span class="hl-1"> </span><span class="hl-2">scripts/refresh-content.ts</span>
+</code><button type="button">Copy</button></pre>
+
+</li>
+</ol>
+<h2 id="▶️-ejecución" class="tsd-anchor-link">▶️ Ejecución<a href="#▶️-ejecución" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<h3 id="desarrollo-local-http" class="tsd-anchor-link">Desarrollo Local (HTTP)<a href="#desarrollo-local-http" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<pre><code class="bash"><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">run</span><span class="hl-1"> </span><span class="hl-2">dev</span>
+</code><button type="button">Copy</button></pre>
+
+<p>Accede a <code>http://localhost:5173</code>.</p>
+<h3 id="desarrollo-local-seguro-https" class="tsd-anchor-link">Desarrollo Local Seguro (HTTPS)<a href="#desarrollo-local-seguro-https" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>Para probar características que requieren SSL (como el micrófono en algunos navegadores):</p>
+<ol>
+<li>Generar certificados:<pre><code class="bash"><span class="hl-0">./init-local-https.sh</span>
+</code><button type="button">Copy</button></pre>
+
+</li>
+<li>Acceder a <code>https://localhost</code>.</li>
+</ol>
+<h3 id="producción-docker-https" class="tsd-anchor-link">Producción (Docker + HTTPS)<a href="#producción-docker-https" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>Despliegue con Nginx y certificados Let's Encrypt automáticos:</p>
+<ol>
+<li>Configura tu dominio en <code>init-letsencrypt.sh</code> y <code>nginx/conf/app.conf</code>.</li>
+<li>Inicializa certificados:<pre><code class="bash"><span class="hl-0">./init-letsencrypt.sh</span>
+</code><button type="button">Copy</button></pre>
+
+</li>
+<li>Arranca los servicios:<pre><code class="bash"><span class="hl-0">docker-compose</span><span class="hl-1"> </span><span class="hl-4">-f</span><span class="hl-1"> </span><span class="hl-2">docker-compose.prod.yml</span><span class="hl-1"> </span><span class="hl-2">up</span><span class="hl-1"> </span><span class="hl-4">-d</span>
+</code><button type="button">Copy</button></pre>
+
+</li>
+</ol>
+<p>Accede a <code>https://tu-dominio.com</code>.</p>
+<h2 id="🧪-tests-y-calidad" class="tsd-anchor-link">🧪 Tests y Calidad<a href="#🧪-tests-y-calidad" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<ul>
+<li><strong>Unitarios:</strong> <code>npm test</code></li>
+<li><strong>E2E:</strong> <code>npm run test:e2e</code> (Ejecuta tests con Playwright contra el servidor de desarrollo local <code>http://localhost:5173</code>)</li>
+<li><strong>Linting:</strong> <code>npm run lint</code></li>
+<li><strong>Seguridad:</strong> <code>npm run test:security</code> (Snyk)</li>
+</ul>
+<h2 id="📄-licencia" class="tsd-anchor-link">📄 Licencia<a href="#📄-licencia" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>Este proyecto está bajo la Licencia MIT.</p>
+</div></div><div class="col-sidebar"><div class="page-menu"><div class="tsd-navigation settings"><details class="tsd-accordion"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-chevronDown"></use></svg><h3>Settings</h3></summary><div class="tsd-accordion-details"><div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span><ul id="tsd-filter-options"><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-external" name="external"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>External</span></label></li></ul></div><div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div><details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-chevronDown"></use></svg><h3>On This Page</h3></summary><div class="tsd-accordion-details"><a href="#🇪🇸-profe-ai-tu-tutor-de-español-con-ia"><span>🇪🇸 <wbr/>Profe <wbr/>AI -<wbr/> <wbr/>Tu <wbr/>Tutor de <wbr/>Español con <wbr/>IA</span></a><ul><li><a href="#✨-características-principales"><span>✨ <wbr/>Características <wbr/>Principales</span></a></li><li><a href="#🛠️-tecnologías-utilizadas"><span>🛠️ <wbr/>Tecnologías <wbr/>Utilizadas</span></a></li><li><a href="#🚀-requisitos-previos"><span>🚀 <wbr/>Requisitos <wbr/>Previos</span></a></li><li><a href="#📥-instalación"><span>📥 <wbr/>Instalación</span></a></li><li><a href="#▶️-ejecución"><span>▶️ <wbr/>Ejecución</span></a></li><li><ul><li><a href="#desarrollo-local-http"><span>Desarrollo <wbr/>Local (<wbr/>HTTP)</span></a></li><li><a href="#desarrollo-local-seguro-https"><span>Desarrollo <wbr/>Local <wbr/>Seguro (<wbr/>HTTPS)</span></a></li><li><a href="#producción-docker-https"><span>Producción (<wbr/>Docker + <wbr/>HTTPS)</span></a></li></ul></li><li><a href="#🧪-tests-y-calidad"><span>🧪 <wbr/>Tests y <wbr/>Calidad</span></a></li><li><a href="#📄-licencia"><span>📄 <wbr/>Licencia</span></a></li></ul></div></details></div><div class="site-menu"><nav class="tsd-navigation"><a href="modules.html">ProfeAI API Documentation - v1.0.0</a><ul class="tsd-small-nested-navigation" id="tsd-nav-container"><li>Loading...</li></ul></nav></div></div></div><footer><p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></footer><div class="overlay"></div></body></html>

@@ -125,3 +125,10 @@
 2.  **Verify Firebase Error**: Check console for specific error codes (`auth/user-not-found`).
     *   If specific error is caught but message is generic, check `SignInForm.tsx` catch block.
 3.  **Password Validation**: The `SignUpForm` uses strict regex. If valid password fails, check the regex in `SignUpForm.tsx`.
+
+### Scenario I: Documentation Gaps
+**Trigger**: Developer cannot find type definitions or API usage.
+
+1.  **Generate Docs**: Run `npm run doc`.
+2.  **Verify Output**: Check `docs/api/index.html`.
+3.  **Missing Types**: If a service is missing, check if it is exported in `typedoc.json` entry points.

@@ -1,6 +1,6 @@
-import { LessonService } from "../src/services/LessonService";
+import { LessonService } from "../services/LessonService";
 
-export const loadLessons = async (nivel) => {
+export const loadLessons = async (nivel: string) => {
   try {
     console.log(`🔄 Fetching lessons for ${nivel} from Firestore...`);
     const lessons = await LessonService.getLessons(nivel);

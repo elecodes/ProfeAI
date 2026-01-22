@@ -4,12 +4,30 @@ import { ThinkingIndicator } from "./ThinkingIndicator";
 import { ChatMessage } from "../types/chat";
 import { useUserStats } from "../hooks/useUserStats";
 
+/**
+ * Props for the ConversationMode component.
+ */
 interface Props {
+  /** The topic for the conversation (e.g., "At the airport"). */
   topic: string;
+  /** The difficulty level ("Beginner", "Intermediate", "Advanced"). */
   level: string;
+  /** Callback to return to the previous screen. */
   onBack: () => void;
 }
 
+/**
+ * The main chat interface for the AI Tutor.
+ * 
+ * Features:
+ * - Real-time chat with `ConversationService`.
+ * - Automatic topic generation if none provided.
+ * - Grammar analysis feedback upon ending the session.
+ * - "Thinking" indicator states.
+ * - Suggestion chips for user replies.
+ * 
+ * @param props - {@link Props}
+ */
 const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState<string>("");

@@ -13,7 +13,6 @@ const ai = genkit({
       googleAI({ apiKey: process.env.GOOGLE_GENAI_API_KEY }), // Direct process.env access as requested
   ],
   model: gpt4oMini, // Default model
-  logLevel: 'debug' 
 });
 
 // ... (Tavily Tool Definition remains same) ...
@@ -149,6 +148,13 @@ const tutorPromptGeminiFlash = ai.definePrompt({
 
 
 // Primary Flow
+/**
+ * The main flow for the AI Spanish tutor.
+ * Processes user messages and returns a structured response including text, gender, corrections, and suggestions.
+ * 
+ * Uses a "racing" strategy with multiple Gemini models to ensure high availability and low latency,
+ * falling back to OpenAI (GPT-4o Mini) if necessary.
+ */
 export const tutorFlow = ai.defineFlow(
   {
     name: 'tutorFlow',
@@ -278,6 +284,13 @@ const dialoguePromptFlash = ai.definePrompt({
 }, DIALOGUE_PROMPT_TEXT);
 
 // Export Dialogue Flow with Fallback Strategy
+/**
+ * A specialized flow for generating educational dialogues.
+ * 
+ * Implements a fallback strategy:
+ * 1. Tries `Gemini 2.0 Flash Lite` (Fast & Cheap).
+ * 2. Falls back to `Gemini 1.5 Flash` (Stable).
+ */
 export const dialogueFlow = ai.defineFlow(
   {
     name: 'dialogueFlow',

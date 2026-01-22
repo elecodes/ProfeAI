@@ -1,10 +1,23 @@
 import React from 'react';
 import Sidebar from './Sidebar';
 
+/**
+ * Props for the Layout component.
+ */
 interface LayoutProps {
+  /** The main content to render inside the layout shell. */
   children: React.ReactNode;
 }
 
+/**
+ * Core application layout shell.
+ * 
+ * Structure:
+ * - Fixed left sidebar (`Sidebar` component).
+ * - Scrollable main content area (pushed right).
+ * 
+ * @param props - {@link LayoutProps}
+ */
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen bg-[var(--color-background)] font-sans text-[var(--color-primary)]">

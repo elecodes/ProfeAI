@@ -1,11 +1,23 @@
 import React from 'react';
 
+/**
+ * Props for FlashcardText.
+ */
 interface FlashcardTextProps {
+  /** The primary text (usually English/Native). */
   english: string;
+  /** The secondary text (usually Spanish/Target). */
   spanish: string;
+  /** Whether to show the secondary text. */
   showTranslation: boolean;
 }
 
+/**
+ * Displays the main content text of a flashcard.
+ * Handles the animated reveal of the translation.
+ * 
+ * @param props - {@link FlashcardTextProps}
+ */
 export default function FlashcardText({ english, spanish, showTranslation }: FlashcardTextProps) {
   return (
     <>
