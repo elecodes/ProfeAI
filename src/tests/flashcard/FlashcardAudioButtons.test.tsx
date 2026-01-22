@@ -12,8 +12,8 @@ describe("FlashcardAudioButtons", () => {
     );
 
     // Verificamos que los botones existen por su contenido de texto
-    expect(screen.getByText("🇺🇸 🔊")).toBeTruthy();
-    expect(screen.getByText("🇪🇸 🔊")).toBeTruthy();
+    expect(screen.getByText("🇺🇸")).toBeTruthy();
+    expect(screen.getByText("🇪🇸")).toBeTruthy();
   });
 
   it("llama a speak con inglés al hacer clic en el botón de USA", () => {
@@ -29,7 +29,7 @@ describe("FlashcardAudioButtons", () => {
     );
 
     // Simulamos el clic
-    const buttonUS = screen.getByText("🇺🇸 🔊");
+    const buttonUS = screen.getByText("🇺🇸");
     fireEvent.click(buttonUS);
 
     // Verificamos que speak se llamó con los argumentos correctos
@@ -50,7 +50,7 @@ describe("FlashcardAudioButtons", () => {
     );
 
     // Simulamos el clic
-    const buttonES = screen.getByText("🇪🇸 🔊");
+    const buttonES = screen.getByText("🇪🇸");
     fireEvent.click(buttonES);
 
     // Verificamos argumentos

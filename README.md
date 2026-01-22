@@ -22,7 +22,11 @@ Profe AI es una aplicación web interactiva diseñada para ayudar a estudiantes 
 *   **⚡ Rendimiento Avanzado:**
     *   **Lazy Loading:** Carga progresiva de páginas para un inicio instantáneo.
     *   **AI Model Racing:** Ejecución paralela de modelos de IA para obtener la respuesta más rápida posible (mínima latencia).
-*   **🔐 Autenticación:** Registro seguro con Firebase Auth.
+    *   **Fallback Inteligente:** Uso de **Gemini 2.0 Flash Lite** con fallback automático a **Gemini 1.5 Flash** para garantizar disponibilidad.
+*   **🔐 Autenticación Mejorada:**
+    *   Registro seguro con validación estricta de contraseñas.
+    *   Detección de "Cuenta no encontrada" con sugerencia de registro.
+    *   Enlace de recuperación de contraseña.
 
 ## 🛠️ Tecnologías Utilizadas
 

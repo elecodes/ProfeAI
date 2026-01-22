@@ -18,8 +18,11 @@ export default function SignUpForm({ onSubmit }: SignUpFormProps) {
     },
     password: (value: string) => {
       if (!value) return "La contraseña es obligatoria.";
-      if (value.length < 6)
-        return "La contraseña debe tener al menos 6 caracteres.";
+      if (value.length < 8)
+        return "Mínimo 8 caracteres.";
+      if (!/[A-Z]/.test(value)) return "Falta una mayúscula.";
+      if (!/[0-9]/.test(value)) return "Falta un número.";
+      if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) return "Falta un carácter especial.";
       return "";
     },
     confirmPassword: (value: string, formData: any) => {
@@ -109,6 +112,17 @@ export default function SignUpForm({ onSubmit }: SignUpFormProps) {
           >
             {showPassword ? "Ocultar" : "Mostrar"}
           </button>
+        </div>
+
+        {/* Password Requirements Checklist */}
+        <div className="mt-2 text-sm text-gray-600 bg-gray-50 p-3 rounded border border-gray-100">
+            <p className="font-medium mb-1">La contraseña debe tener:</p>
+            <ul className="list-disc list-inside space-y-0.5 pl-1 text-xs">
+                <li className={form.password.length >= 8 ? "text-green-600 font-medium" : "text-gray-500"}>Mínimo 8 caracteres</li>
+                <li className={/[A-Z]/.test(form.password) ? "text-green-600 font-medium" : "text-gray-500"}>Una mayúscula</li>
+                <li className={/[0-9]/.test(form.password) ? "text-green-600 font-medium" : "text-gray-500"}>Un número</li>
+                <li className={/[!@#$%^&*(),.?":{}|<>]/.test(form.password) ? "text-green-600 font-medium" : "text-gray-500"}>Un carácter especial</li>
+            </ul>
         </div>
 
         {errors.password && (

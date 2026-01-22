@@ -48,7 +48,15 @@ export default defineConfig({
     globals: true,
     setupFiles: "./test/setup.js",
     include: ["src/tests/**/*.test.{js,jsx,ts,tsx}", "src/tests/**/integration/**/*.integration.test.{js,jsx,ts,tsx}"],
-    projects: [{
+    projects: [
+    {
+      name: 'unit',
+      extends: true,
+      test: {
+        include: ["src/tests/**/*.test.{js,jsx,ts,tsx}", "src/tests/**/integration/**/*.integration.test.{js,jsx,ts,tsx}"],
+      }
+    },
+    {
       extends: true,
       plugins: [
       // The plugin will run tests for the stories defined in your Storybook config

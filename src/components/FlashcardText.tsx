@@ -20,9 +20,11 @@ export default function FlashcardText({ english, spanish, showTranslation }: Fla
       </h2>
 
       <div className={`transition-all duration-300 overflow-hidden ${showTranslation ? 'max-h-20 opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
-         <p className="text-[var(--color-secondary)] text-lg font-sans border-t border-gray-200 pt-4">
-            {spanish}
-         </p>
+         {showTranslation && (
+            <p className="text-[var(--color-secondary)] text-lg font-sans border-t border-gray-200 pt-4">
+                {spanish}
+            </p>
+         )}
       </div>
     </>
   );

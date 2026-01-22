@@ -35,9 +35,25 @@ export default function SignInForm({ onSubmit }: SignInFormProps) {
     validationRules
   );
 
+  const handleCustomSubmit = async (data: any) => {
+    try {
+      await onSubmit(data);
+    } catch (err: any) {
+      if (
+        err.code === 'auth/user-not-found' || 
+        err.code === 'auth/invalid-credential' || 
+        err.message?.includes('not found') ||
+        err.message?.includes('no user record')
+      ) {
+         throw new Error("Account not found. Please register first.");
+      }
+      throw err;
+    }
+  };
+
   return (
     <form
-      onSubmit={(e) => handleSubmit(e, onSubmit)}
+      onSubmit={(e) => handleSubmit(e, handleCustomSubmit)}
       className="flex flex-col gap-4"
       autoComplete="on"
     >
@@ -107,6 +123,15 @@ export default function SignInForm({ onSubmit }: SignInFormProps) {
         {errors.password && (
           <span className="text-red-600 text-sm mt-1">{errors.password}</span>
         )}
+        <div className="text-right mt-1">
+          <button
+            type="button"
+            className="text-sm text-blue-600 hover:text-blue-800 hover:underline focus:outline-none"
+            onClick={() => window.alert("Forgot Password feature coming soon!")}
+          >
+            ¿Olvidaste tu contraseña?
+          </button>
+        </div>
       </div>
 
       {/* SUBMIT */}

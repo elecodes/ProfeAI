@@ -304,7 +304,7 @@ The application follows a **Client-Server** architecture, leveraging modern web 
 -   **Description**: View pre-written dialogues or generate new ones on specific topics.
 -   **Implementation**:
    -   **Static**: Loaded from `src/lessons/dialogues.js`.
-   -   **Dynamic**: `/api/generate-dialogue` endpoint uses `DialogueGenerator.js` to create custom scenarios.
+   -   **Dynamic**: `/api/generate-dialogue` endpoint uses `DialogueGenerator.js` (refactored to use **Gemini via Genkit**) to create custom scenarios. It implements a fallback strategy (Flash Lite -> Flash 1.5) to handle rate limits.
 
 
 ### 3.4 Quiz Mode

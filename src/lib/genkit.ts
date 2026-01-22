@@ -228,3 +228,88 @@ export const tutorFlowGemini = ai.defineFlow(
     }
   }
 );
+// ... existing code ...
+// Local definition to ensure compatibility with Genkit's Zod instance
+const DialogueLineSchema = z.object({
+  speaker: z.string().describe("Name of the speaker"),
+  text: z.string().describe("The text spoken in Spanish"),
+  translation: z.string().describe("English translation of the text"),
+  gender: z.enum(["male", "female"]).describe("Gender of the speaker for TTS"),
+});
+
+const DialogueSchema = z.object({
+  title: z.string().describe("The title of the dialogue in Spanish"),
+  lines: z.array(DialogueLineSchema).describe("The lines of the dialogue"),
+});
+
+const DialogueInputSchema = z.object({
+  topic: z.string(),
+  level: z.string(),
+});
+
+const DIALOGUE_PROMPT_TEXT = `
+  Generate a realistic dialogue in Spanish for a student of level "{{level}}".
+  Topic: "{{topic}}".
+  
+  Requirements:
+  - The dialogue should have between 4 and 6 lines.
+  - Use vocabulary appropriate for the level.
+  - Include English translations.
+  - Assign a gender ("male" or "female") to each speaker.
+  - IMPORTANT: Ensure the speaker's name matches the assigned gender (e.g., Juan = male, Maria = female).
+`;
+
+// Define Dialogue Prompt using Gemini 2.0 Flash Lite (Primary)
+const dialoguePromptLite = ai.definePrompt({
+  name: 'dialogueLite',
+  model: 'googleai/gemini-2.0-flash-lite', 
+  input: { schema: DialogueInputSchema },
+  output: { schema: DialogueSchema },
+  config: { temperature: 0.7 },
+}, DIALOGUE_PROMPT_TEXT);
+
+// Define Dialogue Prompt using Gemini 1.5 Flash (Fallback)
+const dialoguePromptFlash = ai.definePrompt({
+  name: 'dialogueFlash',
+  model: 'googleai/gemini-flash-latest', 
+  input: { schema: DialogueInputSchema },
+  output: { schema: DialogueSchema },
+  config: { temperature: 0.7 },
+}, DIALOGUE_PROMPT_TEXT);
+
+// Export Dialogue Flow with Fallback Strategy
+export const dialogueFlow = ai.defineFlow(
+  {
+    name: 'dialogueFlow',
+    inputSchema: DialogueInputSchema,
+    outputSchema: DialogueSchema,
+  },
+  async (input) => {
+    // Helper to attempt generation
+    const tryGenerate = async (promptName: string, promptFunc: any) => {
+      try {
+        console.log(`🚀 Attempting Dialogue Generation with ${promptName}...`);
+        const result = await promptFunc(input);
+        if (!result.output) throw new Error("Empty output");
+        return result.output;
+      } catch (e: any) {
+        console.warn(`⚠️ ${promptName} failed: ${e.message}`);
+        throw e;
+      }
+    };
+
+    try {
+      // 1. Try Lite
+      return await tryGenerate('Gemini 2.0 Flash Lite', dialoguePromptLite);
+    } catch (e) {
+      // 2. Fallback to 1.5 Flash
+      console.log("🔄 Switching to Gemini 1.5 Flash fallback...");
+      try {
+        return await tryGenerate('Gemini 1.5 Flash', dialoguePromptFlash);
+      } catch (finalError) {
+        console.error("🔥 All Dialogue Generation models failed.");
+        throw finalError; // Rethrow to be caught by the service
+      }
+    }
+  }
+);

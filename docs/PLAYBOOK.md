@@ -117,3 +117,11 @@
     *   Fix the CSS/Component.
     *   Verify locally in Storybook (it auto-reloads).
     *   Commit.
+
+### Scenario H: Authentication UI Issues
+**Trigger**: User reports "Cannot login" or "Forms validation failing".
+
+1.  **Check Components**: Ensure `SignInForm` and `SignUpForm` are being used (not legacy `LoginForm`).
+2.  **Verify Firebase Error**: Check console for specific error codes (`auth/user-not-found`).
+    *   If specific error is caught but message is generic, check `SignInForm.tsx` catch block.
+3.  **Password Validation**: The `SignUpForm` uses strict regex. If valid password fails, check the regex in `SignUpForm.tsx`.

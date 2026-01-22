@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useUserStats } from '../hooks/useUserStats';
 import { useAuth } from '../hooks/useAuth';
 import UserService from '../services/UserService';
 
 const ProfilePage = () => {
     const { stats, updateProfile, resetStats } = useUserStats();
-    const { user } = useAuth();
+    const { user, signOut } = useAuth();
+    const navigate = useNavigate();
     const [isEditing, setIsEditing] = useState(false);
     const [tempName, setTempName] = useState(stats.username || 'Estudiante');
 
@@ -122,6 +123,21 @@ const ProfilePage = () => {
                         className="w-full text-center py-2 text-red-400 text-sm hover:text-red-600 transition"
                     >
                         Reiniciar progreso
+                    </button>
+
+
+                    <button 
+                        onClick={async () => {
+                            try {
+                                await signOut();
+                                navigate('/');
+                            } catch (error) {
+                                console.error("Error signing out:", error);
+                            }
+                        }}
+                        className="w-full text-center py-3 mt-4 border border-gray-300 text-gray-700 font-medium rounded-[var(--radius-btn)] hover:bg-gray-50 transition flex items-center justify-center gap-2"
+                    >
+                        <span>🚪</span> Cerrar Sesión
                     </button>
                 </div>
             </div>
