@@ -69,6 +69,21 @@ describe('ConversationService', () => {
              expect(mockTutorFlow).not.toHaveBeenCalled();
         });
 
+        it('should trigger Grammar check (Infinitive Special Cases)', async () => {
+             const cases = [
+                 { input: "yo saber eso", correction: "Yo sé" },
+                 { input: "yo tener hambre", correction: "Yo tengo" },
+                 { input: "yo querer agua", correction: "Yo quiero" },
+                 { input: "yo poder ir", correction: "Yo puedo" }
+             ];
+
+             for (const c of cases) {
+                 const res = await ConversationService.sendMessage('sess1', c.input, 'topic', 'level');
+                 expect(res.text).toContain(c.correction);
+                 expect(res.correction).toBe(c.correction);
+             }
+        });
+
         it('should call Gemini if input is valid', async () => {
              const mockResponse = { text: '¡Qué bien!', gender: 'female' };
              mockTutorFlow.mockResolvedValueOnce(mockResponse);
