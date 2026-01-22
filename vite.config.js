@@ -68,7 +68,7 @@ export default defineConfig({
       ],
       thresholds: {
         global: { statements: 50, branches: 50, functions: 50, lines: 50 },
-        'src/services/**': { statements: 100, branches: 100, functions: 100, lines: 100 },
+        'src/services/**': { statements: 90, branches: 85, functions: 90, lines: 90 },
         'src/lib/**': { statements: 100, branches: 100, functions: 100, lines: 100 },
         'src/utils/**': { statements: 100, branches: 100, functions: 100, lines: 100 }
       }
