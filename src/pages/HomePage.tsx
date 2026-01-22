@@ -299,7 +299,7 @@ const HomePage = () => {
                         : "bg-white text-[var(--color-secondary)] hover:text-slate-700 border border-gray-200"
                     }`}
                 >
-                    🧠 Estudiar
+                    🧠 Frases
                 </button>
                 <button
                     onClick={() => setMode("learned")}
@@ -331,6 +331,7 @@ const HomePage = () => {
                 >
                     🗣️ Diálogos
                 </button>
+                {/* Widget removed, back to global index.html */}
             </div>
         )}
 

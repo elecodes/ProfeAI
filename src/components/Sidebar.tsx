@@ -12,7 +12,7 @@ const Sidebar = () => {
   const navItems = [
     { 
       path: "/?mode=study", 
-      label: "Estudiar", 
+      label: "Frases", 
       icon: "📚",
       ident: "study"
     },
@@ -30,7 +30,7 @@ const Sidebar = () => {
     },
     { 
       path: "/?mode=chat", 
-      label: "Conversar", 
+      label: "¿Charlamos?", 
       icon: "💬",
       ident: "chat"
     },

@@ -48,7 +48,7 @@ app.use(
           "https://elevenlabs.io", // ElevenLabs General
           "https://polly.us-east-1.amazonaws.com", // AWS Polly
         ],
-        imgSrc: ["'self'", "data:", "blob:", "https://elevenlabs.io", "https://storage.googleapis.com"],
+        imgSrc: ["'self'", "data:", "blob:", "https://elevenlabs.io", "https://*.elevenlabs.io", "https://storage.googleapis.com"],
         mediaSrc: ["'self'", "data:", "blob:"],
         frameSrc: ["'self'", "https://elevenlabs.io", "https://*.firebaseapp.com", "https://apptutor-a4230.firebaseapp.com"],
       },
