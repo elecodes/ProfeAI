@@ -66,10 +66,9 @@
     *   [OpenAI Status](https://status.openai.com/)
     *   [Google Cloud Status](https://status.cloud.google.com/)
     *   [ElevenLabs Status](https://status.elevenlabs.io/)
-2.  **Model Racing & Fallback**:
-    *   The system uses **"Model Racing"** (calling multiple Gemini Flash Lite models simultaneously).
-    *   If *both* race participants fail, it falls back to `Gemini 1.5 Flash` (Stable).
-    *   Check server logs for `🏆 WINNER:` or `🐌 Failed/Lost Race:` to see which models are responding.
+2.  **Model Fallback & Logs**:
+    *   The system uses **"Sequential Fallback"** (trying Gemini 2.5 Flash Lite first, then 2.5 Flash, then 1.5).
+    *   Check server logs for `🤖 AI Model:` or `🚀 Racing model:` to see the attempt history.
 
 ### Scenario G: CSP Violations (Security Policy)
 **Trigger**: Browser console red errors "Refused to load... violates Content Security Policy".

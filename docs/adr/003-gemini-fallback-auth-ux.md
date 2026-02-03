@@ -1,44 +1,23 @@
-# 003. Gemini Fallback Strategy & Auth Security
+# ADR 003: Migración a Gemini 2.5 y Estrategia de Fallback Secuencial
 
-**Date:** 2026-01-22
-**Status:** Accepted
+## Estatus
+Aceptado
 
-## Context
+## Contexto
+Durante las pruebas de carga y uso diario, se detectaron errores 429 (Too Many Requests) frecuentes tanto en los modelos Gemini 2.0/1.5 como en el fallback de OpenAI. Además, la estrategia inicial de "Model Racing" (lanzar múltiples peticiones en paralelo) duplicaba el consumo de cuota por cada mensaje del usuario, acelerando el agotamiento de los límites del Free Tier.
 
-### Dialogue Generation
-The application previously used a hardcoded OpenAI implementation for generating dialogues. This was failing (HTTP 500) because the project is configured for Google Gemini via Genkit. Additionally, Genkit's Gemini models (specifically `flash-lite-001`) are prone to aggressive rate limiting (429 errors) on the free tier.
+## Decisión
+Hemos decidido realizar los siguientes cambios estructurales:
+1.  **Migración a Gemini 2.5**: Adoptar `gemini-2.5-flash-lite` y `gemini-2.5-flash` como modelos primarios, aprovechando su mayor disponibilidad y eficiencia en 2026.
+2.  **Fallback Secuencial**: Sustituir el "Racing" por un intento secuencial ordenado por eficiencia y costo: Gemini 2.5 Lite -> Gemini 2.5 Flash -> Gemini 1.5 Flash -> OpenAI.
+3.  **Model Reporting**: Incluir el nombre del modelo activo en la respuesta de la API y loguearlo en la consola del frontend para facilitar la depuración y transparencia hacia el usuario.
+4.  **Eliminación de Penalizaciones**: Remover los parámetros `presencePenalty` y `frequencyPenalty` en modelos GoogleAI para cumplir con las especificaciones de su API y evitar errores 400.
 
-### Authentication UX/Security
-The login and registration forms lacked specific feedback.
-- Users trying to login without an account received generic "Login failed" errors.
-- Registration passwords had no visible strength requirements, leading to frustration when valid policies were enforced silently.
+## Consecuencias
+### Positivas
+*   **Ahorro de Cuota**: Se reduce a la mitad el consumo de tokens por interacción.
+*   **Mayor Estabilidad**: Menor probabilidad de fallos simultáneos por límites de rate-limit.
+*   **Mejor DX**: Los desarrolladores pueden ver qué modelo está "vivo" directamente en la consola.
 
-## Decision
-
-### 1. Gemini Fallback Strategy (Genkit)
-We migrated `DialogueGenerator` to use **Google Gemini** via Genkit's `ai.defineFlow`. To mitigate rate limits, we implemented a **Racing & Fallback Strategy** directly in `src/lib/genkit.ts`:
-
-1.  **Primary Attempt**: Try **Gemini 2.0 Flash Lite** (Fastest, Lowest Cost).
-2.  **Fallback**: If Primary fails (e.g., 429 Rate Limit), catch the error and automatically try **Gemini 1.5 Flash** (Stable).
-3.  **Last Resort**: The system throws a structured error if both fail.
-
-This ensures high availability without requiring the user to manually retry.
-
-### 2. Enhanced Authentication UX
-We updated `SignInForm.tsx` and `SignUpForm.tsx` (the active components):
-
--   **SignIn**: specifically catches `auth/user-not-found` and `auth/invalid-credential` to display: *"Account not found. Please register first."*
--   **Password Recovery**: Added a "Did you forget your password?" link (currently a UI placeholder for future implementation).
--   **SignUp**: Added a real-time **visual checklist** for password requirements (8+ chars, Uppercase, Number, Special Char) to improve user guidance.
-
-## Consequences
-
-### Positive
--   **Reliability**: Dialogue generation is robust against single-model outages or rate limits.
--   **Cost**: Prioritizes the cheaper/free "Lite" model before using the heavier 1.5 Flash.
--   **UX**: Users have clear guidance on login failures and password creation, reducing support friction.
--   **Consistency**: The backend now correctly uses the project's configured AI provider (Gemini).
-
-### Negative
--   **Complexity**: `genkit.ts` now contains imperative fallback logic.
--   **Latency**: The fallback mechanism introduces a delay (latency of Model A + Model B) when the primary model fails.
+### Negativas
+*   **Latencia**: En caso de fallo del primer modelo, la respuesta tardará unos milisegundos más debido a los reintentos secuenciales (aunque se compensa con la velocidad de la serie 2.5).

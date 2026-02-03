@@ -21,8 +21,8 @@ Profe AI es una aplicación web interactiva diseñada para ayudar a estudiantes 
     *   **Indicadores de Estado:** Animaciones de "Pensando..." durante la generación de IA para reducir la espera percibida.
 *   **⚡ Rendimiento Avanzado:**
     *   **Lazy Loading:** Carga progresiva de páginas para un inicio instantáneo.
-    *   **AI Model Racing:** Ejecución paralela de modelos de IA para obtener la respuesta más rápida posible (mínima latencia).
-    *   **Fallback Inteligente:** Uso de **Gemini 2.0 Flash Lite** con fallback automático a **Gemini 1.5 Flash** para garantizar disponibilidad.
+    *   **AI Model Reporting:** El sistema informa en consola exactamente qué modelo está respondiendo (ej: "Gemini 2.5 Flash Lite").
+    *   **Estrategia Accionable:** Uso de **Gemini 2.5 Flash Lite** con **Sequential Fallback** a Gemini 2.5 Flash y Gemini 1.5 para maximizar la disponibilidad y ahorrar cuota.
 *   **🔐 Autenticación Mejorada:**
     *   Registro seguro con validación estricta de contraseñas.
     *   Detección de "Cuenta no encontrada" con sugerencia de registro.
