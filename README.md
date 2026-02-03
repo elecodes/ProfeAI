@@ -5,8 +5,10 @@ Profe AI es una aplicación web interactiva diseñada para ayudar a estudiantes 
 
 ![AppTutor Screenshot](https://via.placeholder.com/800x400?text=AppTutor+Preview)
 
-## ✨ Características Principales
+### ✨ Características Principales
+![Tour Profe AI](https://raw.githubusercontent.com/elecodes/ProfeAI/main/docs/media/profe_ai_full_tour.webp)
 
+*   **Tutoría con IA:** Conversación fluida y natural impulsada por Google Gemini.
 *   **📚 Lecciones Dinámicas:** Contenido gestionado en **Firestore** que permite actualizaciones sin redesepliegue.
 *   **🗣️ Texto a Voz (TTS) Premium:** Prioriza **Amazon Polly** y **ElevenLabs** para una voz natural, con fallback automático a Google Cloud y Web Speech API.
 *   **🤖 Tutor de IA (Roleplay):** Practica situaciones reales (ej. "En el restaurante") con un tutor de IA que se adapta a tu nivel.
