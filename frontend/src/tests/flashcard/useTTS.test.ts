@@ -2,6 +2,14 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { useTTS } from "../../components/hooks/useTTS";
 
+// Mock useAuth
+vi.mock("../../hooks/useAuth", () => ({
+  useAuth: vi.fn(() => ({
+    user: { uid: "test-uid" },
+    userProfile: { preferences: { voice: null } },
+  })),
+}));
+
 // Mock global para evitar errores de Audio y URL en JSDOM
 global.URL.createObjectURL = vi.fn(() => "mock-url");
 global.URL.revokeObjectURL = vi.fn();
@@ -81,10 +89,10 @@ describe("useTTS", () => {
     await result.current.speak("Hello");
 
     expect(mockFetch).toHaveBeenCalledWith(
-      "/tts",
+      "/api/tts",
       expect.objectContaining({
         method: "POST",
-        body: JSON.stringify({ text: "Hello", language: "es", options: {} }),
+        body: JSON.stringify({ text: "Hello", language: "es", uid: "test-uid", options: {} }),
         headers: {
           "Content-Type": "application/json",
         },

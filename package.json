@@ -15,6 +15,7 @@
     "start": "npm run dev",
     "healthcheck": "npm run healthcheck -w frontend",
     "test:coverage:check": "npm run test:coverage:check -w frontend",
+    "build": "npm run frontend:build",
     "prepare": "husky"
   },
   "devDependencies": {

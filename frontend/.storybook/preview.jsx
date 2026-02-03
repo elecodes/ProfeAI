@@ -1,5 +1,7 @@
 /** @type { import('@storybook/react-vite').Preview } */
 import '../src/index.css';
+import { AuthProvider } from '../src/config/AuthContext';
+import React from 'react';
 
 const preview = {
   parameters: {
@@ -17,6 +19,14 @@ const preview = {
       test: "todo"
     }
   },
+  decorators: [
+    // eslint-disable-next-line no-unused-vars
+    (Story) => (
+      <AuthProvider>
+        <Story />
+      </AuthProvider>
+    ),
+  ],
 };
 
 export default preview;

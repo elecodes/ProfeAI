@@ -1,0 +1,253 @@
+
+> profe-ai@1.0.0 test:coverage:check
+> vitest run --coverage
+
+Warning: Starting in Storybook 8.5.0-alpha.18, the "test.include" option in Vitest is discouraged in favor of just using the "stories" field in your Storybook configuration.
+
+The values you passed to "test.include" will be ignored, please remove them from your Vitest configuration where the Storybook plugin is applied.
+
+More info: https://github.com/storybookjs/storybook/blob/next/MIGRATION.md#addon-test-indexing-behavior-of-storybookaddon-test-is-changed
+
+[1m[46m RUN [49m[22m [36mv4.0.17 [39m[90m/Users/elena/Developer/ProfeAI/frontend[39m
+      [2mCoverage enabled with [22m[33mv8[39m
+
+Warning: Starting in Storybook 8.5.0-alpha.18, the "test.include" option in Vitest is discouraged in favor of just using the "stories" field in your Storybook configuration.
+
+The values you passed to "test.include" will be ignored, please remove them from your Vitest configuration where the Storybook plugin is applied.
+
+More info: https://github.com/storybookjs/storybook/blob/next/MIGRATION.md#addon-test-indexing-behavior-of-storybookaddon-test-is-changed
+ [32m✓[39m [30m[43m 0 [49m[39m src/tests/flashcard/Flashcard.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 40[2mms[22m[39m
+[90mstderr[2m | src/tests/components/DialogueViewer.test.tsx[2m > [22m[2mDialogueViewer[2m > [22m[2mcalls speak when the audio button is clicked
+[22m[39mWarning: An update to DialogueViewer inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at DialogueViewer (/Users/elena/Developer/ProfeAI/frontend/src/components/DialogueViewer.tsx:8:27)
+
+ [32m✓[39m [30m[43m 0 [49m[39m src/tests/flashcard/FlashcardAudioButtons.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32m✓[39m [30m[43m 0 [49m[39m src/tests/flashcard/FlashcardActions.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 24[2mms[22m[39m
+ [32m✓[39m [30m[43m 0 [49m[39m src/tests/components/DialogueViewer.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 25[2mms[22m[39m
+[90mstdout[2m | src/tests/components/auth/AuthForms.test.tsx[2m > [22m[2mAuthentication Forms Integration[2m > [22m[2mSignInForm[2m > [22m[2mdisables submit button and shows loading state on submission
+[22m[39m📝 [SignInForm] handleCustomSubmit called with data: {
+  email: [32m'test@example.com'[39m,
+  password: [32m'password123'[39m,
+  rememberMe: [33mfalse[39m
+}
+
+[90mstdout[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2musa backend TTS cuando está disponible
+[22m[39m🎙️ Attempting backend TTS...
+
+[90mstderr[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2musa backend TTS cuando está disponible
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/Users/elena/Developer/ProfeAI/node_modules/@testing-library/react/dist/pure.js:329:5)
+Warning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/Users/elena/Developer/ProfeAI/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2musa backend TTS cuando está disponible
+[22m[39m✅ TTS successful using elevenlabs
+
+[90mstdout[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2mhace fallback a Web Speech API cuando el backend falla
+[22m[39m🎙️ Attempting backend TTS...
+
+[90mstdout[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2mhace fallback a Web Speech API cuando el backend falla
+[22m[39mAvailable Spanish voices: 1
+⚠️ Using any premium voice (may not match gender): Google español
+🎤 Browser Voice Selected: Google español (es-ES) - Gender: female
+👩 Female voice parameters: rate=0.95, pitch=1.1
+
+[90mstderr[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2mhace fallback a Web Speech API cuando el backend falla
+[22m[39m⚠️ Backend TTS failed. Status: [90mundefined[39m
+Warning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/Users/elena/Developer/ProfeAI/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2mhace fallback a Web Speech API cuando el backend falla
+[22m[39m✅ Using Web Speech API fallback
+
+[90mstdout[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2mhace fallback a Web Speech API cuando el servidor no está disponible
+[22m[39m🎙️ Attempting backend TTS...
+
+[90mstdout[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2mhace fallback a Web Speech API cuando el servidor no está disponible
+[22m[39mAvailable Spanish voices: 1
+⚠️ Using any premium voice (may not match gender): Google español
+🎤 Browser Voice Selected: Google español (es-ES) - Gender: female
+👩 Female voice parameters: rate=0.95, pitch=1.1
+
+[90mstderr[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2mhace fallback a Web Speech API cuando el servidor no está disponible
+[22m[39m⚠️ Backend unreachable: Network error
+Warning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/Users/elena/Developer/ProfeAI/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+[90mstdout[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2mhace fallback a Web Speech API cuando el servidor no está disponible
+[22m[39m✅ Using Web Speech API fallback
+
+[90mstdout[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2mactualiza currentProvider según el proveedor usado
+[22m[39m🎙️ Attempting backend TTS...
+
+[90mstdout[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2mactualiza currentProvider según el proveedor usado
+[22m[39m✅ TTS successful using google
+
+[90mstderr[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2mactualiza currentProvider según el proveedor usado
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/Users/elena/Developer/ProfeAI/node_modules/@testing-library/react/dist/pure.js:329:5)
+Warning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/Users/elena/Developer/ProfeAI/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+ [32m✓[39m [30m[43m 0 [49m[39m src/tests/pages/ProfilePage.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32m✓[39m [30m[43m 0 [49m[39m src/tests/components/auth/AuthForms.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 177[2mms[22m[39m
+[90mstdout[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2mdetiene el audio actual antes de reproducir uno nuevo
+[22m[39m🎙️ Attempting backend TTS...
+
+[90mstdout[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2mdetiene el audio actual antes de reproducir uno nuevo
+[22m[39m✅ TTS successful using elevenlabs
+
+[90mstderr[2m | src/tests/flashcard/useTTS.test.ts[2m > [22m[2museTTS[2m > [22m[2mdetiene el audio actual antes de reproducir uno nuevo
+[22m[39mWarning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/Users/elena/Developer/ProfeAI/node_modules/@testing-library/react/dist/pure.js:329:5)
+Warning: An update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at TestComponent (/Users/elena/Developer/ProfeAI/node_modules/@testing-library/react/dist/pure.js:329:5)
+
+ [32m✓[39m [30m[43m 0 [49m[39m src/tests/flashcard/useTTS.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 87[2mms[22m[39m
+ [32m✓[39m [30m[43m 0 [49m[39m src/tests/services/UserService.test.ts [2m([22m[2m20 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+[90mstdout[2m | src/tests/services/LessonService.test.ts[2m > [22m[2mLessonService[2m > [22m[2msetLesson[2m > [22m[2mshould write lesson data
+[22m[39mLesson lesson_id written successfully.
+
+ [32m✓[39m [30m[43m 0 [49m[39m src/tests/services/LessonService.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m [30m[43m 0 [49m[39m src/tests/flashcard/FlashcardTranslation.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+ [2m[90m↓[39m[22m [30m[43m 0 [49m[39m src/tests/flashcard/integration/FlashcardFlow.integration.test.tsx [2m([22m[2m3 tests[22m[2m | [22m[33m3 skipped[39m[2m)[22m
+ [32m✓[39m [30m[45m storybook (chromium) [49m[39m src/stories/FlashcardAudioButtons.stories.tsx [2m([22m[2m1 test[22m[2m)[22m[32m 244[2mms[22m[39m
+ [32m✓[39m [30m[45m storybook (chromium) [49m[39m src/stories/DialogueGenerator.stories.tsx [2m([22m[2m1 test[22m[2m)[22m[32m 257[2mms[22m[39m
+ [32m✓[39m [30m[45m storybook (chromium) [49m[39m src/stories/FlashcardActions.stories.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 315[2mms[22m[39m
+ [32m✓[39m [30m[45m storybook (chromium) [49m[39m src/stories/Flashcard.stories.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 324[2mms[22m[39m
+ [32m✓[39m [30m[45m storybook (chromium) [49m[39m src/stories/AuthForms.stories.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 322[2mms[22m[39m
+ [32m✓[39m [30m[45m storybook (chromium) [49m[39m src/stories/ConversationMode.stories.tsx [2m([22m[2m1 test[22m[2m)[22m[32m 284[2mms[22m[39m
+ [32m✓[39m [30m[45m storybook (chromium) [49m[39m src/stories/Button.stories.js [2m([22m[2m5 tests[22m[2m)[22m[33m 430[2mms[22m[39m
+ [32m✓[39m [30m[45m storybook (chromium) [49m[39m src/stories/FlashcardText.stories.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 188[2mms[22m[39m
+ [32m✓[39m [30m[45m storybook (chromium) [49m[39m src/stories/Header.stories.js [2m([22m[2m2 tests[22m[2m)[22m[32m 222[2mms[22m[39m
+ [32m✓[39m [30m[45m storybook (chromium) [49m[39m src/stories/Navbar.stories.tsx [2m([22m[2m1 test[22m[2m)[22m[32m 159[2mms[22m[39m
+ [32m✓[39m [30m[45m storybook (chromium) [49m[39m src/stories/TailwindTest.stories.jsx [2m([22m[2m1 test[22m[2m)[22m[32m 88[2mms[22m[39m
+ [32m✓[39m [30m[45m storybook (chromium) [49m[39m src/stories/Sidebar.stories.tsx [2m([22m[2m1 test[22m[2m)[22m[32m 155[2mms[22m[39m
+ [32m✓[39m [30m[45m storybook (chromium) [49m[39m src/stories/Page.stories.js [2m([22m[2m2 tests[22m[2m)[22m[32m 251[2mms[22m[39m
+ [32m✓[39m [30m[45m storybook (chromium) [49m[39m src/stories/GrammarReport.stories.tsx [2m([22m[2m3 tests[22m[2m)[22m[33m 358[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m24 passed[39m[22m[2m | [22m[33m1 skipped[39m[90m (25)[39m
+[2m      Tests [22m [1m[32m75 passed[39m[22m[2m | [22m[33m3 skipped[39m[90m (78)[39m
+[2m   Start at [22m 20:26:56
+[2m   Duration [22m 6.70s[2m (transform 592ms, setup 7.44s, import 3.53s, tests 4.02s, environment 2.43s)[22m
+
+[34m % [39m[2mCoverage report from [22m[33mv8[39m
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   45.27 |    36.07 |   39.25 |   45.89 |                   
+ .storybook        |     100 |      100 |     100 |     100 |                   
+  preview.jsx      |     100 |      100 |     100 |     100 |                   
+ src               |       0 |        0 |       0 |       0 |                   
+  index.css        |       0 |        0 |       0 |       0 |                   
+ src/components    |   44.28 |    42.45 |   43.66 |   46.09 |                   
+  ...ationMode.tsx |   22.07 |     12.5 |   19.35 |   23.57 | ...11-314,342-396 
+  ...Generator.tsx |   34.78 |    38.88 |      25 |   36.36 | 30-54,68-72       
+  ...gueViewer.tsx |   94.11 |     90.9 |     100 |     100 | 41,91             
+  Flashcard.tsx    |   53.33 |       40 |      40 |      50 | 42-47,66-82       
+  ...rdActions.tsx |   83.33 |       50 |      75 |     100 | 37-52             
+  ...ioButtons.tsx |     100 |      100 |     100 |     100 |                   
+  ...hcardText.tsx |     100 |      100 |     100 |     100 |                   
+  ...marReport.tsx |    92.3 |     87.5 |     100 |      90 | 30                
+  Layout.tsx       |      50 |      100 |       0 |      50 | 22                
+  Navbar.tsx       |     100 |      100 |     100 |     100 |                   
+  Sidebar.tsx      |     100 |      100 |     100 |     100 |                   
+  ...tonLoader.tsx |   33.33 |      100 |       0 |   33.33 | 8-19              
+  ...Indicator.tsx |   33.33 |      100 |       0 |      40 | 17-27             
+ ...omponents/auth |   52.43 |    46.51 |   57.89 |   52.38 |                   
+  SignInForm.tsx   |   57.44 |    52.77 |   63.63 |   57.89 | ...-86,91-106,196 
+  SignUpForm.tsx   |   45.71 |       42 |      50 |      44 | ...-36,54,111-158 
+ ...nts/auth/hooks |      80 |       50 |   81.81 |    87.5 |                   
+  ...Validation.ts |      80 |       50 |   81.81 |    87.5 | 48,89,96-98       
+ ...mponents/hooks |   30.56 |    22.66 |   17.94 |   31.39 |                   
+  useTTS.tsx       |   30.56 |    22.66 |   17.94 |   31.39 | ...58-812,836-840 
+ src/hooks         |   34.09 |    13.04 |   38.88 |   35.71 |                   
+  useAuth.ts       |   18.51 |     6.66 |   16.66 |   18.51 | ...67,72-83,88-91 
+  useUserStats.ts  |   58.82 |       25 |      50 |   66.66 | ...48-50,59,66-74 
+ src/pages         |   54.16 |    28.57 |   28.57 |   54.16 |                   
+  ProfilePage.tsx  |   54.16 |    28.57 |   28.57 |   54.16 | 15-16,40-120,135  
+ src/services      |     100 |      100 |     100 |     100 |                   
+  LessonService.ts |     100 |      100 |     100 |     100 |                   
+  UserService.ts   |     100 |      100 |     100 |     100 |                   
+-------------------|---------|----------|---------|---------|-------------------
