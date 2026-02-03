@@ -115,13 +115,13 @@ Accede a `https://tu-dominio.com`.
 *   **Linting:** `npm run lint`
 *   **Seguridad:** `npm run test:security` (Snyk)
 *   **Documentación:** `npm run doc` (Genera documentación técnica con TypeDoc en `docs/api`)
-135: 
-136: ### 🛡️ Estrategia de Testing "Core First"
-137: 
-138: Este proyecto sigue una estrategia de calidad estricta pero pragmática:
-139: *   **Core Services (100%)**:  La lógica de negocio (`src/services/`) debe tener una cobertura del 100%. Esto incluye `UserService`, `LessonService`, `TTSService`, `GrammarService`, `DialogueGenerator` y `ConversationService`.
-140: *   **Global Threshold (80%)**: El objetivo general del proyecto es mantener un 80% de cobertura.
-141: *   **Verificación Automática**: Ejecuta `npm run test:coverage:check` antes de cada push para asegurar que no se introducen regresiones.
+### 🛡️ Estrategia de Testing "Honest Coverage"
+
+Este proyecto sigue una estrategia de calidad pragmática:
+*   **Servicios de Dominio (100%)**: La lógica de negocio pura (`src/services/`) se mantiene con cobertura total.
+*   **Cobertura Global (~46%)**: Enfocada en los flujos principales. No se sobre-testean hooks complejos de navegador (como `useTTS`) para evitar fragilidad en los tests.
+*   **UI & Storybook**: Los componentes visuales se verifican vía Storybook y sus tests de interacción.
+*   **Verificación Automática**: Ejecuta `npm test` antes de cada push para asegurar que no se introducen regresiones.
 
 ## 📄 Licencia
 

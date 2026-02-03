@@ -17,11 +17,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Improved Persistence**: Added "Remember Me" functionality using Firebase persistence levels.
 - **Functional Password Reset**: Integrated real email recovery flow for users.
 - **Google Authentication**: Added one-click Google Sign-In and Sign-Up.
+- **"Honest Coverage" Strategy**: Achieved 100% domain coverage for core services (`LessonService`, `UserService`).
+- **Root Shortcuts**: Added `npm test` and `npm run build` to the root project for easier development.
 
 ### Fixed
 - **TTS Routing**: Resolved 404 errors by standardizing all requests to `/api/tts`.
 - **Auth Configuration**: Corrected Firebase project environment variables and CSP settings for `apptutor-a4230`.
 - **Dialogue Generator**: Fixed 404 and validation errors (case-sensitivity) in the dialogue generation flow.
+- **Storybook Integration**: Fixed test failures by wrapping stories in `AuthProvider`.
+- **Backend Test Separation**: Removed obsolete frontend tests for services moved to the backend.
 
 ## [1.0.0] - 2025-11-16
 

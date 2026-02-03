@@ -12,6 +12,7 @@
     "frontend:build": "npm run build -w frontend",
     "backend:dev": "tsx backend/src/server.ts",
     "dev": "concurrently \"npm run frontend:dev\" \"npm run backend:dev\"",
+    "test": "npm run test:coverage:check",
     "start": "npm run dev",
     "healthcheck": "npm run healthcheck -w frontend",
     "test:coverage:check": "npm run test:coverage:check -w frontend",

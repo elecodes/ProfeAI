@@ -68,5 +68,34 @@ describe('Authentication Forms Integration', () => {
       fireEvent.blur(passwordInput);
       expect(await screen.findByText("Mínimo 8 caracteres.")).toBeInTheDocument();
     });
+
+    it('calls onSubmit with correct data on successful registration', async () => {
+      const mockSubmit = vi.fn().mockImplementation(() => Promise.resolve());
+      render(<SignUpForm onSubmit={mockSubmit} />);
+      
+      fireEvent.change(screen.getByLabelText(/email \*/i), { target: { value: 'new@example.com' } });
+      fireEvent.change(screen.getByLabelText(/^Contraseña \*$/i, { selector: 'input' }), { target: { value: 'Password123!' } });
+      fireEvent.change(screen.getByLabelText(/confirmar contraseña \*/i), { target: { value: 'Password123!' } });
+      
+      const submitBtn = screen.getByRole('button', { name: /registrarse/i });
+      fireEvent.click(submitBtn);
+      
+      await waitFor(() => {
+        expect(mockSubmit).toHaveBeenCalledWith(expect.objectContaining({
+          email: 'new@example.com',
+          password: 'Password123!'
+        }));
+      });
+    });
+
+    it('shows error if passwords do not match', async () => {
+      render(<SignUpForm onSubmit={async () => {}} />);
+      
+      fireEvent.change(screen.getByLabelText(/^Contraseña \*$/i, { selector: 'input' }), { target: { value: 'Password123!' } });
+      fireEvent.change(screen.getByLabelText(/confirmar contraseña \*/i), { target: { value: 'mismatch' } });
+      fireEvent.blur(screen.getByLabelText(/confirmar contraseña \*/i));
+      
+      expect(await screen.findByText(/las contraseñas no coinciden/i)).toBeInTheDocument();
+    });
   });
 });

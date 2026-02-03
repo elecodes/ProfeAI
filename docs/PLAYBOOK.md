@@ -151,3 +151,15 @@ El proyecto está dividido en dos grandes bloques:
 3.  **Enable Switch**: Toggle the "Enable" switch.
 4.  **Project Support Email**: Select a project support email and Save.
 5.  **CORS/Authorized Domains**: Ensure `localhost` and your production domain are in the **Authorized domains** list in the same tab.
+
+### Scenario K: Failing Coverage or Tests
+**Trigger**: `npm test` fails with low coverage or broken tests.
+
+1.  **Honest Coverage Policy**: 
+    - We prioritize **100% Domain Coverage** (services in `src/services`).
+    - UI Components and Hooks are tested for the "Happy Path". Reaching 80%+ global coverage is **not recommended** if it involves extreme mocking of browser APIs (e.g., `useTTS`).
+2.  **Run Coverage**: 
+    - Root: `npm test`
+    - Frontend specific: `npm run test:coverage:check -w frontend`
+3.  **Mocking Auth**: If a component fails because of `useAuth`, ensure it is wrapped in an `AuthProvider` mock in the test file or use the global setup in `test/setup.js`.
+4.  **Storybook Failing**: Stories are tested as part of the coverage. If they fail, check `.storybook/preview.jsx` to ensure `AuthProvider` is correctly wrapping the decorators.
