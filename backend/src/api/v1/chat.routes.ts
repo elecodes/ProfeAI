@@ -6,14 +6,14 @@ const router = Router();
 // POST /api/v1/chat/start
 router.post("/start", async (req: Request, res: Response) => {
   try {
-    const { topic, level, sessionId } = req.body;
-    console.log(`📩 Chat Start Request: topic="${topic}", level="${level}", sessionId="${sessionId}"`);
+    const { topic, level, sessionId, uid } = req.body;
+    console.log(`📩 Chat Start Request: topic="${topic}", level="${level}", sessionId="${sessionId}", uid="${uid}"`);
     
-    if (!topic || !level || !sessionId) {
-      return res.status(400).json({ error: "Missing topic, level, or sessionId" });
+    if (!topic || !level || !sessionId || !uid) {
+      return res.status(400).json({ error: "Missing topic, level, sessionId, or uid" });
     }
 
-    const reply = await ConversationService.startConversation(sessionId, topic, level);
+    const reply = await ConversationService.startConversation(uid, sessionId, topic, level);
 
     const safeReply = typeof reply === "string" ? { text: reply } : reply || { text: "" };
     const finalResponse = { ...safeReply, gender: "male" };
@@ -33,12 +33,12 @@ router.post("/start", async (req: Request, res: Response) => {
 // POST /api/v1/chat/message
 router.post("/message", async (req: Request, res: Response) => {
   try {
-    const { message, sessionId, topic, level } = req.body;
-    if (!message || !sessionId) {
-      return res.status(400).json({ error: "Missing message or sessionId" });
+    const { message, sessionId, topic, level, uid } = req.body;
+    if (!message || !sessionId || !uid) {
+      return res.status(400).json({ error: "Missing message, sessionId, or uid" });
     }
 
-    const reply = await ConversationService.sendMessage(sessionId, message, topic, level);
+    const reply = await ConversationService.sendMessage(uid, sessionId, message, topic, level);
 
     const safeReply = typeof reply === "string" ? { text: reply } : reply || { text: "" };
     const finalResponse = { ...safeReply, gender: "male" };
