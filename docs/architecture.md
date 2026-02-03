@@ -6,7 +6,7 @@ Este documento describe la arquitectura de alto nivel del sistema ProfeAI.
 ProfeAI es una plataforma monorepo que separa claramente las responsabilidades entre el Frontend y el Backend utilizando **npm workspaces**.
 
 ## Componentes Principales
-- **Frontend**: Aplicación React + Vite + TypeScript. Gestión de estado con React Hooks y estilos con Tailwind CSS.
+- **Frontend**: Aplicación React + Vite + TypeScript. Gestión de estado global con **AuthContext (Context API)**, hooks y Tailwind CSS.
 - **Backend**: API robusta construida con **Node.js + Express** (Migrada desde FastAPI). Utiliza TypeScript y `tsx` para la ejecución.
 - **IA (Orquestación)**: Integración con **Google GenAI (Gemini 2.5)** y OpenAI a través de **Google Genkit**.
 - **Servicios de Voz**: Sistema multi-proveedor (ElevenLabs, Google, AWS) con lógica de fallback automática.

@@ -230,20 +230,41 @@ class TTSService {
    * 
    * Priority:
    * 1. Cache (Local filesystem)
-   * 2. ElevenLabs (High quality, expensive) - Requires API Key
-   * 3. Amazon Polly (Good quality, cheaper) - Requires AWS Credentials
-   * 4. Google Cloud (Standard quality) - Requires API Key
+   * 2. User Preference (If UID provided and preference exists)
+   * 3. ElevenLabs (High quality, expensive) - Requires API Key
+   * 4. Amazon Polly (Good quality, cheaper) - Requires AWS Credentials
+   * 5. Google Cloud (Standard quality) - Requires API Key
    * 
    * @param text - The text to synthesize.
    * @param language - Target language code ('es', 'en').
    * @param options - Additional options like gender or specific provider force.
+   * @param uid - Optional user ID to fetch voice preferences.
    * @returns Promise resolving to audio buffer and metadata.
    */
-  async generateSpeech(text: string, language: string = "es", options: TTSOptions = {}): Promise<TTSResult> {
+  async generateSpeech(text: string, language: string = "es", options: TTSOptions = {}, uid?: string): Promise<TTSResult> {
     await this._ensureInitialized();
 
-    // 0. Check Cache
-    const cacheFile = this._getCacheFilePath(text, language, options);
+    // 0. Fetch User Preferences if UID is provided
+    let finalOptions = { ...options };
+    if (uid) {
+      try {
+        const { adminDb } = await import("../lib/firebase-admin");
+        const userDoc = await adminDb.collection("users").doc(uid).get();
+        if (userDoc.exists) {
+            const userData = userDoc.data();
+            const voicePref = userData?.preferences?.voice;
+            if (voicePref) {
+                console.log(`👤 Applied user voice preference: ${JSON.stringify(voicePref)}`);
+                finalOptions = { ...finalOptions, ...voicePref };
+            }
+        }
+      } catch (err) {
+        console.warn("⚠️ Could not fetch user voice preferences:", err);
+      }
+    }
+
+    // 0.5 Check Cache
+    const cacheFile = this._getCacheFilePath(text, language, finalOptions);
     if (fs.existsSync(cacheFile)) {
       try {
         console.log(`💾 Cache HIT: ${cacheFile}`);
@@ -266,8 +287,8 @@ class TTSService {
     // 1. ElevenLabs (Si hay créditos) - SOLO SE INTENTA SI HAY KEY
     if (this.elevenLabsKey && !result) {
       try {
-        console.log(`🎙️ TTS: ElevenLabs (${options.gender || "female"})...`);
-        result = await this.generateWithElevenLabs(text, language, options);
+        console.log(`🎙️ TTS: ElevenLabs (${finalOptions.gender || "female"})...`);
+        result = await this.generateWithElevenLabs(text, language, finalOptions);
       } catch (error: any) {
         console.warn("⚠️ ElevenLabs falló:", error.message);
         errors.push({ provider: "elevenlabs", error: error.message });
@@ -277,8 +298,8 @@ class TTSService {
     // 2. Amazon Polly (Económico y natural)
     if (this.pollyClient && !result) {
       try {
-        console.log(`🎙️ TTS: Amazon Polly (${options.gender || "female"})...`);
-        result = await this.generateWithPolly(text, language, options);
+        console.log(`🎙️ TTS: Amazon Polly (${finalOptions.gender || "female"})...`);
+        result = await this.generateWithPolly(text, language, finalOptions);
       } catch (error: any) {
         console.warn("⚠️ Polly falló:", error.message);
         errors.push({ provider: "polly", error: error.message });
@@ -288,8 +309,8 @@ class TTSService {
     // 3. Google Cloud
     if (this.googleApiKey && !result) {
       try {
-        console.log(`🎙️ TTS: Google Cloud (${options.gender || "female"})...`);
-        result = await this.generateWithGoogle(text, language, options);
+        console.log(`🎙️ TTS: Google Cloud (${finalOptions.gender || "female"})...`);
+        result = await this.generateWithGoogle(text, language, finalOptions);
       } catch (error: any) {
         console.warn("⚠️ Google falló:", error.message);
         errors.push({ provider: "google", error: error.message });

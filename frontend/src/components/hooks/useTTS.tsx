@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { TTSOptions, ManualVoiceConfig, UseTTSReturn } from "../../types/tts";
+import { useAuth } from "../../hooks/useAuth";
+import UserService from "../../services/UserService";
 
 /**
  * Custom hook to handle Text-to-Speech (TTS) functionality.
@@ -238,7 +240,23 @@ export const useTTS = (): UseTTSReturn => {
       ...prev,
       [gender]: voiceIdentifier
     }));
-    console.log(`🎛️ Set ${gender} voice to: ${voiceIdentifier}`);
+
+    // Persist to user profile
+    if (user) {
+      UserService.updateUserProgress(user.uid, {
+        preferences: {
+          theme: userProfile?.preferences?.theme || 'light',
+          notifications: userProfile?.preferences?.notifications ?? true,
+          ...userProfile?.preferences,
+          voice: {
+            gender,
+            voiceId: voiceIdentifier
+          }
+        }
+      });
+    }
+
+    console.log(`🎛️ Set ${gender} voice to: ${voiceIdentifier} (and persisted)`);
   };
 
   // Function to reset manual voice configuration
@@ -534,6 +552,20 @@ export const useTTS = (): UseTTSReturn => {
     });
   };
 
+  const { user, userProfile } = useAuth();
+
+  // Load preferences from profile on mount
+  useEffect(() => {
+    if (userProfile?.preferences?.voice) {
+      const { gender, voiceId } = userProfile.preferences.voice;
+      console.log(`👤 Loading persistent voice preference: ${gender}=${voiceId}`);
+      setManualVoiceConfig(prev => ({
+        ...prev,
+        [gender]: voiceId
+      }));
+    }
+  }, [userProfile]);
+
   const speak = async (text: string, lang: string = "es", options: TTSOptions = {}): Promise<void> => {
     try {
       // Cancel any ongoing speech synthesis
@@ -546,17 +578,26 @@ export const useTTS = (): UseTTSReturn => {
         (window as any).currentAudio = null;
       }
 
+      // Merge current manual config if not explicitly overridden
+      const finalOptions = {
+        ...options,
+        // If gender is matched in manual config, use that voiceId
+        ...(options.gender && manualVoiceConfig[options.gender as 'male' | 'female'] ? 
+            { webSpeechVoiceIndex: typeof manualVoiceConfig[options.gender as 'male' | 'female'] === 'number' ? 
+                manualVoiceConfig[options.gender as 'male' | 'female'] as number : undefined } : {})
+      };
+
       // SPECIAL CASE: Always use Web Speech API for male voices (they sound better)
-      if (options?.gender === "male") {
+      if (finalOptions?.gender === "male") {
         console.log("🎙️ Using Web Speech API directly for male voice (bypassing backend)");
-        await speakWithWebSpeech(text, lang, options);
+        await speakWithWebSpeech(text, lang, finalOptions);
         return;
       }
 
       // SPECIAL CASE: If server forces Web Speech API
-      if (options.forceWebSpeech) {
+      if (finalOptions.forceWebSpeech) {
         console.log("🎙️ Server forced Web Speech API");
-        await speakWithWebSpeech(text, lang, options);
+        await speakWithWebSpeech(text, lang, finalOptions);
         return;
       }
 
@@ -568,7 +609,8 @@ export const useTTS = (): UseTTSReturn => {
           body: JSON.stringify({
             text,
             language: lang,
-            options: options || {},
+            uid: user?.uid, // Send UID for persistence/preferences
+            options: finalOptions || {},
           }),
         });
 

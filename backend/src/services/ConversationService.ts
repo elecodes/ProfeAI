@@ -1,6 +1,6 @@
 import { tutorFlowGemini } from "../lib/genkit";
-import { InMemoryChatMessageHistory } from "@langchain/core/chat_history";
 import { z } from "zod";
+import { adminDb } from "../lib/firebase-admin";
 
 const ResponseSchema = z.object({
   text: z.string(),
@@ -14,14 +14,12 @@ type Response = z.infer<typeof ResponseSchema>;
 
 /**
  * Singleton service that manages chat sessions, history, and AI interaction.
- * Handles rate limiting, history truncation, and Spanglish detection locally before hitting the API.
+ * Persists history to Firestore to remember users across sessions.
  */
 class ConversationService {
-  private messageHistories: Map<string, InMemoryChatMessageHistory>;
   private lastRateLimitTimestamp: number = 0;
   private readonly CIRCUIT_BREAKER_DURATION = 5 * 60 * 1000; // 5 minutes
   
-  // Vocabulary Map for simple Spanglish detection
   private vocabularyMap: Record<string, string> = {
     "vegetables": "verduras 🥦",
     "chicken": "pollo 🍗",
@@ -34,26 +32,41 @@ class ConversationService {
     "milk": "leche 🥛"
   };
 
-  private lastUsedFallback: string = "";
-
   /**
-   * Initializes the ConversationService with an empty history map.
+   * Fetches or creates a chat history in Firestore.
    */
-  constructor() {
-    this.messageHistories = new Map();
+  async getHistory(uid: string, sessionId: string) {
+    const docRef = adminDb.collection("users").doc(uid).collection("sessions").doc(sessionId);
+    const doc = await docRef.get();
+    
+    if (!doc.exists) {
+      return { messages: [] };
+    }
+    
+    return doc.data() as { messages: any[] };
   }
 
-  getHistory(sessionId: string): InMemoryChatMessageHistory {
-    if (!this.messageHistories.has(sessionId)) {
-      this.messageHistories.set(sessionId, new InMemoryChatMessageHistory());
-    }
-    return this.messageHistories.get(sessionId)!;
+  async saveMessage(uid: string, sessionId: string, role: "user" | "model", text: string) {
+    const docRef = adminDb.collection("users").doc(uid).collection("sessions").doc(sessionId);
+    const history = await this.getHistory(uid, sessionId);
+    
+    const newMessages = [
+        ...history.messages,
+        { role, content: [{ text }], timestamp: new Date().toISOString() }
+    ];
+
+    // Truncate to last 10 messages to keep context efficient and save tokens
+    const truncatedHistory = newMessages.slice(-10);
+
+    await docRef.set({ 
+        messages: truncatedHistory,
+        lastUpdated: new Date().toISOString()
+    }, { merge: true });
   }
 
   private checkCorrections(message: string): { text: string; correction?: string } | null {
     const msg = message.toLowerCase();
     
-    // 1. Spanglish Check
     for (const [english, spanish] of Object.entries(this.vocabularyMap)) {
         if (msg.includes(english)) {
             return {
@@ -63,46 +76,25 @@ class ConversationService {
         }
     }
 
-    // 2. Infinitive Error (Yo saber -> Yo sé)
-    // Regex matches "yo" followed by an infinitive ending in ar/er/ir
     if (msg.match(/\byo\s+\w+(ar|er|ir)\b/i)) {
-        // Special cases
-        if (msg.includes("yo saber")) {
-            return { text: "Casi. Para 'I know', decimos **'Yo sé'**. Inténtalo otra vez.", correction: "Yo sé" };
-        }
-        if (msg.includes("yo tener")) {
-            return { text: "Recuerda: 'I have' es **'Yo tengo'**. ¡Prueba de nuevo!", correction: "Yo tengo" };
-        }
-        if (msg.includes("yo querer")) {
-            return { text: "Para decir 'I want', usa **'Yo quiero'**. ¿Cómo quedaría la frase?", correction: "Yo quiero" };
-        }
-        if (msg.includes("yo poder")) {
-             return { text: "Decimos **'Yo puedo'**. ¡Tú puedes hacerlo!", correction: "Yo puedo" };
-        }
-        // Generic rule
-        return { 
-            text: "Parece que usaste el verbo en infinitivo. Recuerda conjugarlo (ej. yo como, yo hablo).",
-            correction: "Conjuga el verbo"
-        };
+        if (msg.includes("yo saber")) return { text: "Casi. Para 'I know', decimos **'Yo sé'**. Inténtalo otra vez.", correction: "Yo sé" };
+        if (msg.includes("yo tener")) return { text: "Recuerda: 'I have' es **'Yo tengo'**. ¡Prueba de nuevo!", correction: "Yo tengo" };
+        if (msg.includes("yo querer")) return { text: "Para decir 'I want', usa **'Yo quiero'**. ¿Cómo quedaría la frase?", correction: "Yo quiero" };
+        if (msg.includes("yo poder")) return { text: "Decimos **'Yo puedo'**. ¡Tú puedes hacerlo!", correction: "Yo puedo" };
+        return { text: "Parece que usaste el verbo en infinitivo. Recuerda conjugarlo (ej. yo como, yo hablo).", correction: "Conjuga el verbo" };
     }
 
-    // 3. Negation Error (no querer -> no quiero)
     if (msg.includes("no querer")) return { text: "Mejor di: **'No quiero'**.", correction: "No quiero" };
     if (msg.includes("no poder")) return { text: "La forma correcta es: **'No puedo'**.", correction: "No puedo" };
 
     return null;
   }
 
-
-
-  async _generateResponse(sessionId: string, input: string, topic: string, level: string): Promise<Response> {
-    // CIRCUIT BREAKER CHECK
+  async _generateResponse(uid: string, sessionId: string, input: string, topic: string, level: string): Promise<Response> {
     if (Date.now() - this.lastRateLimitTimestamp < this.CIRCUIT_BREAKER_DURATION) {
-        console.log("⚡ Circuit Breaker Open: Skipping Genkit call due to recent Rate Limit.");
         throw new Error("El sistema está descansando un momento. Inténtalo de nuevo en unos segundos.");
     }
 
-    // 5. Topic Scenarios Map
     const TOPIC_SCENARIOS: Record<string, string> = {
         "Restaurant": "You are a friendly waiter at a popular tapas bar in Madrid. It's lunch time.",
         "Restaurante": "Eres un camarero amable en un bar de tapas en Madrid. Es la hora de comer.",
@@ -115,56 +107,67 @@ class ConversationService {
         "Tiempo": "Eres un vecino charlando en el ascensor sobre el tiempo loco de estos días."
     };
 
-    console.log(`⚡ Generating GENKIT response for session ${sessionId}...`);
+    console.log(`📑 Process: sessionId="${sessionId}", uid="${uid}", topic="${topic}"`);
     
-    const history = await this.getHistory(sessionId).getMessages();
-    // OPTIMIZATION: Limit history to last 4 messages to save tokens (requested by user)
-    const historyContext = history.slice(-4).map(m => ({
-        role: m._getType() === 'human' ? 'user' : 'model',
-        content: [{ text: m.content.toString() }]
-    }));
+    const historyData = await this.getHistory(uid, sessionId);
+    console.log(`📚 Loaded ${historyData.messages.length} messages from Firestore.`);
+    
+    // Convert history array to a formatted string for the AI prompt
+    const historyContext = historyData.messages
+        .filter(m => !m.content[0].text.startsWith("Start conversation.")) // Filter internal triggers
+        .map(m => `[${m.role === 'model' ? 'MATEO' : 'USER'}]: ${m.content[0].text}`)
+        .join('\n');
 
-    console.log('📜 GENKIT HISTORY DEBUG:', JSON.stringify(historyContext, null, 2));
+    // Fetch user profile for personalization
+    const userDoc = await adminDb.collection("users").doc(uid).get();
+    const userData = userDoc.exists ? userDoc.data() : null;
+    const userName = userData?.displayName || "Estudiante";
 
-    const scenarioDescription = TOPIC_SCENARIOS[topic] || TOPIC_SCENARIOS[topic.charAt(0).toUpperCase() + topic.slice(1)] || `Contexto: Conversación sobre ${topic}.`;
+    const scenarioDescription = TOPIC_SCENARIOS[topic] || `Contexto: Conversación sobre ${topic}.`;
+    
+    // Inject user context into the scenario
+    const personalizedScenario = `${scenarioDescription} The user's name is ${userName}. Their current level is ${level}. Adapt your complexity accordingly.`;
 
     const inputPayload = {
-        history: historyContext,
+        history: historyContext || "No previous history.",
         message: input,
-        topic: scenarioDescription,
+        topic: personalizedScenario,
         level: level
     };
 
-    // PRIMARY ENGINE: Google Gemini 1.5 Flash (Direct Call)
-    console.log("✨ Contacting Gemini 1.5 Flash...");
+    console.log("📤 Sending to Genkit. History preview:", historyContext ? historyContext.substring(0, 100) + "..." : "EMPTY");
     
-    // No try/catch here - let errors bubble up to server.ts
     const result = await tutorFlowGemini(inputPayload);
     const output = result as Response;
 
-    console.log("♊ Gemini Response:", JSON.stringify(output, null, 2));
-
     if (!output || !output.text) throw new Error("Empty Response from Gemini");
     
-    await this.getHistory(sessionId).addUserMessage(input);
-    await this.getHistory(sessionId).addAIMessage(output.text);
+    // Save both messages to Firestore
+    await this.saveMessage(uid, sessionId, "user", input);
+    await this.saveMessage(uid, sessionId, "model", output.text);
 
     return output;
   }
 
-  /**
-   * Starts a new conversation session.
-   * 
-   * @param sessionId - Unique identifier for the session.
-   * @param topic - Theoretical topic or context (trigger for the system prompt).
-   * @param level - Difficulty level.
-   * @returns Initial AI response introducing the roleplay.
-   */
-  async startConversation(sessionId: string, topic: string, level: string) {
-    this.messageHistories.set(sessionId, new InMemoryChatMessageHistory());
+  async startConversation(uid: string, sessionId: string, topic: string, level: string) {
+    const history = await this.getHistory(uid, sessionId);
+    
+    // If we have existing history, just return a special "RESUMED" flag or empty message
+    // so the frontend knows we are resuming.
+    if (history.messages.length > 0) {
+      // Filter out internal trigger messages so they don't appear in the chat UI
+      const filteredMessages = history.messages.filter(m => !m.content[0].text.startsWith("Start conversation."));
+      
+      return { 
+        text: "¡Hola de nuevo! Vamos a continuar nuestra conversación.", 
+        resumed: true,
+        messages: filteredMessages 
+      };
+    }
     
     // Initial Trigger for the AI to introduce itself
     return await this._generateResponse(
+      uid,
       sessionId, 
       "Start conversation. Topic: " + topic, 
       topic, 
@@ -172,32 +175,19 @@ class ConversationService {
     );
   }
 
-  /**
-   * Sends a user message to the AI and gets a response.
-   * 
-   * @param sessionId - Session ID to retrieve history.
-   * @param message - User's input text.
-   * @param topic - Current topic context.
-   * @param level - Difficulty level.
-   * @returns AI response with potential corrections and suggestions.
-   */
-  async sendMessage(sessionId: string, message: string, topic: string, level: string) {
-    // 0. Check for content corrections (Spanglish/Grammar) locally
+  async sendMessage(uid: string, sessionId: string, message: string, topic: string, level: string) {
     const correction = this.checkCorrections(message);
     if (correction) {
-        // Save to history so context is kept?
-        // Usually corrections stop the flow, but let's record it so the AI knows.
-        // Actually, for this feature, we just return the correction immediately.
-        await this.getHistory(sessionId).addUserMessage(message);
-        await this.getHistory(sessionId).addAIMessage(correction.text);
+        await this.saveMessage(uid, sessionId, "user", message);
+        await this.saveMessage(uid, sessionId, "model", correction.text);
         return {
             text: correction.text,
-            gender: "female", // Default
+            gender: "female",
             correction: correction.correction
         } as Response;
     }
 
-    return await this._generateResponse(sessionId, message, topic, level);
+    return await this._generateResponse(uid, sessionId, message, topic, level);
   }
 }
 

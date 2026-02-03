@@ -3,6 +3,7 @@ import GrammarReport from "./GrammarReport";
 import { ThinkingIndicator } from "./ThinkingIndicator";
 import { ChatMessage } from "../types/chat";
 import { useUserStats } from "../hooks/useUserStats";
+import { useAuth } from "../hooks/useAuth";
 
 /**
  * Props for the ConversationMode component.
@@ -33,6 +34,7 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
   const [input, setInput] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { addXP } = useUserStats();
+  const { user } = useAuth(); // Get authenticated user
   const [showReport, setShowReport] = useState<boolean>(false);
   const [grammarReport, setGrammarReport] = useState<any>(null);
   const [showTopicSelector, setShowTopicSelector] = useState<boolean>(false);
@@ -59,7 +61,7 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
 
   useEffect(() => {
     const startChat = async () => {
-      if (fetchingRef.current) return;
+      if (fetchingRef.current || !user) return; // Wait for user to be available
       fetchingRef.current = true;
       setIsLoading(true);
 
@@ -73,7 +75,8 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
           body: JSON.stringify({ 
             topic: currentTopic, 
             level, 
-            sessionId: currentSessionId 
+            sessionId: currentSessionId,
+            uid: user.uid // Send UID
           }),
           signal: controller.signal,
         });
@@ -89,17 +92,26 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
         }
 
         const data = await res.json();
-        const messageData = typeof data.message === 'string' 
-          ? { text: data.message, gender: 'female', suggestions: [] } 
-          : data.message;
+        const messageData = data.message;
 
         if (messageData.model) {
           console.log(`🤖 AI Model: ${messageData.model}`);
         }
 
-        const { text, gender, suggestions: newSuggestions } = messageData;
-        setMessages([{ role: "ai", content: text }]);
-        setSuggestions(newSuggestions || []);
+        if (messageData.resumed && messageData.messages) {
+          // Map Firestore history to Frontend format
+          const restoredMessages = messageData.messages.map((m: any) => ({
+            role: m.role === "model" ? "ai" : "user",
+            content: m.content[0].text
+          }));
+          setMessages(restoredMessages);
+          setSuggestions(messageData.suggestions || []);
+          console.log(`📚 Resumed conversation with ${restoredMessages.length} messages.`);
+        } else {
+          const { text, suggestions: newSuggestions } = messageData;
+          setMessages([{ role: "ai", content: text }]);
+          setSuggestions(newSuggestions || []);
+        }
 
       } catch (error: any) {
         console.error("Chat Error:", error);
@@ -120,13 +132,13 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
     };
 
     startChat();
-  }, [currentTopic, level, currentSessionId]);
+  }, [currentTopic, level, currentSessionId, user]); // Add user to deps
 
   const handleSend = async (e?: React.FormEvent, forcedText?: string) => {
     e?.preventDefault();
     const userMsg = forcedText || input;
 
-    if (!userMsg.trim() || isLoading) return;
+    if (!userMsg.trim() || isLoading || !user) return;
 
     // Clear suggestions immediately after sending
     setSuggestions([]);
@@ -146,7 +158,8 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
           message: userMsg, 
           sessionId: currentSessionId, 
           topic: currentTopic, 
-          level 
+          level,
+          uid: user.uid // Send UID
         }),
         signal: controller.signal,
       });
@@ -159,7 +172,7 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
       }
 
       const data = await res.json();
-      const { text, gender, correction, suggestions: nextSuggestions, model } = data.message;
+      const { text, correction, suggestions: nextSuggestions, model } = data.message;
 
       if (model) {
         console.log(`🤖 AI Model: ${model}`);

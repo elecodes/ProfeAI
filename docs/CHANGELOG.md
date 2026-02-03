@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Sequential Fallback Strategy**: Replaced racing models with a sequential strategy to conserve API quota and improve reliability.
 - **Monorepo Migration**: Separated codebase into `frontend/` and `backend/` workspaces for better dependency management and clarity.
 - **New Express API**: Migrated core endpoints to a cleaner Node.js/Express structure under `/api/v1`.
+- **Unified Auth State**: Implemented `AuthProvider` and `AuthContext` to manage a single source of truth for authentication.
+- **Improved Persistence**: Added "Remember Me" functionality using Firebase persistence levels.
+- **Functional Password Reset**: Integrated real email recovery flow for users.
+- **Google Authentication**: Added one-click Google Sign-In and Sign-Up.
 
 ### Fixed
 - **TTS Routing**: Resolved 404 errors by standardizing all requests to `/api/tts`.

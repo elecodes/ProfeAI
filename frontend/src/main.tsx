@@ -35,12 +35,18 @@ if (!rootElement) {
 }
 const root = createRoot(rootElement);
 
+import { AuthProvider } from './config/AuthContext'
+
 const app = enableSentry ? (
   <Sentry.ErrorBoundary fallback={<div className="p-4 text-red-500">Ha ocurrido un error inesperado. Por favor recarga la página.</div>}>
-    <App />
+    <AuthProvider>
+      <App />
+    </AuthProvider>
   </Sentry.ErrorBoundary>
 ) : (
-  <App />
+  <AuthProvider>
+    <App />
+  </AuthProvider>
 );
 
 /**

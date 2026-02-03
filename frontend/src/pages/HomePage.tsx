@@ -38,7 +38,7 @@ const HomePage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   
   // Auth State from Hook
-  const { user, userProfile, loading: authLoading, signIn, signUp } = useAuth();
+  const { user, userProfile, loading: authLoading, signIn, signUp, resetPassword, signInWithGoogle } = useAuth();
 
   // App State
   const [nivel, setNivel] = useState<string>("beginner");
@@ -84,11 +84,19 @@ const HomePage = () => {
 
   // === Auth Handlers ===
   const handleSignIn = async (formData: any) => {
-    await signIn(formData.email, formData.password);
+    await signIn(formData.email, formData.password, formData.rememberMe);
+  };
+
+  const handleResetPassword = async (email: string) => {
+    await resetPassword(email);
   };
 
   const handleSignUp = async (formData: any) => {
     await signUp(formData.email, formData.password);
+  };
+
+  const handleGoogleSignIn = async () => {
+    await signInWithGoogle();
   };
 
   // === Sync with User Profile ===
@@ -268,12 +276,14 @@ const HomePage = () => {
 
   // Route to conversation
   const startConversation = () => {
-    // Generate a simple sessionId
-    const sessionId = `session_${Date.now()}`;
+    // Generate a stable sessionId based on the topic/theme
+    // We slugify the theme to ensure a safe URL part
+    const topicId = (tema || "General").toLowerCase().replace(/\s+/g, "_");
+    const sessionId = `topic_${topicId}`; // Stable ID for this specific topic
+    
     const safeTopic = encodeURIComponent(tema || "General Conversation");
     const safeLevel = encodeURIComponent(nivel);
     
-    // Navigate using URL parameters to match App.tsx route definition
     navigate(`/chat/${safeTopic}/${safeLevel}/${sessionId}`);
   };
 
@@ -440,7 +450,12 @@ const HomePage = () => {
                   Inicia sesión para acceder a las lecciones personalizadas y guardar tu progreso con la IA.
                 </p>
               <Suspense fallback={<Loading />}>
-                <AuthForm onSignIn={handleSignIn} onSignUp={handleSignUp} />
+                <AuthForm 
+                  onSignIn={handleSignIn} 
+                  onSignUp={handleSignUp} 
+                  onResetPassword={handleResetPassword} 
+                  onGoogleSignIn={handleGoogleSignIn}
+                />
               </Suspense>
             </div>
           </div>
@@ -580,7 +595,8 @@ const HomePage = () => {
                              <button
                                 key={topic}
                                 onClick={() => {
-                                    const sessionId = `session_${Date.now()}`;
+                                    const topicId = topic.toLowerCase().replace(/\s+/g, "_");
+                                    const sessionId = `topic_${topicId}`;
                                     const safeTopic = encodeURIComponent(topic);
                                     const safeLevel = encodeURIComponent(nivel);
                                     navigate(`/chat/${safeTopic}/${safeLevel}/${sessionId}`);

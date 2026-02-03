@@ -10,6 +10,7 @@ export type GenerateDialogueRequest = z.infer<typeof generateDialogueSchema>;
 export const ttsSchema = z.object({
   text: z.string().min(1, "Text is required"),
   language: z.string().optional().default("es"),
+  uid: z.string().optional(),
   options: z
     .object({
       gender: z.string().optional(), // Cambiado de enum a string para mayor flexibilidad

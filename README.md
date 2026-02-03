@@ -5,8 +5,16 @@ Profe AI es una aplicación web interactiva diseñada para ayudar a estudiantes 
 
 ![AppTutor Screenshot](https://via.placeholder.com/800x400?text=AppTutor+Preview)
 
-## ✨ Características Principales
+### ✨ Características Principales
+![Tour Profe AI](./docs/media/profe_ai_full_tour.webp)
 
+| Estudio (Frases) | Evaluación (Quiz) | Diálogos AI |
+| :---: | :---: | :---: |
+| ![Estudio](./docs/media/feature_study.png) | ![Quiz](./docs/media/feature_quiz.png) | ![Diálogos](./docs/media/feature_dialogues.png) |
+| **Generador AI** | **Chat Interactivo** | **Perfil Estudiante** |
+| ![Generador](./docs/media/feature_generator.png) | ![Chat](./docs/media/feature_chat.png) | ![Perfil](./docs/media/feature_profile.png) |
+
+*   **Tutoría con IA:** Conversación fluida y natural impulsada por Google Gemini.
 *   **📚 Lecciones Dinámicas:** Contenido gestionado en **Firestore** que permite actualizaciones sin redesepliegue.
 *   **🗣️ Texto a Voz (TTS) Premium:** Prioriza **Amazon Polly** y **ElevenLabs** para una voz natural, con fallback automático a Google Cloud y Web Speech API.
 *   **🤖 Tutor de IA (Roleplay):** Practica situaciones reales (ej. "En el restaurante") con un tutor de IA que se adapta a tu nivel.
@@ -23,10 +31,12 @@ Profe AI es una aplicación web interactiva diseñada para ayudar a estudiantes 
     *   **Lazy Loading:** Carga progresiva de páginas para un inicio instantáneo.
     *   **AI Model Reporting:** El sistema informa en consola exactamente qué modelo está respondiendo (ej: "Gemini 2.5 Flash Lite").
     *   **Estrategia Accionable:** Uso de **Gemini 2.5 Flash Lite** con **Sequential Fallback** a Gemini 2.5 Flash y Gemini 1.5 para maximizar la disponibilidad y ahorrar cuota.
-*   **🔐 Autenticación Mejorada:**
-    *   Registro seguro con validación estricta de contraseñas.
-    *   Detección de "Cuenta no encontrada" con sugerencia de registro.
-    *   Enlace de recuperación de contraseña.
+*   **🔐 Autenticación Profesional (Sincronizada):**
+    *   **Estado Global (Unified Auth):** Implementado con Context API para asegurar una sesión única en toda la app.
+    *   **Recuérdame:** Soporte real para persistencia de sesión (`LOCAL` vs `SESSION`).
+    *   **Recuperación de Contraseña:** Flujo completo de recuperación vía email.
+    *   **Login con Google:** Acceso rápido y seguro con un solo clic.
+    *   **Validación Estricta:** Registro seguro y detección inteligente de cuentas existentes.
 
 ## 🛠️ Tecnologías y Estructura (Monorepo)
 

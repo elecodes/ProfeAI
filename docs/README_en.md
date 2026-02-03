@@ -2,10 +2,17 @@
 
 Profe AI is an interactive web application designed to help students learn Spanish through structured lessons, pronunciation practice (TTS), quizzes, and dynamic conversations powered by Artificial Intelligence.
 
-![AppTutor Screenshot](https://via.placeholder.com/800x400?text=AppTutor+Preview)
+![Profe AI Tour](../docs/media/profe_ai_full_tour.webp)
+
+| Study (Phrases) | Evaluation (Quiz) | AI Dialogues |
+| :---: | :---: | :---: |
+| ![Study](../docs/media/feature_study.png) | ![Quiz](../docs/media/feature_quiz.png) | ![Dialogues](../docs/media/feature_dialogues.png) |
+| **AI Generator** | **Interactive Chat** | **Student Profile** |
+| ![Generator](../docs/media/feature_generator.png) | ![Chat](../docs/media/feature_chat.png) | ![Profile](../docs/media/feature_profile.png) |
 
 ## ✨ Key Features
 
+*   **AI Tutoring:** Fluid and natural conversation powered by Google Gemini.
 *   **📚 Dynamic Lessons:** Content managed in **Firestore**, allowing updates without redeployment.
 *   **🗣️ Premium Text-to-Speech (TTS):** Prioritizes **Amazon Polly** and **ElevenLabs** for natural-sounding voice, with automatic fallback to Google Cloud and Web Speech API.
 *   **🤖 AI Tutor (Roleplay):** Practice real-life situations (e.g., "At the restaurant") with an AI tutor that adapts to your proficiency level.
@@ -21,7 +28,12 @@ Profe AI is an interactive web application designed to help students learn Spani
     *   **Lazy Loading:** Progressive page loading for instant startup.
     *   **AI Model Reporting:** System logs exactly which AI model is responding to the console (e.g., "Gemini 2.5 Flash Lite").
     *   **Sequential Fallback:** Prioritizes **Gemini 2.5 Flash Lite** and **Gemini 2.5 Flash** with automatic fallback to stable models to ensure availability and save cost.
-*   **🔐 Authentication:** Secure registration with Firebase Auth.
+*   **🔐 Professional Authentication (Unified):**
+    *   **Global Auth Context:** Single source of truth for the user session across the app.
+    *   **Remember Me:** Real support for session persistence (`LOCAL` vs `SESSION`).
+    *   **Password Reset:** Functional email recovery flow.
+    *   **Google Login:** Quick and secure one-click access.
+    *   **Strict Validation:** Secure registration and smart existing account detection.
 
 ## 🛠️ Technologies & Structure (Monorepo)
 

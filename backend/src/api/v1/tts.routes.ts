@@ -10,7 +10,7 @@ router.post("/", validate(ttsSchema), async (req: Request, res: Response) => {
   try {
     console.log("📩 /tts request:", req.body);
 
-    let { text, language, options } = req.body;
+    let { text, language, options, uid } = req.body;
     options = options || {};
 
     if (options.gender === "male") {
@@ -21,7 +21,7 @@ router.post("/", validate(ttsSchema), async (req: Request, res: Response) => {
 
     let result;
     try {
-      result = await TTSService.generateSpeech(text, language, options);
+      result = await TTSService.generateSpeech(text, language, options, uid);
     } catch (error: any) {
       console.warn(`⚠️ Primary TTS failed: ${error.message}`);
       try {
