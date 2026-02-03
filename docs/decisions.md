@@ -11,4 +11,6 @@ Este documento centraliza las decisiones arquitectónicas importantes tomadas du
 
 ## Decisiones Actuales
 - [ADR 001: Adopción de Storybook para Desarrollo UI](adr/001-adopcion-storybook-development.md)
-- [ADR 002: Reorganización a Monorepo Separado](adr/002-reorganizacion-monorepo.md)
+- [ADR 002: Optimización de Rendimiento y Latencia (Model Racing)](adr/002-performance-latency-optimization.md)
+- [ADR 003: Estrategia de Testing "Core First"](adr/003-testing-strategy.md)
+- [ADR 004: Migración a Gemini 2.5 y Fallback Secuencial (Supera ADR 002)](adr/004-gemini-25-fallback-strategy.md)
