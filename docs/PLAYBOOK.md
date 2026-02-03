@@ -130,10 +130,11 @@ El proyecto está dividido en dos grandes bloques:
 ### Scenario H: Authentication UI Issues
 **Trigger**: User reports "Cannot login" or "Forms validation failing".
 
-1.  **Check Components**: Ensure `SignInForm` and `SignUpForm` are being used (not legacy `LoginForm`).
-2.  **Verify Firebase Error**: Check console for specific error codes (`auth/user-not-found`).
+1.  **Check Context**: Verify that `AuthProvider` is wrapping the `App` in `main.tsx`. If it is missing, `useAuth()` will throw an error.
+2.  **Verify Firebase Error**: Check console for specific error codes (`auth/invalid-credential`).
     *   If specific error is caught but message is generic, check `SignInForm.tsx` catch block.
-3.  **Password Validation**: The `SignUpForm` uses strict regex. If valid password fails, check the regex in `SignUpForm.tsx`.
+3.  **Persistence Issues**: If "Remember Me" fails, check `localStorage` keys starting with `firebase:authUser`.
+4.  **Password Validation**: The `SignUpForm` uses strict regex in `useFormValidation.ts`.
 
 ### Scenario I: Documentation Gaps
 **Trigger**: Developer cannot find type definitions or API usage.
@@ -141,3 +142,12 @@ El proyecto está dividido en dos grandes bloques:
 1.  **Generate Docs**: Run `npm run doc`.
 2.  **Verify Output**: Check `docs/api/index.html`.
 3.  **Missing Types**: If a service is missing, check if it is exported in `typedoc.json` entry points.
+
+### Scenario J: Google Auth Configuration Error
+**Trigger**: Console error `auth/operation-not-allowed` during Google Login.
+
+1.  **Firebase Console**: Go to **Authentication** -> **Sign-in method**.
+2.  **Enable Google**: Click on **Add new provider** and select **Google**.
+3.  **Enable Switch**: Toggle the "Enable" switch.
+4.  **Project Support Email**: Select a project support email and Save.
+5.  **CORS/Authorized Domains**: Ensure `localhost` and your production domain are in the **Authorized domains** list in the same tab.

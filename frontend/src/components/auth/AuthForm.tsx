@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import SignInForm from "./SignInForm";
 import SignUpForm from "./SignUpForm";
 
 interface AuthFormProps {
   onSignIn: (data: any) => Promise<void>;
   onSignUp: (data: any) => Promise<void>;
+  onResetPassword?: (email: string) => Promise<void>;
+  onGoogleSignIn?: () => Promise<void>;
 }
 
-export default function AuthForm({ onSignIn, onSignUp }: AuthFormProps) {
+export default function AuthForm({ onSignIn, onSignUp, onResetPassword, onGoogleSignIn }: AuthFormProps) {
   const [activeTab, setActiveTab] = useState<"signin" | "signup">("signin");
 
   return (
@@ -39,9 +41,9 @@ export default function AuthForm({ onSignIn, onSignUp }: AuthFormProps) {
       {/* FORM CONTENT */}
       <div className="mt-4">
         {activeTab === "signin" ? (
-          <SignInForm onSubmit={onSignIn} />
+          <SignInForm onSubmit={onSignIn} onResetPassword={onResetPassword} onGoogleSignIn={onGoogleSignIn} />
         ) : (
-          <SignUpForm onSubmit={onSignUp} />
+          <SignUpForm onSubmit={onSignUp} onGoogleSignIn={onGoogleSignIn} />
         )}
       </div>
 

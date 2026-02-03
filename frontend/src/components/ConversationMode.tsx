@@ -92,17 +92,26 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
         }
 
         const data = await res.json();
-        const messageData = typeof data.message === 'string' 
-          ? { text: data.message, gender: 'female', suggestions: [] } 
-          : data.message;
+        const messageData = data.message;
 
         if (messageData.model) {
           console.log(`🤖 AI Model: ${messageData.model}`);
         }
 
-        const { text, gender, suggestions: newSuggestions } = messageData;
-        setMessages([{ role: "ai", content: text }]);
-        setSuggestions(newSuggestions || []);
+        if (messageData.resumed && messageData.messages) {
+          // Map Firestore history to Frontend format
+          const restoredMessages = messageData.messages.map((m: any) => ({
+            role: m.role === "model" ? "ai" : "user",
+            content: m.content[0].text
+          }));
+          setMessages(restoredMessages);
+          setSuggestions(messageData.suggestions || []);
+          console.log(`📚 Resumed conversation with ${restoredMessages.length} messages.`);
+        } else {
+          const { text, suggestions: newSuggestions } = messageData;
+          setMessages([{ role: "ai", content: text }]);
+          setSuggestions(newSuggestions || []);
+        }
 
       } catch (error: any) {
         console.error("Chat Error:", error);
@@ -163,7 +172,7 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
       }
 
       const data = await res.json();
-      const { text, gender, correction, suggestions: nextSuggestions, model } = data.message;
+      const { text, correction, suggestions: nextSuggestions, model } = data.message;
 
       if (model) {
         console.log(`🤖 AI Model: ${model}`);

@@ -13,6 +13,8 @@
     "backend:dev": "tsx backend/src/server.ts",
     "dev": "concurrently \"npm run frontend:dev\" \"npm run backend:dev\"",
     "start": "npm run dev",
+    "healthcheck": "npm run healthcheck -w frontend",
+    "test:coverage:check": "npm run test:coverage:check -w frontend",
     "prepare": "husky"
   },
   "devDependencies": {

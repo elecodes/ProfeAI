@@ -107,13 +107,16 @@ class ConversationService {
         "Tiempo": "Eres un vecino charlando en el ascensor sobre el tiempo loco de estos días."
     };
 
-    console.log(`⚡ Generating Response for UID: ${uid}, Session: ${sessionId}...`);
+    console.log(`📑 Process: sessionId="${sessionId}", uid="${uid}", topic="${topic}"`);
     
     const historyData = await this.getHistory(uid, sessionId);
-    const historyContext = historyData.messages.map(m => ({
-        role: m.role,
-        content: m.content
-    }));
+    console.log(`📚 Loaded ${historyData.messages.length} messages from Firestore.`);
+    
+    // Convert history array to a formatted string for the AI prompt
+    const historyContext = historyData.messages
+        .filter(m => !m.content[0].text.startsWith("Start conversation.")) // Filter internal triggers
+        .map(m => `[${m.role === 'model' ? 'MATEO' : 'USER'}]: ${m.content[0].text}`)
+        .join('\n');
 
     // Fetch user profile for personalization
     const userDoc = await adminDb.collection("users").doc(uid).get();
@@ -126,12 +129,14 @@ class ConversationService {
     const personalizedScenario = `${scenarioDescription} The user's name is ${userName}. Their current level is ${level}. Adapt your complexity accordingly.`;
 
     const inputPayload = {
-        history: historyContext,
+        history: historyContext || "No previous history.",
         message: input,
         topic: personalizedScenario,
         level: level
     };
 
+    console.log("📤 Sending to Genkit. History preview:", historyContext ? historyContext.substring(0, 100) + "..." : "EMPTY");
+    
     const result = await tutorFlowGemini(inputPayload);
     const output = result as Response;
 
@@ -145,9 +150,22 @@ class ConversationService {
   }
 
   async startConversation(uid: string, sessionId: string, topic: string, level: string) {
-    // Clear/Reset session in Firestore for start
-    await adminDb.collection("users").doc(uid).collection("sessions").doc(sessionId).delete();
+    const history = await this.getHistory(uid, sessionId);
     
+    // If we have existing history, just return a special "RESUMED" flag or empty message
+    // so the frontend knows we are resuming.
+    if (history.messages.length > 0) {
+      // Filter out internal trigger messages so they don't appear in the chat UI
+      const filteredMessages = history.messages.filter(m => !m.content[0].text.startsWith("Start conversation."));
+      
+      return { 
+        text: "¡Hola de nuevo! Vamos a continuar nuestra conversación.", 
+        resumed: true,
+        messages: filteredMessages 
+      };
+    }
+    
+    // Initial Trigger for the AI to introduce itself
     return await this._generateResponse(
       uid,
       sessionId, 

@@ -21,7 +21,12 @@ Profe AI is an interactive web application designed to help students learn Spani
     *   **Lazy Loading:** Progressive page loading for instant startup.
     *   **AI Model Reporting:** System logs exactly which AI model is responding to the console (e.g., "Gemini 2.5 Flash Lite").
     *   **Sequential Fallback:** Prioritizes **Gemini 2.5 Flash Lite** and **Gemini 2.5 Flash** with automatic fallback to stable models to ensure availability and save cost.
-*   **🔐 Authentication:** Secure registration with Firebase Auth.
+*   **🔐 Professional Authentication (Unified):**
+    *   **Global Auth Context:** Single source of truth for the user session across the app.
+    *   **Remember Me:** Real support for session persistence (`LOCAL` vs `SESSION`).
+    *   **Password Reset:** Functional email recovery flow.
+    *   **Google Login:** Quick and secure one-click access.
+    *   **Strict Validation:** Secure registration and smart existing account detection.
 
 ## 🛠️ Technologies & Structure (Monorepo)
 

@@ -7,7 +7,11 @@ import {
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
   signInWithPopup, 
-  signOut 
+  signOut,
+  sendPasswordResetEmail,
+  setPersistence,
+  browserLocalPersistence,
+  browserSessionPersistence
 } from "firebase/auth";
 
 // Your web app's Firebase configuration
@@ -27,6 +31,9 @@ const app = initializeApp(firebaseConfig);
 // Autenticación
 export const auth = getAuth(app);
 
+// Default persistence
+setPersistence(auth, browserLocalPersistence).catch((err) => console.error("Firebase persistence error:", err));
+
 // Firestore (lo usaremos para memoria del usuario)
 export const db = getFirestore(app);
 
@@ -34,12 +41,24 @@ export const db = getFirestore(app);
 export const googleProvider = new GoogleAuthProvider();
 
 // Funciones para Login / Signup
-export const emailSignup = (email: any, password: any) =>
-  createUserWithEmailAndPassword(auth, email, password);
+export const emailSignup = (email: string, password: string) =>
+  createUserWithEmailAndPassword(auth, email.trim(), password);
 
-export const emailLogin = (email: any, password: any) =>
-  signInWithEmailAndPassword(auth, email, password);
+export const emailLogin = (email: string, password: string) =>
+  signInWithEmailAndPassword(auth, email.trim(), password);
 
 export const googleLogin = () => signInWithPopup(auth, googleProvider);
 
 export const logout = () => signOut(auth);
+
+export const resetPassword = (email: string) => 
+  sendPasswordResetEmail(auth, email);
+
+export const setAuthPersistence = async (remember: boolean) => {
+  try {
+    const mode = remember ? browserLocalPersistence : browserSessionPersistence;
+    await setPersistence(auth, mode);
+  } catch (err: any) {
+    console.error("Error updating persistence:", err.message);
+  }
+};

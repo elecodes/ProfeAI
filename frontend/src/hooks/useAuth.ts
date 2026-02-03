@@ -1,62 +1,51 @@
-import { useState, useEffect } from "react";
-import { onAuthStateChanged, User } from "firebase/auth";
-import { auth, emailLogin, emailSignup, googleLogin, logout } from "../config/firebase";
+import { useContext } from "react";
+import { AuthContext } from "../config/AuthContext";
+import { emailLogin, emailSignup, googleLogin, logout, resetPassword as firebaseResetPassword, setAuthPersistence } from "../config/firebase";
 import UserService from "../services/UserService";
-import { AppUser } from "../types";
-
-export interface UseAuthReturn {
-  user: User | null;
-  userProfile: AppUser | null;
-  loading: boolean;
-  error: string | null;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
-  signInWithGoogle: () => Promise<void>;
-  signOut: () => Promise<void>;
-  setUserProfile: React.Dispatch<React.SetStateAction<AppUser | null>>;
-}
 
 /**
- * Hook to manage authentication state and user data
+ * Hook to consume the global authentication state and provide auth actions.
  */
-export function useAuth(): UseAuthReturn {
-  const [user, setUser] = useState<User | null>(null);
-  const [userProfile, setUserProfile] = useState<AppUser | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+export function useAuth() {
+  const context = useContext(AuthContext);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        // User is signed in
-        setUser(firebaseUser);
-        
-        // Create or fetch user profile in Firestore
-        try {
-          await UserService.createUserProfile(firebaseUser);
-          const profile = await UserService.getUserProfile(firebaseUser.uid);
-          setUserProfile(profile);
-        } catch (err) {
-          console.error("Error loading user profile:", err);
-        }
-      } else {
-        // User is signed out
-        setUser(null);
-        setUserProfile(null);
-      }
-      setLoading(false);
-    });
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
 
-    return () => unsubscribe();
-  }, []);
+  const { user, userProfile, loading, error, setError, setLoading, setUserProfile } = context;
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string, rememberMe: boolean = false) => {
     setLoading(true);
     setError(null);
+    const cleanEmail = email.trim();
+
+    if (!cleanEmail || !password) {
+      setError("Email y contraseña son obligatorios.");
+      setLoading(false);
+      return;
+    }
+
     try {
-      await emailLogin(email, password);
+      await setAuthPersistence(rememberMe);
+      const result = await emailLogin(cleanEmail, password);
+      return result;
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || "Error al iniciar sesión.");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resetPassword = async (email: string) => {
+    setLoading(true);
+    setError(null);
+    const cleanEmail = email.trim();
+    try {
+      await firebaseResetPassword(cleanEmail);
+    } catch (err: any) {
+      setError(err.message || "Error al enviar el correo.");
       throw err;
     } finally {
       setLoading(false);
@@ -68,7 +57,6 @@ export function useAuth(): UseAuthReturn {
     setError(null);
     try {
       const result = await emailSignup(email, password);
-      // Create profile immediately after signup
       if (result.user) {
         await UserService.createUserProfile(result.user);
       }
@@ -113,6 +101,7 @@ export function useAuth(): UseAuthReturn {
     signUp,
     signInWithGoogle,
     signOut: signOutUser,
-    setUserProfile // Allow manual updates to local profile state if needed
+    resetPassword,
+    setUserProfile
   };
 }
