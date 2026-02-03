@@ -7,6 +7,16 @@
 *   **Runbook**: Routine operational procedures (e.g., "How to deploy", "How to backup DB"). Followed when things are *working*.
 *   **Playbook**: Response to *incidents*. Focuses on diagnosis, mitigation, and recovery. Followed when things are *broken*.
 
+## 📂 Arquitectura Monorepo
+El proyecto está dividido en dos grandes bloques:
+- **frontend/**: React + Vite + Tailwind.
+- **backend/**: Node.js + Express + Genkit.
+
+### Comandos de Emergencia (Raíz)
+- `npm run dev`: Lanza ambos entornos a la vez.
+- `npm run frontend:dev`: Solo la web.
+- `npm run backend:dev`: Solo el servidor.
+
 ---
 
 ## 🔄 Incident Response Lifecycle

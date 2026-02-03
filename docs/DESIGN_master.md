@@ -166,47 +166,22 @@ The project has a comprehensive testing and quality assurance strategy.
    *   **Usage:** Enforces pre-commit checks (linting, testing).
 
 
-## 10. Project Structure
-
+## 7. Directory Structure
 
 ```
 /
-├───.genkit/          # Genkit local configuration
-├───.github/          # GitHub Actions workflows (CI/CD)
-├───.husky/           # Git hooks
-├───certbot/          # SSL certificate files
-├───dist/             # Build output
-├───docs/             # Project documentation
-├───firebase/         # Firebase configuration
-├───nginx/            # Nginx configuration
-├───node_modules/     # Project dependencies
-├───public/           # Static assets
-├───scripts/          # Node.js scripts (e.g., database seeding)
-├───src/              # Application source code
-│   ├───assets/       # Static assets like images
-│   ├───components/   # Reusable React components
-│   ├───config/       # Application configuration
-│   ├───data/         # Static data
-│   ├───hooks/        # Custom React hooks
-│   ├───lessons/      # Lesson content in JSON format
-│   ├───lib/          # Core libraries (Genkit)
-│   ├───middleware/   # Express middleware
-│   ├───pages/        # Top-level page components
-│   ├───prompts/      # AI Prompts (Genkit/Dotprompt)
-│   ├───schemas/      # Data validation schemas (Zod)
-│   ├───services/     # Backend service modules
-│   ├───tests/        # Automated tests
-│   ├───types/        # TypeScript type definitions
-│   ├───utils/        # Utility functions
-│   ├───App.tsx       # Main application component
-│   └───main.tsx      # Entry point
-├───test/             # Test setup and configuration
-├───.env.example      # Example environment variables
-├───docker-compose.yml # Docker Compose for development
-├───Dockerfile        # Docker configuration for the app
-├───package.json      # Project metadata and dependencies
-├───server.ts         # Backend Express server entry point
-└───vite.config.js    # Vite configuration
+├── frontend/           # React + Vite application
+│   ├── src/            # Components, hooks, services, assets
+│   ├── public/         # Static assets
+│   └── package.json    # Frontend dependencies
+├── backend/            # Express server
+│   ├── src/            # Routes, services, middleware, Genkit config
+│   ├── scripts/        # Seed and maintenance scripts
+│   └── package.json    # Backend dependencies
+├── docs/               # Architecture, ADRs, playbooks, and guides
+├── .genkit/            # Genkit local configuration
+├── package.json        # Root monorepo workspace configuration
+└── .env                # Root environment variables
 ```
 
 
