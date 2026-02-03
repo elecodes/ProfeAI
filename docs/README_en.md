@@ -23,90 +23,38 @@ Profe AI is an interactive web application designed to help students learn Spani
     *   **Sequential Fallback:** Prioritizes **Gemini 2.5 Flash Lite** and **Gemini 2.5 Flash** with automatic fallback to stable models to ensure availability and save cost.
 *   **🔐 Authentication:** Secure registration with Firebase Auth.
 
-## 🛠️ Technologies Used
+## 🛠️ Technologies & Structure (Monorepo)
 
-*   **Frontend:** React, Vite, Tailwind CSS.
-*   **Backend:** Node.js, Express, **Helmet.js**.
-*   **Infrastructure:** **Docker**, **Nginx** (Reverse Proxy), **Certbot** (SSL).
-*   **Database:** Firebase Firestore & Authentication.
-*   **AI & Services:** LangChain, **Genkit** (Orchestration), OpenAI, Amazon Polly, Google Cloud TTS, ElevenLabs, **Tavily** (Search).
-*   **Quality:** Sentry, Playwright, Vitest, Lighthouse, **Snyk**, **Husky**, **Dependabot**.
+The project is organized as an **npm workspace** to clearly separate concerns:
 
-## 🚀 Prerequisites
+- **Frontend (`/frontend`)**: React, Vite, Tailwind CSS.
+- **Backend (`/backend`)**: Node.js, Express, **Helmet.js**, Genkit.
 
-*   [Node.js](https://nodejs.org/) (v18+)
-*   [Docker](https://www.docker.com/) (for deployment and HTTPS)
-*   Firebase Account (Firestore and Auth enabled)
-*   API Keys: OpenAI, AWS (Polly), Google Cloud, ElevenLabs.
+### External Integrations
+- **Database**: Firebase Firestore & Authentication.
+- **AI & Services**: LangChain, **Genkit**, OpenAI, Gemini 2.5, Amazon Polly, Google Cloud TTS, ElevenLabs, **Tavily**.
 
-## 📥 Installation
+## 🚀 Installation & Usage
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/your-username/apptutor.git
-    cd apptutor
-    ```
-
-2.  **Install dependencies:**
+1.  **Install dependencies (from root):**
     ```bash
     npm install
     ```
 
-3.  **Configure environment variables:**
-    Create a `.env` file based on `.env.example`:
-    ```env
-    # AI & Voice
-    OPENAI_API_KEY=sk-...
-    AWS_ACCESS_KEY_ID=...
-    AWS_SECRET_ACCESS_KEY=...
-    AWS_REGION=us-east-1
+2.  **Configure Environment Variables:**
+    Create a `.env` file in the root (see `.env.example`).
 
-    # Genkit & Search
-    GOOGLE_GENAI_API_KEY=...
-    TAVILY_API_KEY=tv-...
-    
-    # Firebase
-    GOOGLE_APPLICATION_CREDENTIALS=./path/to/credentials.json
-    
-    # Security
-    PORT=3001
-    ```
+3.  **Run using Workspace Scripts:**
+    - `npm run dev`: Starts both frontend and backend.
+    - `npm run frontend:dev`: Starts only the web frontend.
+    - `npm run backend:dev`: Starts only the API backend.
 
 4.  **Load Content (Seed):**
     Upload initial lessons to Firestore:
     ```bash
-    node scripts/seedLessons.js
+    # Running from root using workspace delegate
+    npm run backend:seed
     ```
-
-## ▶️ Execution
-
-### Local Development (HTTP)
-```bash
-npm run dev
-```
-Access at `http://localhost:5173`.
-
-### Secure Local Development (HTTPS)
-To test features requiring SSL (like microphone access in some browsers):
-1.  Generate certificates:
-    ```bash
-    ./init-local-https.sh
-    ```
-2.  Access at `https://localhost`.
-
-### Production (Docker + HTTPS)
-Deployment with Nginx and automatic Let's Encrypt certificates:
-
-1.  Configure your domain in `init-letsencrypt.sh` and `nginx/conf/app.conf`.
-2.  Initialize certificates:
-    ```bash
-    ./init-letsencrypt.sh
-    ```
-3.  Start services:
-    ```bash
-    docker-compose -f docker-compose.prod.yml up -d
-    ```
-Access at `https://your-domain.com`.
 
 ## 🧪 Testing and Quality
 

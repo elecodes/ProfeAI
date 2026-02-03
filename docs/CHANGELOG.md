@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Gemini 2.5 Integration**: Added support for Gemini 2.5 Flash and Gemini 2.5 Flash Lite.
 - **AI Model Reporting**: The frontend and backend now log the specific AI model name responding to requests for full transparency.
 - **Sequential Fallback Strategy**: Replaced racing models with a sequential strategy to conserve API quota and improve reliability.
+- **Monorepo Migration**: Separated codebase into `frontend/` and `backend/` workspaces for better dependency management and clarity.
 - **New Express API**: Migrated core endpoints to a cleaner Node.js/Express structure under `/api/v1`.
 
 ### Fixed

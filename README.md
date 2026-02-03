@@ -28,54 +28,32 @@ Profe AI es una aplicación web interactiva diseñada para ayudar a estudiantes 
     *   Detección de "Cuenta no encontrada" con sugerencia de registro.
     *   Enlace de recuperación de contraseña.
 
-## 🛠️ Tecnologías Utilizadas
+## 🛠️ Tecnologías y Estructura (Monorepo)
 
-*   **Frontend:** React, Vite, Tailwind CSS.
-*   **Backend:** Node.js, Express, **Helmet.js**.
-*   **Infraestructura:** **Docker**, **Nginx** (Reverse Proxy), **Certbot** (SSL).
-*   **Base de Datos:** Firebase Firestore & Authentication.
-*   **IA & Servicios:** LangChain, **Genkit** (Orchestration), OpenAI, Amazon Polly, Google Cloud TTS, ElevenLabs, **Tavily** (Search).
-*   **Calidad:** Sentry, Playwright, Vitest, Lighthouse, **Snyk**, **Husky**, **Dependabot**.
+El proyecto está organizado como un **npm workspace** para separar claramente las responsabilidades:
 
-## 🚀 Requisitos Previos
+- **Frontend (`/frontend`)**: React, Vite, Tailwind CSS.
+- **Backend (`/backend`)**: Node.js, Express, **Helmet.js**, Genkit.
 
-*   [Node.js](https://nodejs.org/) (v18+)
-*   [Docker](https://www.docker.com/) (para despliegue y HTTPS)
-*   Cuenta de Firebase (Firestore y Auth habilitados)
-*   Claves de API: OpenAI, AWS (Polly), Google Cloud, ElevenLabs.
+### Integraciones Externas
+- **Base de Datos**: Firebase Firestore & Authentication.
+- **IA & Servicios**: LangChain, **Genkit**, OpenAI, Gemini 2.5, Amazon Polly, Google Cloud TTS, ElevenLabs, **Tavily**.
+- **Calidad**: Sentry, Playwright, Vitest, Lighthouse.
 
-## 📥 Instalación
+## 🚀 Instalación y Uso
 
-1.  **Clonar el repositorio:**
-    ```bash
-    git clone https://github.com/tu-usuario/apptutor.git
-    cd apptutor
-    ```
-
-2.  **Instalar dependencias:**
+1.  **Instalar dependencias (desde la raíz):**
     ```bash
     npm install
     ```
 
-3.  **Configurar variables de entorno:**
-    Crea un archivo `.env` basado en `.env.example`:
-    ```env
-    # IA & Voz
-    OPENAI_API_KEY=sk-...
-    AWS_ACCESS_KEY_ID=...
-    AWS_SECRET_ACCESS_KEY=...
-    AWS_REGION=us-east-1
+2.  **Configurar variables de entorno:**
+    Crea un archivo `.env` en la raíz (ver `.env.example`).
 
-    # Genkit & Search
-    GOOGLE_GENAI_API_KEY=...
-    TAVILY_API_KEY=tv-...
-    
-    # Firebase
-    GOOGLE_APPLICATION_CREDENTIALS=./path/to/credentials.json
-    
-    # Seguridad
-    PORT=3001
-    ```
+3.  **Ejecución con Scripts de Workspace:**
+    - `npm run dev`: Lanza frontend y backend simultáneamente.
+    - `npm run frontend:dev`: Inicia solo el cliente web.
+    - `npm run backend:dev`: Inicia solo el servidor API.
 
 4.  **Cargar Contenido (Seed):**
     Sube las lecciones iniciales a Firestore:
