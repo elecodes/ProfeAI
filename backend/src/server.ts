@@ -27,7 +27,7 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://unpkg.com", "https://cdn.tailwindcss.com", "https://apis.google.com"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "blob:", "data:", "https://unpkg.com", "https://cdn.tailwindcss.com", "https://*.elevenlabs.io", "https://apis.google.com"],
         styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://unpkg.com", "https://elevenlabs.io"],
         fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
         connectSrc: [
