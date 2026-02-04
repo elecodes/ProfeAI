@@ -3,6 +3,11 @@ import ConversationService from "../../services/ConversationService";
 
 const router = Router();
 
+// GET /api/v1/chat/health
+router.get("/health", (req: Request, res: Response) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
 // POST /api/v1/chat/start
 router.post("/start", async (req: Request, res: Response) => {
   try {
