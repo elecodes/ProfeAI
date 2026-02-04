@@ -19,7 +19,7 @@ Profe AI es una aplicación web interactiva diseñada para ayudar a estudiantes 
 *   **🗣️ Texto a Voz (TTS) Premium:** Prioriza **Amazon Polly** y **ElevenLabs** para una voz natural, con fallback automático a Google Cloud y Web Speech API.
 *   **🤖 Tutor de IA (Roleplay):** Practica situaciones reales (ej. "En el restaurante") con un tutor de IA que se adapta a tu nivel.
 *   **👨‍⚕️ Doctor Gramática:** Análisis gramatical con validación robusta (**Zod**).
-*   **🔄 Contenido Fresco Automático:** Script automatizado (Github Actions) que genera nuevas frases y quizzes cada 2 semanas usando **Gemini 2.0**.
+*   **🔄 Contenido Fresco Automático:** Script robusto (Github Actions) que genera nuevas frases y quizzes cada 2 semanas usando **Gemini 2.0**, con estrategias de fallback y backoff para maximizar la disponibilidad en cuentas gratuitas.
 *   **🔒 Seguridad Reforzada:** Protección con **Helmet.js** (CSP), **HTTPS** automático (Let's Encrypt) y actualizaciones automáticas (**Dependabot**).
 *   **💬 Modo Conversación Híbrido:** Chat de texto y voz fluido.
 *   **✅ Seguimiento de Progreso:** Visualiza tu avance por semanas y niveles (con opción de reinicio completo).

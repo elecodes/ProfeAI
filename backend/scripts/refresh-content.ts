@@ -70,17 +70,11 @@ async function listAvailableModels(genAI: GoogleGenerativeAI) {
 }
 
 async function generateNewContent(genAI: GoogleGenerativeAI) {
-  // User selected 'gemini-2.0-flash'.
-  // This model is known to hit 429 Rate Limits on free tiers, so we keep the retry logic.
-  const modelName = "gemini-2.0-flash";
-  console.log(`🤖 Using model: ${modelName}`);
-
-  const model = genAI.getGenerativeModel({ 
-    model: modelName,
-    generationConfig: {
-      responseMimeType: "application/json"
-    }
-  });
+  // Only use models verified by the diagnostic tool. 
+  const modelsToTry = [
+    "gemini-2.0-flash", 
+    "gemini-2.0-flash-lite"
+  ];
 
   const prompt = `
     Genera un JSON para actualizar mis lecciones de idiomas. Necesito 3 bloques principales: 'beginner', 'intermediate', 'advanced'.
@@ -111,27 +105,49 @@ async function generateNewContent(genAI: GoogleGenerativeAI) {
   console.log('⏳ Generating new content with Gemini...');
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
   
-  const maxRetries = 3;
-  for (let i = 0; i < maxRetries; i++) {
+  for (const modelName of modelsToTry) {
+    console.log(`🤖 Attempting with model: ${modelName}`);
+    
     try {
-        const result = await model.generateContent(prompt);
-        const text = result.response.text();
-        const jsonString = text.replace(/```json\\n?|\\n?```/g, '').trim();
-        const data = JSON.parse(jsonString);
-        console.log('✅ Content generated and parsed successfully!');
-        return data;
-    } catch (error: any) {
-        if (error.message.includes("429")) {
-            console.warn(`⚠️ Hit 429 Rate Limit (Attempt ${i + 1}/${maxRetries}). Waiting 10s...`);
-            await delay(10000); // Wait 10s
-        } else {
-            console.error('❌ Error generating content:', error);
-            throw error;
+        const model = genAI.getGenerativeModel({ 
+            model: modelName,
+            generationConfig: {
+              responseMimeType: "application/json"
+            }
+        });
+
+        const maxRetries = 3;
+        for (let i = 0; i < maxRetries; i++) {
+            try {
+                const result = await model.generateContent(prompt);
+                const text = result.response.text();
+                const jsonString = text.replace(/```json\\n?|\\n?```/g, '').trim();
+                const data = JSON.parse(jsonString);
+                console.log(`✅ Content generated successfully with ${modelName}!`);
+                return data;
+            } catch (error: any) {
+                const errorText = error.message || String(error);
+                const isRateLimit = errorText.includes("429") || errorText.includes("Quota") || errorText.includes("limit");
+                
+                if (isRateLimit) {
+                    // Very aggressive wait times for free tier: 45s, 90s, 120s
+                    const waitTimes = [45000, 90000, 120000];
+                    const waitTime = waitTimes[i] || 120000;
+                    console.warn(`⚠️ Model ${modelName} hit rate limit (Attempt ${i + 1}/${maxRetries}). Waiting ${waitTime/1000}s...`);
+                    await delay(waitTime); 
+                } else {
+                    console.error(`❌ Unexpected error using model ${modelName}:`, errorText);
+                    break; 
+                }
+            }
         }
+    } catch (e: any) {
+        console.error(`❌ Failed to initialize model ${modelName}:`, e.message);
     }
+    console.warn(`⏭️ Model ${modelName} exhausted. Trying next...`);
   }
   
-  throw new Error("❌ Failed to generate content after multiple retries due to Rate Limiting.");
+  throw new Error("❌ Failed to generate content: All models hit rate limits. Usually this means the daily quota is exhausted.");
 }
 
 import { createRequire } from 'module';
@@ -141,14 +157,25 @@ async function main() {
   console.log('🚀 Script de actualización de contenido iniciado...');
   
   try {
-    // Initialize Firebase Admin with explicit service account using require() as requested
-    // Note: In ESM (module: type="module"), 'require' is not available globally, so we construct it.
-    const serviceAccount = require('../service-account.json');
-    
+    // 1. Initialize Firebase Admin
     if (admin.apps.length === 0) {
-      admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount)
-      });
+      if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+        console.log(`🔑 Using GOOGLE_APPLICATION_CREDENTIALS from environment: ${process.env.GOOGLE_APPLICATION_CREDENTIALS}`);
+        admin.initializeApp();
+      } else {
+        try {
+          // Fallback to local service-account.json relative to this script
+          const serviceAccount = require('../service-account.json');
+          console.log('📄 Using local service-account.json file.');
+          admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount)
+          });
+        } catch (e) {
+          console.warn('⚠️ No GOOGLE_APPLICATION_CREDENTIALS found and local service-account.json missing.');
+          console.log('📡 Attempting default initialization (Application Default Credentials)...');
+          admin.initializeApp();
+        }
+      }
     } else {
         console.log('🔥 Firebase Admin already initialized, skipping re-init.');
     }

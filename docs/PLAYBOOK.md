@@ -114,6 +114,15 @@ El proyecto está dividido en dos grandes bloques:
 
 ---
 
+### Scenario L: Content Refresh Script Failure (429 Rate Limits)
+**Trigger**: GitHub Action "Auto Update Lessons" fails with "Failed to generate content: All models hit rate limits".
+
+1.  **Wait and Retry**: This is usually a daily or per-minute quota issue. If it fails once, wait a few hours and trigger it manually from the Actions tab.
+2.  **Verify Models**: The script (`backend/scripts/refresh-content.ts`) uses a fallback list. Check if Google has released new models that should be added to `modelsToTry`.
+3.  **Local Execution**: If you need content immediately, run `npx tsx backend/scripts/refresh-content.ts` from the root. Be prepared for it to take 5-10 minutes if it hits quotas.
+
+---
+
 > **Remember**: In an incident, **Communication > Code**. Tell the team/users what is happening.
 ### Scenario F: UI Bugs / Visual Regressions
 **Trigger**: User report "Button looks broken on mobile" or "Colors are wrong".
