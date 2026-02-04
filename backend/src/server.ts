@@ -27,8 +27,8 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "blob:", "data:", "https://unpkg.com", "https://cdn.tailwindcss.com", "https://*.elevenlabs.io", "https://apis.google.com"],
-        scriptSrcElem: ["'self'", "'unsafe-inline'", "blob:", "data:", "https://unpkg.com", "https://cdn.tailwindcss.com", "https://*.elevenlabs.io", "https://apis.google.com"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "blob:", "data:", "https://unpkg.com", "https://*.firebaseapp.com", "https://cdn.tailwindcss.com", "https://*.elevenlabs.io", "https://apis.google.com"],
+        scriptSrcElem: ["'self'", "'unsafe-inline'", "blob:", "data:", "https://unpkg.com", "https://*.firebaseapp.com", "https://cdn.tailwindcss.com", "https://*.elevenlabs.io", "https://apis.google.com"],
         workerSrc: ["'self'", "blob:", "data:"],
         styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://unpkg.com", "https://elevenlabs.io"],
         fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
@@ -47,11 +47,12 @@ app.use(
           "https://elevenlabs.io",
           "https://polly.us-east-1.amazonaws.com",
         ],
-        imgSrc: ["'self'", "data:", "blob:", "https://elevenlabs.io", "https://*.elevenlabs.io", "https://storage.googleapis.com"],
+        imgSrc: ["'self'", "data:", "blob:", "https://elevenlabs.io", "https://*.elevenlabs.io", "https://storage.googleapis.com", "https://*.googleusercontent.com"],
         mediaSrc: ["'self'", "data:", "blob:"],
-        frameSrc: ["'self'", "https://elevenlabs.io", "https://*.firebaseapp.com", "https://apptutor-a4230.firebaseapp.com"],
+        frameSrc: ["'self'", "https://elevenlabs.io", "https://accounts.google.com", "https://*.firebaseapp.com", "https://apptutor-a4230.firebaseapp.com"],
       },
     },
+    crossOriginOpenerPolicy: false,
   })
 );
 
