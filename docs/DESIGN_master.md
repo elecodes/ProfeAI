@@ -12,6 +12,8 @@ Profe AI is an interactive web application designed to help students learn Spani
 
 The application follows a client-server architecture, with a React single-page application (SPA) for the frontend and a Node.js/Express server for the backend. In production, the system is containerized as a single unified Docker image, deployed to **Render** which handles SSL termination and scaling.
 
+**Production URL**: [https://profeai.onrender.com/](https://profeai.onrender.com/)
+
 ```
 +----------------+      +-------------------+
 |   User's       |      |  Render Platform  |
