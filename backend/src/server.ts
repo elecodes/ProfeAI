@@ -28,6 +28,8 @@ app.use(
       directives: {
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "blob:", "data:", "https://unpkg.com", "https://cdn.tailwindcss.com", "https://*.elevenlabs.io", "https://apis.google.com"],
+        scriptSrcElem: ["'self'", "'unsafe-inline'", "blob:", "data:", "https://unpkg.com", "https://cdn.tailwindcss.com", "https://*.elevenlabs.io", "https://apis.google.com"],
+        workerSrc: ["'self'", "blob:", "data:"],
         styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://unpkg.com", "https://elevenlabs.io"],
         fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
         connectSrc: [
