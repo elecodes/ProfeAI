@@ -57,7 +57,12 @@ Since disk space is tight (~12GB available), occasionally run this to clean up u
 docker system prune
 ```
 
+## Deployment Ready
+The same `Dockerfile` used locally is optimized for cloud platforms like **Render**:
+1.  **Uniformity**: We use the same image definition for dev and prod.
+2.  **Statics**: React is built and served by Express, eliminating Nginx needs for simple setups.
+
 ## Configuration Files
-- **Dockerfile**: Defines how the image is built (multi-stage: builds React app, then sets up Node server).
-- **docker-compose.yml**: Orchestrates running the app container and mapping port 3001.
-- **.dockerignore**: Prevents large files (like `node_modules`) from slowing down the build.
+- **Dockerfile**: (Root) Defines the multi-stage build (React Build -> Node Server).
+- **docker-compose.yml**: Orchestrates local development.
+- **.dockerignore**: Keeps the build context clean.

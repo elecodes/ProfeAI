@@ -31,9 +31,9 @@ El proyecto está dividido en dos grandes bloques:
 
 ### 2. 🔍 Diagnose
 *   **Check Sentry**: Look for spikes in errors or specific transaction failures.
-*   **Check Logs**: `docker-compose logs -f server` or Cloud logs.
-*   **Reproduce**: Can you trigger it in Dev/Staging?
-*   **Recent Changes**: Did a deployment just happen? (Check Git history).
+*   **Check Logs**: Use Render Dashboard (Logs tab) or `docker-compose logs -f server` for local.
+*   **Reproduce**: Can you trigger it in Dev?
+*   **Recent Changes**: Did a deployment just happen on Render? (Check "Deploys" tab).
 
 ### 3. 🛠️ Fix
 *   **Mitigation First**: Stop the bleeding.
@@ -87,7 +87,8 @@ El proyecto está dividido en dos grandes bloques:
 2.  **Update Config**:
     *   **Backend**: Add domain to `server.ts` (Helmet config).
     *   **Frontend**: Add domain to `index.html` (Meta tag) for local Dev.
-3.  **Restart**: Backend changes (`server.ts`) REQUIRE a server restart (`npm start`). Frontend changes just need a refresh.
+3.  **Restart**: Render will automatically restart if you push change. For local, restart with `npm start` or `npm run dev`.
+4.  **AudioWorklet Specific**: If ElevenLabs audio is blocked, ensure `scriptSrcElem` and `workerSrc` allow `data:` and `blob:`.
 
 ### Scenario C: Frontend Assets 404
 **Trigger**: White screen, "Loading chunk failed".
@@ -159,7 +160,8 @@ El proyecto está dividido en dos grandes bloques:
 2.  **Enable Google**: Click on **Add new provider** and select **Google**.
 3.  **Enable Switch**: Toggle the "Enable" switch.
 4.  **Project Support Email**: Select a project support email and Save.
-5.  **CORS/Authorized Domains**: Ensure `localhost` and your production domain are in the **Authorized domains** list in the same tab.
+5.  **CORS/Authorized Domains**: Ensure your production domain (e.g., `profeai.onrender.com`) is in the **Authorized domains** list in the same tab.
+6.  **COOP Header**: If the popup closes immediately, ensure `crossOriginOpenerPolicy` is set to `false` in `server.ts`.
 
 ### Scenario K: Failing Coverage or Tests
 **Trigger**: `npm test` fails with low coverage or broken tests.

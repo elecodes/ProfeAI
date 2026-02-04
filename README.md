@@ -94,19 +94,15 @@ Para probar características que requieren SSL (como el micrófono en algunos na
     ```
 2.  Acceder a `https://localhost`.
 
-### Producción (Docker + HTTPS)
-Despliegue con Nginx y certificados Let's Encrypt automáticos:
+### Producción (Render / Docker)
+El proyecto está optimizado para desplegarse como un **Web Service** en **Render** usando Docker:
 
-1.  Configura tu dominio en `init-letsencrypt.sh` y `nginx/conf/app.conf`.
-2.  Inicializa certificados:
-    ```bash
-    ./init-letsencrypt.sh
-    ```
-3.  Arranca los servicios:
-    ```bash
-    docker-compose -f docker-compose.prod.yml up -d
-    ```
-Accede a `https://tu-dominio.com`.
+1.  **Repo**: Conecta tu repositorio de GitHub a Render.
+2.  **Runtime**: Selecciona **Docker**.
+3.  **Dockerfile Path**: `Dockerfile` (en la raíz).
+4.  **Build Context**: `.` (raíz del proyecto).
+5.  **Variables**: Configura todas las claves de API como variables de entorno. Las variables `VITE_*` deben pasarse igual, el sistema las inyectará automáticamente durante el build.
+6.  **Firebase**: Recuerda añadir el dominio de Render a la lista de **Dominios Autorizados** en la consola de Firebase Authentication.
 
 ## 🧪 Tests y Calidad
 
