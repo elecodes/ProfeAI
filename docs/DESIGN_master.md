@@ -10,20 +10,20 @@ Profe AI is an interactive web application designed to help students learn Spani
 ## 2. System Architecture
 
 
-The application follows a client-server architecture, with a React single-page application (SPA) for the frontend and a Node.js/Express server for the backend. In production, the system is containerized using Docker and fronted by an Nginx reverse proxy for SSL termination and serving static assets.
-
+The application follows a client-server architecture, with a React single-page application (SPA) for the frontend and a Node.js/Express server for the backend. In production, the system is containerized as a single unified Docker image, deployed to **Render** which handles SSL termination and scaling.
 
 ```
-+----------------+      +------------------+      +-------------------+
-|   User's       |      |  Nginx           |      |  Node.js/Express  |
-|   Browser      <----->|  Reverse Proxy   <----->|  Backend Server   |
-+----------------+      |  (SSL)           |      +-------------------+
-      |                +------------------+             |
-      |                                                 |
-      |                               +-----------------v-+
-      |                               | External Services |
-      |                               | (Firebase, AI APIs)|
-      +------------------------------>+-------------------+
++----------------+      +-------------------+
+|   User's       |      |  Render Platform  |
+|   Browser      <----->|  (SSL & Docker)   |
++----------------+      |  (Express + Dist) |
+      |                 +---------+---------+
+      |                           |
+      |                           |
+      |                 +---------v---------+
+      |                 | External Services |
+      |                 | (Firebase, AI APIs)|
+      +---------------->+-------------------+
 ```
 
 
@@ -104,22 +104,14 @@ Profe AI integrates with several external services to provide its core features:
 ## 7. Infrastructure and Deployment
 
 
-The application is designed to be deployed using Docker for consistency across development and production environments.
+The application is designed to be deployed using Docker for consistency.
 
-
-*   **Containerization:** Docker is used to containerize the Node.js application and the Nginx reverse proxy.
-   *   `Dockerfile`: Defines the image for the Node.js application.
-   *   `docker-compose.yml`: For local development.
-   *   `docker-compose.prod.yml`: For production deployments.
-*   **Reverse Proxy:** Nginx is used as a reverse proxy in production to:
-   *   Handle SSL/TLS termination.
-   *   Serve the static frontend assets.
-   *   Proxy API requests to the Node.js server.
-*   **HTTPS:**
-   *   **Let's Encrypt:** Used to obtain free SSL certificates.
-   *   **Certbot:** The tool used to automate the process of obtaining and renewing Let's Encrypt certificates.
-   *   `init-letsencrypt.sh`: A script to initialize the SSL certificates.
-   *   `init-local-https.sh`: A script to generate self-signed certificates for local HTTPS development.
+*   **Containerization:** A multi-stage `Dockerfile` is used to build the React frontend and then set up the Express backend to serve it.
+*   **Deployment (Render):** Deployed as a **Web Service** on Render, which manages:
+    *   **CI/CD**: Automatic builds on push to `main`.
+    *   **SSL/TLS**: Automatic certificates via Let's Encrypt.
+    *   **Static Assets**: Served directly by the backend from the `frontend/dist` directory.
+    *   **Port Mapping**: Automatic detection of the `$PORT` environment variable.
 
 
 ## 8. Security

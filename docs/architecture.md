@@ -30,3 +30,7 @@ ProfeAI/
 3. El backend procesa la lógica mediante **Servicios** especializados.
 4. **Resiliencia de IA**: Se implementa una **Estrategia Secuencial** (Gemini 2.5 Lite -> Flash -> 1.5 -> OpenAI) para manejar límites de cuota (429) y garantizar disponibilidad.
 5. Los datos se persisten en **Firebase Firestore** y la autenticación se gestiona con **Firebase Auth**.
+## Despliegue y Hosting
+- **Infraestructura**: Despliegue unificado en **Render** mediante un único **Dockerfile**.
+- **SSL y DNS**: Gestionados automáticamente por la plataforma Render.
+- **CI/CD**: Flujo de despliegue continuo integrado con GitHub para actualizaciones automáticas en `main`.
