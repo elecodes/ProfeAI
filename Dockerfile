@@ -34,7 +34,8 @@ COPY frontend/package*.json ./frontend/
 
 # Install production dependencies from frontend workspace
 # Note: Since there is no backend/package.json, we rely on frontend's dependencies
-RUN npm install --omit=dev -w frontend
+# We use --ignore-scripts to prevent husky from trying to run in production
+RUN npm install --omit=dev -w frontend --ignore-scripts
 
 # Copy backend source
 COPY backend/src ./backend/src
