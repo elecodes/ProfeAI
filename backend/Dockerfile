@@ -3,12 +3,11 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy root manifest and workspace manifests
+# Copy root manifest and frontend manifest (where all dependencies live)
 COPY package*.json ./
 COPY frontend/package*.json ./frontend/
-COPY backend/package*.json ./backend/
 
-# Install dependencies for the whole monorepo
+# Install dependencies
 RUN npm install
 
 # Copy source code
@@ -29,26 +28,22 @@ RUN npm install -g npm@latest
 # Update system packages to fix OS-level vulnerabilities
 RUN apk update && apk upgrade
 
-# Copy root package.json for workspace awareness
+# Copy manifestations
 COPY package*.json ./
-COPY backend/package*.json ./backend/
+COPY frontend/package*.json ./frontend/
 
-# Disable husky in production
-RUN npm pkg delete scripts.prepare
-# Install production dependencies for the backend workspace
-RUN npm install --omit=dev -w backend
+# Install production dependencies from frontend workspace
+# Note: Since there is no backend/package.json, we rely on frontend's dependencies
+RUN npm install --omit=dev -w frontend
 
 # Copy backend source
-COPY backend/server.ts ./backend/
 COPY backend/src ./backend/src
 COPY backend/scripts ./backend/scripts
 
 # Copy built frontend assets from builder stage
-# Ensure this matches your Vite build output directory
 COPY --from=builder /app/frontend/dist ./frontend/dist
 
 EXPOSE 3001
 
-# The backend server should be configured to serve frontend/dist
-# We use tsx to run the backend in our specific configuration
+# Start the server using tsx (which is a dependency in frontend/package.json)
 CMD ["npx", "tsx", "backend/src/server.ts"]

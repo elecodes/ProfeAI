@@ -2,18 +2,17 @@
   "name": "profe-ai-monorepo",
   "private": true,
   "version": "1.0.0",
-  "description": "Monorepo for ProfeAI - React Frontend and FastAPI Backend",
+  "description": "Monorepo for ProfeAI - React Frontend and Node.js Backend",
   "workspaces": [
-    "frontend",
-    "backend"
+    "frontend"
   ],
   "scripts": {
     "frontend:dev": "npm run dev -w frontend",
     "frontend:build": "npm run build -w frontend",
-    "backend:dev": "tsx backend/src/server.ts",
+    "backend:dev": "npx tsx backend/src/server.ts",
     "dev": "concurrently \"npm run frontend:dev\" \"npm run backend:dev\"",
     "test": "npm run test:coverage:check",
-    "start": "npm run dev",
+    "start": "npx tsx backend/src/server.ts",
     "healthcheck": "npm run healthcheck -w frontend",
     "test:coverage:check": "npm run test:coverage:check -w frontend",
     "build": "npm run frontend:build",
