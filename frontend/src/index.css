@@ -52,12 +52,13 @@ body {
   box-shadow: var(--shadow-soft);
 }
 
-/* Force ElevenLabs Widget to be smaller on mobile */
+/* Force ElevenLabs Widget to be smaller and on top-right on mobile */
 @media (max-width: 768px) {
   elevenlabs-convai {
-    transform: scale(0.7) !important;
-    transform-origin: bottom right;
-    bottom: 10px !important;
-    right: 10px !important;
+    transform: scale(0.65) !important;
+    transform-origin: top right;
+    top: 85px !important;
+    right: 5px !important;
+    bottom: auto !important;
   }
 }
