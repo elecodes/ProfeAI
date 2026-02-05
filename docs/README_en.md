@@ -28,6 +28,8 @@ Profe AI is an interactive web application designed to help students learn Spani
     *   **Lazy Loading:** Progressive page loading for instant startup.
     *   **AI Model Reporting:** System logs exactly which AI model is responding to the console (e.g., "Gemini 2.5 Flash Lite").
     *   **Sequential Fallback:** Prioritizes **Gemini 2.5 Flash Lite** and **Gemini 2.5 Flash** with automatic fallback to stable models to ensure availability and save cost.
+*   **📱 Mobile-First Design:** Fully responsive interface with optimized navigation (sidebar) and centered visuals for a premium mobile experience.
+*   **🎙️ Optimized AI Widget:** ElevenLabs widget perfectly integrated into the header, optimized to avoid obstructing content and ensuring full visibility during conversation.
 *   **🔐 Professional Authentication (Unified):**
     *   **Global Auth Context:** Single source of truth for the user session across the app.
     *   **Remember Me:** Real support for session persistence (`LOCAL` vs `SESSION`).

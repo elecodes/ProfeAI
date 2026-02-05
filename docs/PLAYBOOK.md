@@ -132,7 +132,10 @@ El proyecto está dividido en dos grandes bloques:
     *   Run `npm run storybook`.
     *   **Simple Components**: Check `Flashcard`, `Navbar`, `GrammarReport`.
     *   **Complex Flows**: Use `ConversationMode` or `DialogueGenerator`. These use **mocked network calls**, so you can reproduce "Loading" or "Error" states just by selecting the story args, without needing the real backend.
-2.  **Verify Fix**:
+2.  **Mobile Responsive Testing**:
+    *   Use Chrome DevTools (F12 -> Toggle Device Toolbar) to test at **390x840 (iPhone 12 Pro)** and **768x1024 (Tablet)**.
+    *   Verify the ElevenLabs widget (`elevenlabs-convai`) is correctly scaled (`0.7`) and positioned (`top: 5px`) without obstructing tabs.
+3.  **Verify Fix**:
     *   Fix the CSS/Component.
     *   Verify locally in Storybook (it auto-reloads).
     *   Commit.

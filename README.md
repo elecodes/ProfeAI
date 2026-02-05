@@ -33,6 +33,8 @@ Profe AI es una aplicación web interactiva diseñada para ayudar a estudiantes 
     *   **Lazy Loading:** Carga progresiva de páginas para un inicio instantáneo.
     *   **AI Model Reporting:** El sistema informa en consola exactamente qué modelo está respondiendo (ej: "Gemini 2.5 Flash Lite").
     *   **Estrategia Accionable:** Uso de **Gemini 2.5 Flash Lite** con **Sequential Fallback** a Gemini 2.5 Flash y Gemini 1.5 para maximizar la disponibilidad y ahorrar cuota.
+*   **📱 Diseño Mobile-First:** Interfaz totalmente adaptativa con navegación optimizada (menú lateral) y visuales centrados para una experiencia premium en dispositivos móviles.
+*   **🎙️ Widget de IA Mejorado:** Widget de ElevenLabs perfectamente integrado en el header, optimizado para no obstruir el contenido y garantizando visibilidad total durante la conversación.
 *   **🔐 Autenticación Profesional (Sincronizada):**
     *   **Estado Global (Unified Auth):** Implementado con Context API para asegurar una sesión única en toda la app.
     *   **Recuérdame:** Soporte real para persistencia de sesión (`LOCAL` vs `SESSION`).

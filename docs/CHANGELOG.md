@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-02-05
+
+### Added
+- **Mobile First Adaptation**: Full responsive overhaul for mobile devices, including optimized layouts for HomePage, Profile, and Chat.
+- **ElevenLabs Widget Optimization**: Refined positioning (top-right fixed) and scaling (0.7) for the AI tutor widget to ensure it remains visible without obstructing content.
+- **Improved UI Heuristics**: Added specific mobile navigation (hamburger menu) and centered profile visuals.
+
+### Fixed
+- **Widget Overlap**: Resolved issues where the ElevenLabs widget was covered by the navigation bar or appeared collapsed.
+- **Responsive Layouts**: Fixed overflow issues in the main dashboard and session cards on small screens.
+
 ## [1.1.0] - 2026-02-03
 
 ### Added

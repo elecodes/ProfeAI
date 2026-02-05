@@ -159,6 +159,15 @@ The project has a comprehensive testing and quality assurance strategy.
    *   **Tool:** Husky
    *   **Usage:** Enforces pre-commit checks (linting, testing).
 
+## 10. Mobile Design Principles
+
+Profe AI follows a mobile-first philosophy to ensure a premium experience across all devices.
+
+*   **Responsive Navigation**: Transition from a top-bar navigation on desktop to a sidebar "Hamburger" menu on mobile to maximize screen real estate.
+*   **Floating UI Management**: 
+    *   **ElevenLabs Widget**: Fixed to the top-right corner (`top: 5px`, `right: 12px`) with a scale of `0.7` to remain accessible without obstructing core UI tabs.
+    *   **Expandable Containers**: Uses large `min-height` (500px) and `height: auto` for floating widgets to prevent internal clipping during state transitions (e.g., from pill to chat window).
+*   **Visual Hierarchy**: Simplified cards and centered profile visuals on small screens to maintain clarity and focus.
 
 ## 7. Directory Structure
 
