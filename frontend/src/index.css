@@ -52,5 +52,12 @@ body {
   box-shadow: var(--shadow-soft);
 }
 
-/* Force ElevenLabs Widget to be inline - NUCLEAR OPTION */
-/* Custom Widget Positioning - Removed, using default */
+/* Force ElevenLabs Widget to be smaller on mobile */
+@media (max-width: 768px) {
+  elevenlabs-convai {
+    transform: scale(0.7) !important;
+    transform-origin: bottom right;
+    bottom: 10px !important;
+    right: 10px !important;
+  }
+}

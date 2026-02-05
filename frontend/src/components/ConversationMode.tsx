@@ -322,32 +322,32 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
   }
 
   return (
-    <div className="flex flex-col h-[600px] max-w-2xl mx-auto glass-panel rounded-[var(--radius-card)] overflow-hidden">
+    <div className="flex flex-col h-[calc(100vh-160px)] md:h-[600px] max-w-2xl mx-auto glass-panel rounded-[var(--radius-card)] overflow-hidden">
       {/* Header */}
-        <div className="flex bg-slate-100/90 backdrop-blur-md p-4 text-slate-800 justify-between items-center border-b border-gray-200 pb-4 pt-4 sticky top-0 z-10">
+        <div className="flex bg-slate-100/90 backdrop-blur-md p-3 md:p-4 text-slate-800 justify-between items-center border-b border-gray-200 sticky top-0 z-10">
             <button 
                 onClick={onBack} 
-                className="flex items-center gap-2 bg-white border border-gray-200 hover:bg-gray-50 text-slate-600 px-4 py-2 rounded-[var(--radius-btn)] transition-all mr-4 font-medium tracking-wide shadow-sm hover:shadow"
+                className="flex items-center gap-1 md:gap-2 bg-white border border-gray-200 hover:bg-gray-50 text-slate-600 px-2 md:px-4 py-1.5 md:py-2 rounded-[var(--radius-btn)] transition-all mr-2 md:mr-4 font-medium tracking-wide shadow-sm hover:shadow"
                 title="Salir de la conversación"
                 aria-label="Salir de la conversación y volver al menú principal"
             >
-                <span className="text-lg">⬅️</span>
-                <span className="uppercase text-xs font-bold">Salir</span>
+                <span className="text-base md:text-lg">⬅️</span>
+                <span className="uppercase text-[10px] md:text-xs font-bold hidden sm:inline">Salir</span>
             </button>
-            <div className="flex-1">
-                <h2 className="font-display font-bold text-xl tracking-wide truncate text-slate-800">{currentTopic}</h2>
-                <span className="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600">Nivel: {level}</span>
+            <div className="flex-1 min-w-0">
+                <h2 className="font-display font-bold text-base md:text-xl tracking-wide truncate text-slate-800">{currentTopic}</h2>
+                <span className="text-[10px] md:text-xs font-bold uppercase tracking-[0.1em] md:tracking-[0.2em] text-indigo-600">Nivel: {level}</span>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-1 md:gap-2 flex-shrink-0">
                 <button onClick={() => setShowTopicSelector(true)} className="text-xs bg-white border border-indigo-200 text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-[var(--radius-btn)] font-bold transition tracking-wide shadow-sm hidden sm:block">
                     ✨ Nuevo Tema
                 </button>
           <button 
             onClick={handleEndConversation}
             disabled={isLoading}
-            className="text-xs bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 px-4 py-2 rounded-[var(--radius-btn)] transition disabled:opacity-50 tracking-wide font-bold shadow-sm"
+            className="text-[10px] md:text-xs bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 px-2 md:px-4 py-1.5 md:py-2 rounded-[var(--radius-btn)] transition disabled:opacity-50 tracking-wide font-bold shadow-sm"
           >
-            {isLoading ? "Analizando..." : "Finalizar"}
+            {isLoading ? "..." : "Finalizar"}
           </button>
         </div>
       </div>
@@ -355,12 +355,12 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
       <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/50">
         {messages.map((msg, idx) => (
           <div key={idx} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-            <div className={`max-w-[85%] p-5 shadow-sm transition-all ${
+            <div className={`max-w-[90%] md:max-w-[85%] p-3 md:p-5 shadow-sm transition-all ${
               msg.role === "user"
                 ? "bg-slate-600 text-white rounded-2xl rounded-br-sm shadow-md"
                 : "bg-white border border-gray-100 text-[var(--color-primary)] rounded-2xl rounded-bl-sm"
             }`}>
-              <p className={msg.role === "user" ? "font-sans leading-relaxed" : "font-serif text-lg leading-relaxed"}>
+              <p className={msg.role === "user" ? "font-sans leading-relaxed text-sm md:text-base" : "font-serif text-base md:text-lg leading-relaxed"}>
                   {msg.content}
               </p>
             </div>
@@ -376,12 +376,12 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
 
       {/* SUGGESTIONS PILLS */}
       {suggestions.length > 0 && !isLoading && (
-        <div className="px-6 py-4 bg-white/50 border-t border-gray-100 backdrop-blur-sm flex flex-wrap gap-2">
+        <div className="px-4 md:px-6 py-3 md:py-4 bg-white/50 border-t border-gray-100 backdrop-blur-sm flex overflow-x-auto no-scrollbar gap-2">
             {suggestions.map((s, idx) => (
                 <button 
                   key={idx}
                   onClick={() => handleSuggestionClick(s)}
-                  className="bg-white border border-[var(--color-accent)]/30 text-[var(--color-primary)] rounded-full px-5 py-2 text-sm hover:bg-[var(--color-accent)]/10 transition shadow-sm hover:shadow-md text-left font-medium"
+                  className="bg-white border border-[var(--color-accent)]/30 text-[var(--color-primary)] rounded-full px-4 md:px-5 py-1.5 md:py-2 text-xs md:text-sm hover:bg-[var(--color-accent)]/10 transition shadow-sm hover:shadow-md text-left font-medium whitespace-nowrap"
                 >
                   ✨ {s}
                 </button>
@@ -389,19 +389,19 @@ const ConversationMode: React.FC<Props> = ({ topic: initialTopic, level, onBack 
         </div>
       )}
 
-      <form onSubmit={(e) => handleSend(e)} className="p-4 border-t border-gray-200 bg-white/80 backdrop-blur-md flex gap-3">
+      <form onSubmit={(e) => handleSend(e)} className="p-3 md:p-4 border-t border-gray-200 bg-white/80 backdrop-blur-md flex gap-2 md:gap-3">
         <input
           type="text"
           value={input}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
-          placeholder="Escribe tu respuesta en español..."
-          className="flex-1 border border-gray-200 bg-gray-50 rounded-[var(--radius-btn)] px-5 py-3 focus:outline-none focus:ring-1 focus:ring-slate-400 transition"
+          placeholder="Escribe en español..."
+          className="flex-1 border border-gray-200 bg-gray-50 rounded-[var(--radius-btn)] px-4 md:px-5 py-2 md:py-3 text-sm md:text-base focus:outline-none focus:ring-1 focus:ring-slate-400 transition"
           disabled={isLoading}
         />
         <button
           type="submit"
           disabled={isLoading || !input.trim()}
-          className="bg-slate-700 text-white px-8 py-3 rounded-[var(--radius-btn)] hover:bg-slate-800 disabled:opacity-50 font-bold tracking-wide transition shadow-lg"
+          className="bg-slate-700 text-white px-4 md:px-8 py-2 md:py-3 rounded-[var(--radius-btn)] hover:bg-slate-800 disabled:opacity-50 font-bold text-sm md:text-base tracking-wide transition shadow-lg"
         >
           ENVIAR
         </button>

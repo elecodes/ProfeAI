@@ -300,10 +300,10 @@ const HomePage = () => {
         {/* Navigation Tabs (Replacements for Sidebar items) */}
         {/* Navigation Tabs (Replacements for Sidebar items) */}
         {!user ? null : (
-            <div className="flex flex-wrap gap-4 border-b border-gray-200 pb-4">
+            <div className="flex overflow-x-auto no-scrollbar gap-2 md:gap-4 border-b border-gray-200 pb-4 -mx-4 px-4 md:mx-0 md:px-0">
                 <button
                     onClick={() => setMode("study")}
-                    className={`px-6 py-2 rounded-full font-medium transition-all ${
+                    className={`whitespace-nowrap px-4 md:px-6 py-2 rounded-full font-medium transition-all ${
                     mode === "study"
                         ? "bg-slate-700 text-white shadow-md"
                         : "bg-white text-[var(--color-secondary)] hover:text-slate-700 border border-gray-200"
@@ -313,7 +313,7 @@ const HomePage = () => {
                 </button>
                 <button
                     onClick={() => setMode("learned")}
-                    className={`px-6 py-2 rounded-full font-medium transition-all ${
+                    className={`whitespace-nowrap px-4 md:px-6 py-2 rounded-full font-medium transition-all ${
                     mode === "learned"
                         ? "bg-slate-700 text-white shadow-md"
                         : "bg-white text-[var(--color-secondary)] hover:text-slate-700 border border-gray-200"
@@ -323,7 +323,7 @@ const HomePage = () => {
                 </button>
                 <button
                     onClick={() => setMode("quiz")}
-                    className={`px-6 py-2 rounded-full font-medium transition-all ${
+                    className={`whitespace-nowrap px-4 md:px-6 py-2 rounded-full font-medium transition-all ${
                     mode === "quiz"
                         ? "bg-slate-700 text-white shadow-md"
                         : "bg-white text-[var(--color-secondary)] hover:text-slate-700 border border-gray-200"
@@ -333,7 +333,7 @@ const HomePage = () => {
                 </button>
                 <button
                     onClick={() => setMode("dialogues")}
-                    className={`px-6 py-2 rounded-full font-medium transition-all ${
+                    className={`whitespace-nowrap px-4 md:px-6 py-2 rounded-full font-medium transition-all ${
                     mode === "dialogues"
                         ? "bg-slate-700 text-white shadow-md"
                         : "bg-white text-[var(--color-secondary)] hover:text-slate-700 border border-gray-200"
@@ -341,22 +341,31 @@ const HomePage = () => {
                 >
                     🗣️ Diálogos
                 </button>
-                {/* Widget removed, back to global index.html */}
+                <button
+                    onClick={() => setMode("chat")}
+                    className={`whitespace-nowrap px-4 md:px-6 py-2 rounded-full font-medium transition-all ${
+                    mode === "chat"
+                        ? "bg-slate-700 text-white shadow-md"
+                        : "bg-white text-[var(--color-secondary)] hover:text-slate-700 border border-gray-200"
+                    }`}
+                >
+                    💬 Chat
+                </button>
             </div>
         )}
 
 
         {/* Barra superior */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="flex items-center gap-4">
-            <h1 className="text-3xl font-serif font-bold text-[var(--color-primary)]">
+            <h1 className="text-2xl md:text-3xl font-serif font-bold text-[var(--color-primary)]">
               🇪🇸 Aprende Español
             </h1>
           </div>
 
-          <div className="flex flex-wrap items-center gap-4">
+          <div className="flex flex-wrap items-center gap-3 md:gap-4 w-full md:w-auto">
             <div className="flex items-center gap-2">
-                <label htmlFor="nivel" className="text-sm font-bold uppercase tracking-widest text-[var(--color-secondary)]">
+                <label htmlFor="nivel" className="text-[10px] md:text-sm font-bold uppercase tracking-widest text-[var(--color-secondary)]">
                 Nivel:
                 </label>
                 <select
@@ -367,7 +376,7 @@ const HomePage = () => {
                     setNivel(newLevel);
                     if (user) UserService.updateUserProgress((user as any).uid, { level: newLevel });
                 }}
-                className="border border-gray-200 bg-white rounded-[var(--radius-btn)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--color-primary)]"
+                className="border border-gray-200 bg-white rounded-[var(--radius-btn)] px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm focus:outline-none focus:border-[var(--color-primary)]"
                 >
                 <option value="beginner">Principiante</option>
                 <option value="intermediate">Intermedio</option>
@@ -425,13 +434,13 @@ const HomePage = () => {
                   
                   <button
                     onClick={() => setShowGenerator(!showGenerator)}
-                    className={`px-4 py-2 rounded-[var(--radius-btn)] text-sm font-bold tracking-wide transition ${
+                    className={`px-3 md:px-4 py-1.5 md:py-2 rounded-[var(--radius-btn)] text-xs md:text-sm font-bold tracking-wide transition ${
                       showGenerator 
                         ? 'bg-[var(--color-accent)] text-white' 
                         : 'bg-white border border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white'
                     }`}
                   >
-                    {showGenerator ? 'Cancelar' : '✨ Generar Nuevo'}
+                    {showGenerator ? 'Cancelar' : '✨ Nuevo'}
                   </button>
                 </div>
               </>
@@ -524,7 +533,7 @@ const HomePage = () => {
 
             {/* === Quiz === */}
             {mode === "quiz" && frases.length > 0 && (
-              <div className="w-full max-w-lg glass-panel p-10 rounded-[var(--radius-card)] text-center mx-auto shadow-xl">
+              <div className="w-full max-w-lg glass-panel p-6 md:p-10 rounded-[var(--radius-card)] text-center mx-auto shadow-xl">
                 {!quizCompleted ? (
                   <>
                     <h2 className="text-3xl font-serif font-bold text-[var(--color-primary)] mb-8">
@@ -590,7 +599,7 @@ const HomePage = () => {
                         Elige un tema y empieza a practicar tu español con correcciones en tiempo real.
                     </p>
                     
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                         {['Cafetería', 'Aeropuerto', 'Restaurante', 'Hotel', 'Trabajo', 'Hobbies'].map(topic => (
                              <button
                                 key={topic}
@@ -601,14 +610,14 @@ const HomePage = () => {
                                     const safeLevel = encodeURIComponent(nivel);
                                     navigate(`/chat/${safeTopic}/${safeLevel}/${sessionId}`);
                                 }}
-                                className="bg-white border border-gray-200 p-6 rounded-[var(--radius-btn)] hover:border-slate-600 hover:bg-slate-600 hover:text-white transition-all shadow-sm font-medium text-lg"
+                                className="bg-white border border-gray-200 p-4 md:p-6 rounded-[var(--radius-btn)] hover:border-slate-600 hover:bg-slate-600 hover:text-white transition-all shadow-sm font-medium text-base md:text-lg"
                              >
                                 {topic}
                              </button>
                         ))}
                          <button
                                 onClick={startConversation}
-                                className="col-span-1 sm:col-span-2 bg-[var(--color-accent)] text-white p-6 rounded-[var(--radius-btn)] hover:opacity-90 transition-all shadow-md font-bold text-lg"
+                                className="col-span-1 sm:col-span-2 bg-[var(--color-accent)] text-white p-4 md:p-6 rounded-[var(--radius-btn)] hover:opacity-90 transition-all shadow-md font-bold text-base md:text-lg"
                              >
                                 ✨ Tema General / Libre
                              </button>

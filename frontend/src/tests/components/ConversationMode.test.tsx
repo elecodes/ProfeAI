@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import ConversationMode from '../../components/ConversationMode';
 import { useAuth } from '../../hooks/useAuth';
 import { useUserStats } from '../../hooks/useUserStats';
-import React from 'react';
+
 
 // Mock dependencies
 vi.mock('../../hooks/useAuth', () => ({
@@ -89,9 +89,9 @@ describe('ConversationMode', () => {
   it('sends a message and receives reply', async () => {
     render(<ConversationMode topic="Travel" level="B1" onBack={mockOnBack} />);
     
-    await waitFor(() => expect(screen.getByPlaceholderText(/Escribe tu respuesta/i)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByPlaceholderText(/Escribe en español/i)).toBeInTheDocument());
     
-    const input = screen.getByPlaceholderText(/Escribe tu respuesta/i);
+    const input = screen.getByPlaceholderText(/Escribe en español/i);
     fireEvent.change(input, { target: { value: 'I love traveling.' } });
     fireEvent.click(screen.getByText(/ENVIAR/i));
 
@@ -108,7 +108,7 @@ describe('ConversationMode', () => {
     await waitFor(() => expect(screen.getByText(/Finalizar/i)).toBeInTheDocument());
     
     // Send a message first so there is content to analyze
-    const input = screen.getByPlaceholderText(/Escribe tu respuesta/i);
+    const input = screen.getByPlaceholderText(/Escribe en español/i);
     fireEvent.change(input, { target: { value: 'Hello' } });
     fireEvent.click(screen.getByText(/ENVIAR/i));
     await waitFor(() => expect(screen.getByText('That is interesting!')).toBeInTheDocument());

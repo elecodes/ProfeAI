@@ -56,9 +56,9 @@ const DialogueGenerator: React.FC<Props> = ({ onGenerate, level }) => {
   };
 
   return (
-    <div className="glass-panel rounded-[var(--radius-card)] p-8 mb-8">
-      <h3 className="text-xl font-display font-bold text-[var(--color-primary)] mb-6 flex items-center gap-3">
-        <span className="text-2xl">✨</span> Generador Mágico de Diálogos
+    <div className="glass-panel rounded-[var(--radius-card)] p-5 md:p-8 mb-8">
+      <h3 className="text-lg md:text-xl font-display font-bold text-[var(--color-primary)] mb-4 md:mb-6 flex items-center gap-3">
+        <span className="text-xl md:text-2xl">✨</span> Generador Mágico
       </h3>
       
       <div className="flex flex-col sm:flex-row gap-4">

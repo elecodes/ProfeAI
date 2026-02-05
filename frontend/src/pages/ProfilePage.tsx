@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useUserStats } from '../hooks/useUserStats';
 import { useAuth } from '../hooks/useAuth';
@@ -22,76 +22,78 @@ const ProfilePage = () => {
 
     return (
 
-        <div className="max-w-4xl mx-auto p-6 flex flex-col items-center">
-            <div className="w-full glass-panel rounded-[var(--radius-card)] p-10 shadow-lg">
+        <div className="max-w-4xl mx-auto p-0 md:p-6 flex flex-col items-center w-full">
+            <div className="w-full glass-panel rounded-[var(--radius-card)] p-6 md:p-10 shadow-lg">
                 
                 {/* Header Section */}
-                <div className="flex flex-col md:flex-row justify-between items-center mb-10 pb-8 border-b border-gray-100">
-                    <div className="flex items-center gap-6 mb-4 md:mb-0 w-full">
-                        <div className="w-20 h-20 bg-slate-700 rounded-full flex items-center justify-center text-3xl text-white shadow-md">
+                <div className="flex flex-col md:flex-row justify-between items-center mb-6 md:mb-10 pb-6 md:pb-8 border-b border-gray-100">
+                    <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 w-full text-center md:text-left">
+                        <div className="w-16 h-16 md:w-20 md:h-20 bg-slate-700 rounded-full flex items-center justify-center text-2xl md:text-3xl text-white shadow-md">
                             👤
                         </div>
-                        <div className="flex-1">
+                        <div className="flex-1 w-full">
                             {isEditing ? (
-                                <div className="flex items-center gap-3">
+                                <div className="flex flex-col md:flex-row items-center gap-3">
                                     <input
                                         type="text"
                                         value={tempName}
                                         onChange={(e) => setTempName(e.target.value)}
-                                        className="border-b-2 border-[var(--color-accent)] bg-transparent focus:outline-none text-3xl font-serif font-bold text-[var(--color-primary)] py-1 w-full max-w-xs"
+                                        className="border-b-2 border-[var(--color-accent)] bg-transparent focus:outline-none text-2xl md:text-3xl font-serif font-bold text-[var(--color-primary)] py-1 w-full text-center md:text-left"
                                         autoFocus
                                     />
-                                    <button onClick={handleSave} className="text-sm bg-slate-700 text-white px-4 py-2 rounded-[var(--radius-btn)] hover:bg-slate-800 transition">Guardar</button>
-                                    <button onClick={() => setIsEditing(false)} className="text-sm text-[var(--color-secondary)] hover:text-slate-700">Cancelar</button>
+                                    <div className="flex gap-2">
+                                        <button onClick={handleSave} className="text-sm bg-slate-700 text-white px-4 py-2 rounded-[var(--radius-btn)] hover:bg-slate-800 transition">Guardar</button>
+                                        <button onClick={() => setIsEditing(false)} className="text-sm text-[var(--color-secondary)] hover:text-slate-700">Cancelar</button>
+                                    </div>
                                 </div>
                             ) : (
-                                <div className="flex items-center gap-3 group">
-                                    <h1 className="text-3xl font-serif font-bold text-slate-800">{stats.username || 'Estudiante'}</h1>
+                                <div className="flex items-center justify-center md:justify-start gap-3 group">
+                                    <h1 className="text-2xl md:text-3xl font-serif font-bold text-slate-800">{stats.username || 'Estudiante'}</h1>
                                     <button 
                                         onClick={() => {
                                             setTempName(stats.username || 'Estudiante');
                                             setIsEditing(true);
                                         }}
-                                        className="opacity-0 group-hover:opacity-100 transition-opacity text-[var(--color-secondary)] hover:text-[var(--color-accent)]"
+                                        className="opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity text-[var(--color-secondary)] hover:text-[var(--color-accent)]"
                                         title="Editar nombre"
                                     >
                                         ✏️
                                     </button>
                                 </div>
                             )}
-                            <p className="text-[var(--color-accent)] text-sm font-bold uppercase tracking-widest mt-1">{stats.level}</p>
+                            <p className="text-[var(--color-accent)] text-xs md:text-sm font-bold uppercase tracking-widest mt-1">{stats.level}</p>
                         </div>
                     </div>
                 </div>
 
                 {/* Progress Section (Main Focus) */}
-                <div className="mb-12">
+                <div className="mb-8 md:mb-12">
                     <div className="flex justify-between items-end mb-3">
-                        <span className="text-sm font-semibold text-[var(--color-secondary)] uppercase tracking-wider">Tu Progreso</span>
+                        <span className="text-[10px] md:text-sm font-semibold text-[var(--color-secondary)] uppercase tracking-wider">Tu Progreso</span>
                         <div className="text-right">
-                             <span className="text-3xl font-display font-bold text-[var(--color-accent)]">{stats.xp}</span>
-                             <span className="text-[var(--color-secondary)] text-sm font-medium"> / {xpGoal} XP</span>
+                             <span className="text-2xl md:text-3xl font-display font-bold text-[var(--color-accent)]">{stats.xp}</span>
+                             <span className="text-[var(--color-secondary)] text-xs md:text-sm font-medium"> / {xpGoal} XP</span>
                         </div>
                     </div>
-                    <div className="w-full bg-gray-100 rounded-full h-4 overflow-hidden inner-shadow">
+                    <div className="w-full bg-gray-100 rounded-full h-3 md:h-4 overflow-hidden inner-shadow">
                         <div 
                             className="bg-[var(--color-accent)] h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(197,160,89,0.4)]"
                             style={{ width: `${progressPercent}%` }}
                         ></div>
                     </div>
-                    <p className="text-xs text-[var(--color-secondary)] mt-3 text-right font-medium">Sigue practicando para alcanzar el siguiente nivel.</p>
+                    <p className="text-[10px] md:text-xs text-[var(--color-secondary)] mt-3 text-right font-medium">Sigue practicando para alcanzar el siguiente nivel.</p>
                 </div>
 
                 {/* Stats Cards */}
-                <div className="grid grid-cols-2 gap-8 mb-10">
-                    <div className="bg-white/50 p-8 rounded-[var(--radius-card)] border border-gray-100 flex flex-col items-center hover:shadow-md transition-shadow">
-                        <div className="text-5xl font-display font-bold text-slate-800 mb-2">{stats.xp}</div>
-                        <div className="text-xs font-bold text-[var(--color-secondary)] uppercase tracking-[0.2em]">Total XP</div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-8 mb-10">
+                    <div className="bg-white/50 p-6 md:p-8 rounded-[var(--radius-card)] border border-gray-100 flex flex-col items-center hover:shadow-md transition-shadow">
+                        <div className="text-4xl md:text-5xl font-display font-bold text-slate-800 mb-2">{stats.xp}</div>
+                        <div className="text-[10px] md:text-xs font-bold text-[var(--color-secondary)] uppercase tracking-[0.2em]">Total XP</div>
                     </div>
                     
-                    <div className="bg-white/50 p-8 rounded-[var(--radius-card)] border border-gray-100 flex flex-col items-center hover:shadow-md transition-shadow">
-                        <div className="text-5xl font-display font-bold text-slate-800 mb-2">{stats.streak}</div>
-                        <div className="text-xs font-bold text-[var(--color-secondary)] uppercase tracking-[0.2em]">Racha Días</div>
+                    <div className="bg-white/50 p-6 md:p-8 rounded-[var(--radius-card)] border border-gray-100 flex flex-col items-center hover:shadow-md transition-shadow">
+                        <div className="text-4xl md:text-5xl font-display font-bold text-slate-800 mb-2">{stats.streak}</div>
+                        <div className="text-[10px] md:text-xs font-bold text-[var(--color-secondary)] uppercase tracking-[0.2em]">Racha Días</div>
                     </div>
                 </div>
 

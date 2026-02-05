@@ -55,10 +55,10 @@ const DialogueViewer: React.FC<Props> = ({ dialogue }) => {
             }`}
           >
             <div
-              className={`max-w-[80%] p-6 shadow-sm transition-all ${
+              className={`max-w-[90%] md:max-w-[80%] p-4 md:p-6 shadow-sm transition-all ${
                 index % 2 === 0
-                  ? "bg-white border border-gray-100 rounded-[24px] rounded-tl-sm text-[var(--color-primary)]"
-                  : "bg-slate-600 text-white rounded-[24px] rounded-tr-sm shadow-md"
+                  ? "bg-white border border-gray-100 rounded-[20px] md:rounded-[24px] rounded-tl-sm text-[var(--color-primary)]"
+                  : "bg-slate-600 text-white rounded-[20px] md:rounded-[24px] rounded-tr-sm shadow-md"
               }`}
             >
               <div className="flex items-center justify-between mb-3 gap-6">
@@ -82,7 +82,7 @@ const DialogueViewer: React.FC<Props> = ({ dialogue }) => {
                 </button>
               </div>
 
-              <p className={`text-xl leading-relaxed ${index % 2 === 0 ? "font-serif" : "font-sans"}`}>
+              <p className={`text-lg md:text-xl leading-relaxed ${index % 2 === 0 ? "font-serif" : "font-sans"}`}>
                   {line.text}
               </p>
 
