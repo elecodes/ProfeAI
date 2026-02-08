@@ -124,6 +124,15 @@ El proyecto está dividido en dos grandes bloques:
 
 ---
 
+### Scenario M: Content Mismatch (Local/Remote Success but UI Stale)
+**Trigger**: Seeding scripts report success, Firestore has correct data, but User UI shows old content.
+
+1.  **Check Project IDs**: Compare `VITE_FIREBASE_PROJECT_ID` in `.env` with the `project_id` in the `service-account.json`. They MUST match.
+2.  **Verify Collection**: Ensure scripts and frontend are using the same collection name (default: `lessons`).
+3.  **Ghost Documents**: If you see wrong content for a level, use a manual script to `listAllLessons` and check for duplicate IDs (e.g., `advanced_conditionals` vs `conditionals`).
+
+---
+
 > **Remember**: In an incident, **Communication > Code**. Tell the team/users what is happening.
 ### Scenario F: UI Bugs / Visual Regressions
 **Trigger**: User report "Button looks broken on mobile" or "Colors are wrong".

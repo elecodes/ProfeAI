@@ -9,7 +9,7 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'fire
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const LESSONS_DIR = path.join(__dirname, '../src/lessons');
+const LESSONS_DIR = path.join(__dirname, '../../frontend/src/lessons');
 
 async function authenticate() {
   const email = "admin@apptutor.test";

@@ -79,6 +79,11 @@ async function generateNewContent(genAI: GoogleGenerativeAI) {
   const prompt = `
     Genera un JSON para actualizar mis lecciones de idiomas. Necesito 3 bloques principales: 'beginner', 'intermediate', 'advanced'.
     
+    Cada nivel debe tener una temática gramatical distinta:
+    1. 'beginner': Vocabulario básico y saludos de la vida diaria.
+    2. 'intermediate': Tiempos verbales del pasado (pretérito e imperfecto) y futuro simple.
+    3. 'advanced': Estructuras complejas como el condicional y el subjuntivo.
+    
     Cada bloque debe ser un objeto con dos campos:
     1. "items": Un array de 5 frases. Cada frase debe tener:
        - "id": un string aleatorio corto (ej. hash).

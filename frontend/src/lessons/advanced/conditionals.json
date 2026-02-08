@@ -1,37 +1,37 @@
 {
-  "title": "Past Tense Practice",
-  "level": "Intermediate",
-  "topic": "Past Tense",
+  "title": "Advanced Conditionals",
+  "level": "Advanced",
+  "topic": "Conditionals",
   "sentences": [
     {
-      "text": "Yesterday I went to the park.",
-      "translation": "Ayer fui al parque.",
-      "id": "arzm72psR0"
+      "text": "If I were you, I would tell the truth.",
+      "translation": "Si yo fuera tú, diría la verdad.",
+      "id": "adv_cond_1"
     },
     {
-      "text": "She cooked dinner last night.",
-      "translation": "Ella cocinó la cena anoche.",
-      "id": "0RUmGgyw9D"
+      "text": "If it rains tomorrow, we will cancel the trip.",
+      "translation": "Si llueve mañana, cancelaremos el viaje.",
+      "id": "adv_cond_2"
     },
     {
-      "text": "We watched a movie together.",
-      "translation": "Vimos una película juntos.",
-      "id": "VavlXkrbHq"
+      "text": "If they had studied more, they would have passed.",
+      "translation": "Si hubieran estudiado más, habrían aprobado.",
+      "id": "adv_cond_3"
     },
     {
-      "text": "He didn’t study for the exam.",
-      "translation": "Él no estudió para el examen.",
-      "id": "Yah1pHcyxK"
+      "text": "I would travel more if I had enough time.",
+      "translation": "Viajaría más si tuviera suficiente tiempo.",
+      "id": "adv_cond_4"
     },
     {
-      "text": "Did you call your friend?",
-      "translation": "¿Llamaste a tu amigo?",
-      "id": "U8rq73ztib"
+      "text": "If you speak to him, he will understand.",
+      "translation": "Si hablas con él, lo entenderá.",
+      "id": "adv_cond_5"
     },
     {
-      "text": "They traveled to Spain in 2020.",
-      "translation": "Viajaron a España en 2020.",
-      "id": "C0TRzJtBSH"
+      "text": "We would have arrived early if we had taken the taxi.",
+      "translation": "Habríamos llegado temprano si hubiéramos tomado el taxi.",
+      "id": "adv_cond_6"
     }
   ]
 }

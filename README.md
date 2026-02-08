@@ -70,16 +70,18 @@ El proyecto está organizado como un **npm workspace** para separar claramente l
     - `npm run backend:dev`: Inicia solo el servidor API.
 
 4.  **Cargar Contenido (Seed):**
-    Sube las lecciones iniciales a Firestore:
+    Sube las lecciones iniciales desde los archivos JSON locales a Firestore. 
+    > [!IMPORTANT]
+    > Requiere un archivo `service-account.json` en la raíz que pertenezca al mismo proyecto configurado en el frontend.
     ```bash
-    node scripts/seedLessons.js
+    # Sincroniza lecciones locales a Firestore
+    node backend/scripts/seedLessons.js
     ```
 
 5.  **Actualizar Contenido con IA (Opcional):**
-    Para generar contenido fresco manualmente:
+    Para generar contenido fresco usando Gemini:
     ```bash
-    # Requiere service-account.json en la raíz
-    npx tsx scripts/refresh-content.ts
+    npx tsx backend/scripts/refresh-content.ts
     ```
 
 ## ▶️ Ejecución
