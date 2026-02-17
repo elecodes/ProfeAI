@@ -36,7 +36,7 @@ jobs:
         run: npm run lint
 
       - name: Run All Tests
-        run: npx vitest run
+        run: npm run test:vitest
 
       - name: Run Accessibility Tests (Pa11y)
         run: npm run ci:a11y
@@ -49,7 +49,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Verify Docker Build
-        run: docker-compose build
+        run: docker build .
 
   playwright:
     runs-on: ubuntu-latest
@@ -66,7 +66,7 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Run Playwright tests
-        run: npx start-server-and-test start http://localhost:3001 test:e2e
+        run: npm run test:e2e
 
   release:
     runs-on: ubuntu-latest

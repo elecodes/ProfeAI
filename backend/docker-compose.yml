@@ -6,4 +6,4 @@ services:
     env_file:
       - .env
     volumes:
-      - /Users/elena/.google-cloud/apptutor-credentials.json:/app/service-account.json
+      - ../service-account.json:/app/service-account.json
