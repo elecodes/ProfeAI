@@ -17,7 +17,7 @@ Profe AI is an interactive web application designed to help students learn Spani
 *   **🗣️ Premium Text-to-Speech (TTS):** Prioritizes **Amazon Polly** and **ElevenLabs** for natural-sounding voice, with automatic fallback to Google Cloud and Web Speech API.
 *   **🤖 AI Tutor (Roleplay):** Practice real-life situations (e.g., "At the restaurant") with an AI tutor that adapts to your proficiency level.
 *   **👨‍⚕️ Grammar Doctor:** Grammar analysis with robust validation (**Zod**).
-*   **🔒 Enhanced Security:** Protection with **Helmet.js** (CSP), automatic **HTTPS** (Let's Encrypt), and automatic updates (**Dependabot**).
+*   **🔒 Enhanced Security:** Protection with **Helmet.js** (CSP), automatic **HTTPS** (Let's Encrypt), and vulnerability management via Snyk with selective dependency updates and monorepo-level **overrides**.
 *   **💬 Hybrid Conversation Mode:** Fluid voice and text chat.
 *   **✅ Progress Tracking:** Visualize your progress by weeks and levels (with full reset option).
 *   **♿ Accessibility & UX Heuristics:**

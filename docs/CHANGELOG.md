@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2026-02-17
+
+### Added
+- **Security Hardening**: Integrated monorepo-level `overrides` in the root `package.json` to resolve critical transitive vulnerabilities (e.g., `qs@6.14.2`).
+- **Dockerfile Hardening**: Added `apk upgrade` and `npm -g install npm@latest` to the production runner stage to mitigate base image vulnerabilities.
+
+### Changed
+- **Dependency Updates**: Updated core SDKs for security: `@aws-sdk/client-polly@3.991.0`, `@google-cloud/text-to-speech@6.4.0`, and `langchain@1.2.8`.
+
 ## [1.2.0] - 2026-02-05
 
 ### Added

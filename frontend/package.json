@@ -29,11 +29,11 @@
     "doc": "typedoc"
   },
   "dependencies": {
-    "@aws-sdk/client-polly": "^3.940.0",
+    "@aws-sdk/client-polly": "^3.974.0",
     "@genkit-ai/ai": "^1.27.0",
     "@genkit-ai/core": "^1.27.0",
     "@genkit-ai/googleai": "^1.27.0",
-    "@google-cloud/text-to-speech": "^5.8.1",
+    "@google-cloud/text-to-speech": "^6.4.0",
     "@google/generative-ai": "^0.24.1",
     "@langchain/openai": "^1.1.3",
     "@tavily/core": "^0.6.4",
@@ -45,7 +45,7 @@
     "genkit": "^1.27.0",
     "genkitx-openai": "^0.29.0",
     "helmet": "^8.1.0",
-    "langchain": "^1.1.1",
+    "langchain": "^1.2.8",
     "node-fetch": "^3.3.2",
     "react-router-dom": "^7.12.0",
     "tsx": "^4.21.0",
@@ -102,8 +102,5 @@
     "vite": "^7.2.4",
     "vite-plugin-image-optimizer": "^2.0.3",
     "vitest": "^4.0.13"
-  },
-  "overrides": {
-    "qs": "6.14.1"
   }
 }

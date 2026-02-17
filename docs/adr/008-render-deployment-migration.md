@@ -15,10 +15,11 @@ Se buscaba una solución de despliegue que:
 Hemos decidido migrar el despliegue principal a **Render**, utilizando su arquitectura de **Web Service (Docker)**.
 
 Los pilares de esta configuración son:
-1. **Docker unificado**: Un único `Dockerfile` en la raíz que compila el frontend (React/Vite) y lo sirve estáticamente desde el backend (Express/Node.js).
+1. **Docker unificado**: Un único `Dockerfile` en la raíz que compila el frontend (React/Vite) y lo sirve estáticamente desde el backend (Express/Node.js). El Dockerfile incorpora hardening mediante `apk upgrade` y actualizaciones de `npm` para mitigar vulnerabilidades base.
 2. **Inyección de variables en Build-time**: Debido a que Vite embebe las variables `VITE_*` durante el empaquetado, el Dockerfile crea un archivo `.env` dinámico usando `ARG` pasados por Render.
-3. **Optimización de arranque**: Uso de `tsx` en el backend para ejecutar directamente TypeScript en producción, simplificando el flujo de compilación.
-4. **Seguridad Adaptativa**: Configuración de Helmet ajustada para permitir WebSockets de ElevenLabs y Popups de Firebase Auth (`Cross-Origin-Opener-Policy`).
+3. **Gestión de Transitorias**: Uso de `overrides` en el `package.json` raíz para forzar versiones seguras de dependencias indirectas (ej: `qs`) identificadas por Snyk.
+4. **Optimización de arranque**: Uso de `tsx` en el backend para ejecutar directamente TypeScript en producción, simplificando el flujo de compilación.
+5. **Seguridad Adaptativa**: Configuración de Helmet ajustada para permitir WebSockets de ElevenLabs y Popups de Firebase Auth (`Cross-Origin-Opener-Policy`).
 
 ## Consecuencias
 - **Positivas**:

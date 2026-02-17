@@ -22,7 +22,7 @@ Profe AI es una aplicación web interactiva diseñada para ayudar a estudiantes 
 *   **🤖 Tutor de IA (Roleplay):** Practica situaciones reales (ej. "En el restaurante") con un tutor de IA que se adapta a tu nivel.
 *   **👨‍⚕️ Doctor Gramática:** Análisis gramatical con validación robusta (**Zod**).
 *   **🔄 Contenido Fresco Automático:** Script robusto (Github Actions) que genera nuevas frases y quizzes cada 2 semanas usando **Gemini 2.0**, con estrategias de fallback y backoff para maximizar la disponibilidad en cuentas gratuitas.
-*   **🔒 Seguridad Reforzada:** Protección con **Helmet.js** (CSP), **HTTPS** automático (Let's Encrypt) y actualizaciones automáticas (**Dependabot**).
+*   **🔒 Seguridad Reforzada:** Protección con **Helmet.js** (CSP), **HTTPS** automático (Let's Encrypt), y gestión de vulnerabilidades vía Snyk con actualizaciones de dependencias y **overrides** a nivel monorepo.
 *   **💬 Modo Conversación Híbrido:** Chat de texto y voz fluido.
 *   **✅ Seguimiento de Progreso:** Visualiza tu avance por semanas y niveles (con opción de reinicio completo).
 *   **♿ Accesibilidad y Heurística (UX):**
@@ -107,8 +107,13 @@ El proyecto está optimizado para desplegarse como un **Web Service** en **Rende
 2.  **Runtime**: Selecciona **Docker**.
 3.  **Dockerfile Path**: `Dockerfile` (en la raíz).
 4.  **Build Context**: `.` (raíz del proyecto).
-5.  **Variables**: Configura todas las claves de API como variables de entorno. Las variables `VITE_*` deben pasarse igual, el sistema las inyectará automáticamente durante el build.
-6.  **Firebase**: Recuerda añadir el dominio de Render a la lista de **Dominios Autorizados** en la consola de Firebase Authentication.
+5.  **Docker unificado**: Un único `Dockerfile` en la raíz que compila el frontend (React/Vite) y lo sirve estáticamente desde el backend (Express/Node.js). El Dockerfile incorpora hardening mediante `apk upgrade` y actualizaciones de `npm` para mitigar vulnerabilidades base.
+6.  **Inyección de variables en Build-time**: Debido a que Vite embebe las variables `VITE_*` durante el empaquetado, el Dockerfile crea un archivo `.env` dinámico usando `ARG` pasados por Render.
+7.  **Gestión de Transitorias**: Uso de `overrides` en el `package.json` raíz para forzar versiones seguras de dependencias indirectas (ej: `qs`) identificadas por Snyk.
+8.  **Optimización de arranque**: Uso de `tsx` en el backend para ejecutar directamente TypeScript en producción, simplificando el flujo de compilación.
+9.  **Seguridad Adaptativa**: Configuración de Helmet ajustada para permitir WebSockets de ElevenLabs y Popups de Firebase Auth (`Cross-Origin-Opener-Policy`).
+10. **Variables**: Configura todas las claves de API como variables de entorno. Las variables `VITE_*` deben pasarse igual, el sistema las inyectará automáticamente durante el build.
+11. **Firebase**: Recuerda añadir el dominio de Render a la lista de **Dominios Autorizados** en la consola de Firebase Authentication.
 
 ## 🧪 Tests y Calidad
 

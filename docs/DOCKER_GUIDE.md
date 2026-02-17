@@ -20,7 +20,7 @@ For your specific project (React Frontend + Node.js Backend), Docker provides th
     - You don't need to run two separate terminals (`vite` and `server`) or worry about build steps. One command (`docker-compose up`) starts the whole system.
 
 3.  **Security & Cleanliness**:
-    - As we just saw, we fixed vulnerabilities by updating the Docker image, not by messing with your Mac's system files.
+    - We fixed vulnerabilities by updating the Docker image base (system upgrades) and using monorepo-wide **overrides** for transitive dependencies identified by Snyk. This ensures a secure production environment without polluting your local machine.
     - If you install a database or other tools later, they live in Docker, keeping your Mac clean.
 
 ## Common Commands
