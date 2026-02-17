@@ -2,6 +2,13 @@
 <html lang="en">
 
 <head>
+  <script type="module">import { injectIntoGlobalHook } from "/@react-refresh";
+injectIntoGlobalHook(window);
+window.$RefreshReg$ = () => {};
+window.$RefreshSig$ = () => (type) => type;</script>
+
+  <script type="module" src="/@vite/client"></script>
+
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -23,14 +30,6 @@
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
   <elevenlabs-convai agent-id="agent_5001k9j3ad8nfkr871pypnhj7m3r"></elevenlabs-convai>
-  <script>
-    // Hide ElevenLabs widget during automated accessibility testing
-    if (navigator.webdriver || window.Cypress || window.__pa11y) {
-      const style = document.createElement('style');
-      style.textContent = 'elevenlabs-convai { display: none !important; }';
-      document.head.appendChild(style);
-    }
-  </script>
 </body>
 
 </html>

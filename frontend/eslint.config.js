@@ -1,44 +1,59 @@
-// For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
-
-
 import js from '@eslint/js'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
-import { defineConfig, globalIgnores } from 'eslint/config'
+import tseslint from 'typescript-eslint'
 
-export default defineConfig([
-  globalIgnores(['dist', 'storybook-static', 'docs', 'node_modules']),
+export default tseslint.config(
   {
-    files: ['**/*.{js,jsx}'],
-    extends: [
-      js.configs.recommended,
-      reactHooks.configs['recommended-latest'],
-      reactRefresh.configs.vite,
-    ],
+    ignores: ['**/dist/**', '**/storybook-static/**', '**/docs/**', '**/node_modules/**'],
+  },
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+  {
+    files: ['**/*.{js,jsx,ts,tsx,cjs,mjs}'],
+    plugins: {
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh,
+    },
     languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        ...globals.jest,
+      },
       parserOptions: {
         ecmaVersion: 'latest',
-        ecmaFeatures: { jsx: true },
         sourceType: 'module',
       },
     },
     rules: {
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': ['warn', { 
+        varsIgnorePattern: '^[A-Z_]',
+        argsIgnorePattern: '^_',
+      }],
+      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/ban-ts-comment': 'off',
+      'no-undef': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
+      'prefer-const': 'warn',
     },
   },
   {
     files: [
-      '**/*.test.{js,jsx}', 
+      '**/*.test.{js,jsx,ts,tsx}', 
+      '**/*.spec.{js,jsx,ts,tsx}',
       'test/**/*.js', 
       'server*.js', 
       'test-*.js', 
       'src/config/agents.js', 
       'src/services/TTSService.js',
       'playwright.config.js',
-      'vite.config.js'
+      'vite.config.js',
+      '**/*.cjs',
+      '**/*.mjs'
     ],
     languageOptions: {
       globals: {
@@ -46,5 +61,9 @@ export default defineConfig([
         ...globals.browser,
       },
     },
+    rules: {
+      '@typescript-eslint/no-unused-vars': 'warn',
+      'no-unused-vars': 'warn',
+    }
   },
-])
+)

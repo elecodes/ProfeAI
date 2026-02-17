@@ -109,7 +109,7 @@ export default function SignUpForm({ onSubmit, onGoogleSignIn }: SignUpFormProps
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-3 text-sm text-blue-600"
+            className="absolute right-3 top-3 text-sm text-blue-700"
             aria-label={
               showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
             }
@@ -122,10 +122,10 @@ export default function SignUpForm({ onSubmit, onGoogleSignIn }: SignUpFormProps
         <div className="mt-2 text-sm text-gray-600 bg-gray-50 p-3 rounded border border-gray-100">
             <p className="font-medium mb-1">La contraseña debe tener:</p>
             <ul className="list-disc list-inside space-y-0.5 pl-1 text-xs">
-                <li className={form.password.length >= 8 ? "text-green-600 font-medium" : "text-gray-500"}>Mínimo 8 caracteres</li>
-                <li className={/[A-Z]/.test(form.password) ? "text-green-600 font-medium" : "text-gray-500"}>Una mayúscula</li>
-                <li className={/[0-9]/.test(form.password) ? "text-green-600 font-medium" : "text-gray-500"}>Un número</li>
-                <li className={/[!@#$%^&*(),.?":{}|<>]/.test(form.password) ? "text-green-600 font-medium" : "text-gray-500"}>Un carácter especial</li>
+                <li className={form.password.length >= 8 ? "text-green-700 font-medium" : "text-gray-600"}>Mínimo 8 caracteres</li>
+                <li className={/[A-Z]/.test(form.password) ? "text-green-700 font-medium" : "text-gray-600"}>Una mayúscula</li>
+                <li className={/[0-9]/.test(form.password) ? "text-green-700 font-medium" : "text-gray-600"}>Un número</li>
+                <li className={/[!@#$%^&*(),.?":{}|<>]/.test(form.password) ? "text-green-700 font-medium" : "text-gray-600"}>Un carácter especial</li>
             </ul>
         </div>
 
@@ -156,7 +156,7 @@ export default function SignUpForm({ onSubmit, onGoogleSignIn }: SignUpFormProps
           <button
             type="button"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            className="absolute right-3 top-3 text-sm text-blue-600"
+            className="absolute right-3 top-3 text-sm text-blue-700"
             aria-label={
               showConfirmPassword ? "Ocultar contraseña" : "Mostrar contraseña"
             }
@@ -189,7 +189,7 @@ export default function SignUpForm({ onSubmit, onGoogleSignIn }: SignUpFormProps
               <span className="w-full border-t border-gray-300"></span>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500 font-medium font-sans">O</span>
+              <span className="px-2 bg-white text-gray-600 font-medium font-sans">O</span>
             </div>
           </div>
 

@@ -14,7 +14,7 @@ const meta = {
         <div className="relative">
              <Story />
         </div>
-        <div className="ml-64 p-8 text-gray-400">
+        <div className="ml-64 p-8 text-gray-600">
             (Main Content Area Placeholder)
         </div>
       </div>

@@ -38,7 +38,7 @@ const DialogueViewer: React.FC<Props> = ({ dialogue }) => {
     }));
   };
 
-  if (!dialogue) return <div className="text-center text-gray-500">Selecciona un diálogo</div>;
+  if (!dialogue) return <div className="text-center text-gray-600">Selecciona un diálogo</div>;
 
   return (
     <div className="max-w-3xl mx-auto">

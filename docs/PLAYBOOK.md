@@ -186,3 +186,20 @@ El proyecto está dividido en dos grandes bloques:
     - Frontend specific: `npm run test:coverage:check -w frontend`
 3.  **Mocking Auth**: If a component fails because of `useAuth`, ensure it is wrapped in an `AuthProvider` mock in the test file or use the global setup in `test/setup.js`.
 4.  **Storybook Failing**: Stories are tested as part of the coverage. If they fail, check `.storybook/preview.jsx` to ensure `AuthProvider` is correctly wrapping the decorators.
+
+### Scenario N: Accessibility Testing Failures
+**Trigger**: `npm run ci:a11y` fails with color contrast or WCAG violations.
+
+1.  **Review pa11y Report**: Check the console output for specific violations (e.g., `color-contrast`, `aria-labels`).
+2.  **Common Fixes**:
+    - **Color Contrast**: Ensure text has at least 4.5:1 contrast ratio. Use hardcoded colors (e.g., `text-gray-800`) instead of CSS variables if needed.
+    - **Shadow DOM Elements**: Third-party widgets (like ElevenLabs) may have inaccessible elements. Use JavaScript detection to hide them during automated testing:
+      ```javascript
+      if (navigator.webdriver) {
+        const style = document.createElement('style');
+        style.textContent = 'widget-element { display: none !important; }';
+        document.head.appendChild(style);
+      }
+      ```
+3.  **Verify Fix**: Run `npm run ci:a11y -w frontend` to confirm all URLs pass.
+4.  **CI Integration**: The accessibility tests run automatically in CI. Ensure they pass before merging.

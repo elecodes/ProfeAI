@@ -25,7 +25,7 @@ const GrammarReport: React.FC<GrammarReportProps> = ({ report }) => {
   const { score, corrections, generalFeedback } = report;
 
   const getScoreColor = (s: number): string => {
-    if (s >= 90) return 'text-green-600';
+    if (s >= 90) return 'text-green-700';
     if (s >= 70) return 'text-yellow-600';
     return 'text-red-600';
   };

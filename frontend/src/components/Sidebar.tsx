@@ -71,7 +71,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             <h1 className="text-2xl font-serif font-bold text-[var(--color-primary)] tracking-tight">
               Profe AI
             </h1>
-            <p className="text-xs text-[var(--color-secondary)] uppercase tracking-widest mt-1">
+            <p className="text-xs text-gray-800 uppercase tracking-widest mt-1">
               Tutor Personal
             </p>
           </div>
@@ -152,7 +152,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
         {/* Footer / User Info could go here */}
         <div className="px-8 mt-auto">
-          <div className="text-xs text-[var(--color-secondary)]">
+          <div className="text-xs text-gray-800">
             &copy; 2026 Elecodes
           </div>
         </div>

@@ -684,10 +684,10 @@ export const useTTS = (): UseTTSReturn => {
     return (
       <div className="fixed top-4 right-4 bg-white border border-gray-300 rounded-lg shadow-lg p-4 max-w-md max-h-96 overflow-y-auto z-50">
         <h3 className="font-bold mb-2">🎤 Voice Debugger</h3>
-        <div className="mb-2 text-xs text-green-600 bg-green-50 p-2 rounded">
+        <div className="mb-2 text-xs text-green-700 bg-green-50 p-2 rounded">
           💡 <strong>Best Male Voice:</strong> Google español - Suena más masculino!
         </div>
-        <div className="mb-2 text-xs text-blue-600 bg-blue-50 p-2 rounded">
+        <div className="mb-2 text-xs text-blue-700 bg-blue-50 p-2 rounded">
           📋 <strong>Current Config:</strong>
           Male: {manualVoiceConfig.male ? `${manualVoiceConfig.male} (manual)` : 'auto (Google español)'}
           | Female: {manualVoiceConfig.female ? `${manualVoiceConfig.female} (manual)` : 'auto (original)'}
@@ -704,7 +704,7 @@ export const useTTS = (): UseTTSReturn => {
         </div>
 
         <div className="mb-4">
-          <h4 className="font-semibold mb-2 text-green-600">🌿 Natural Voices ({naturalVoices.length}):</h4>
+          <h4 className="font-semibold mb-2 text-green-700">🌿 Natural Voices ({naturalVoices.length}):</h4>
           {naturalVoices.map((voice) => {
             const actualIndex = voices.indexOf(voice);
             return (

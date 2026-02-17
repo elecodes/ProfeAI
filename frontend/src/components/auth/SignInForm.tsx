@@ -123,7 +123,7 @@ export default function SignInForm({ onSubmit, onResetPassword, onGoogleSignIn }
       )}
 
       {resetSent && (
-        <div className="text-green-600 text-sm bg-green-100 p-2 rounded">
+        <div className="text-green-700 text-sm bg-green-100 p-2 rounded">
           ¡Correo de recuperación enviado! Revisa tu bandeja de entrada.
         </div>
       )}
@@ -173,7 +173,7 @@ export default function SignInForm({ onSubmit, onResetPassword, onGoogleSignIn }
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-3 text-sm text-blue-600"
+            className="absolute right-3 top-3 text-sm text-blue-700"
             aria-label={
               showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
             }
@@ -194,14 +194,14 @@ export default function SignInForm({ onSubmit, onResetPassword, onGoogleSignIn }
             type="checkbox"
             checked={rememberMe}
             onChange={(e) => setRememberMe(e.target.checked)}
-            className="mr-2 h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+            className="mr-2 h-4 w-4 text-blue-700 rounded border-gray-300 focus:ring-blue-500"
           />
           Recuérdame
         </label>
         
         <button
           type="button"
-          className="text-sm text-blue-600 hover:text-blue-800 hover:underline focus:outline-none"
+          className="text-sm text-blue-700 hover:text-blue-800 hover:underline focus:outline-none"
           onClick={handleForgotPassword}
         >
           ¿Olvidaste tu contraseña?
@@ -212,7 +212,7 @@ export default function SignInForm({ onSubmit, onResetPassword, onGoogleSignIn }
       <button
         type="submit"
         disabled={loading}
-        className="bg-blue-600 text-white p-3 rounded text-lg font-semibold mt-2 disabled:bg-blue-300 hover:bg-blue-700 transition"
+        className="bg-blue-600 text-white p-3 rounded text-lg font-semibold mt-2 disabled:bg-gray-200 disabled:text-gray-700 hover:bg-blue-700 transition"
       >
         {loading ? "Cargando..." : "Iniciar sesión"}
       </button>
@@ -225,7 +225,7 @@ export default function SignInForm({ onSubmit, onResetPassword, onGoogleSignIn }
               <span className="w-full border-t border-gray-300"></span>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500 font-medium font-sans">O</span>
+              <span className="px-2 bg-white text-gray-600 font-medium font-sans">O</span>
             </div>
           </div>
 

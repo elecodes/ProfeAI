@@ -1,7 +1,6 @@
-import { renderHook, act, waitFor, render, screen } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useTTS } from '../../../components/hooks/useTTS';
-import { useAuth } from '../../../hooks/useAuth';
 import UserService from '../../../services/UserService';
 import React from 'react';
 
@@ -181,6 +180,3 @@ describe('useTTS Exhaustive', () => {
     });
   });
 });
-
-// Helper for fireEvent
-import { fireEvent } from '@testing-library/react';

@@ -1,0 +1,13 @@
+Running Pa11y on 2 URLs:
+ > http://127.0.0.1:5173 - Failed to run
+ > http://127.0.0.1:5173/login - Failed to run
+
+Errors in http://127.0.0.1:5173:
+
+ • Error: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:5173
+
+Errors in http://127.0.0.1:5173/login:
+
+ • Error: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:5173/login
+
+✘ 0/2 URLs passed

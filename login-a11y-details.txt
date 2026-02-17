@@ -1,0 +1,19 @@
+1: starting server using command "npm --prefix frontend run dev"
+and when url "[ 'http://127.0.0.1:5173' ]" is responding with HTTP status code 200
+running tests using command "npx pa11y http://127.0.0.1:5173/login --reporter cli"
+
+
+> profe-ai@1.0.0 dev
+> vite
+
+
+  VITE v7.2.4  ready in 482 ms
+
+  ➜  Local:   http://127.0.0.1:5173/
+
+Welcome to Pa11y
+
+ > Running Pa11y on URL http://127.0.0.1:5173/login
+
+No issues found!
+

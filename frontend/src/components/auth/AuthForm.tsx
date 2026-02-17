@@ -20,8 +20,8 @@ export default function AuthForm({ onSignIn, onSignUp, onResetPassword, onGoogle
           onClick={() => setActiveTab("signin")}
           className={`flex-1 py-3 text-center font-semibold transition ${
             activeTab === "signin"
-              ? "text-blue-600 border-b-2 border-blue-600"
-              : "text-gray-500 hover:text-gray-700"
+              ? "text-blue-700 border-b-2 border-blue-600"
+              : "text-gray-600 hover:text-gray-700"
           }`}
         >
           Iniciar sesión
@@ -30,8 +30,8 @@ export default function AuthForm({ onSignIn, onSignUp, onResetPassword, onGoogle
           onClick={() => setActiveTab("signup")}
           className={`flex-1 py-3 text-center font-semibold transition ${
             activeTab === "signup"
-              ? "text-green-600 border-b-2 border-green-600"
-              : "text-gray-500 hover:text-gray-700"
+              ? "text-green-700 border-b-2 border-green-700"
+              : "text-gray-600 hover:text-gray-700"
           }`}
         >
           Registrarse
@@ -54,7 +54,7 @@ export default function AuthForm({ onSignIn, onSignUp, onResetPassword, onGoogle
             ¿No tienes cuenta?{" "}
             <button
               onClick={() => setActiveTab("signup")}
-              className="text-blue-600 hover:underline font-medium"
+              className="text-blue-700 hover:underline font-medium"
             >
               Regístrate aquí
             </button>
@@ -64,7 +64,7 @@ export default function AuthForm({ onSignIn, onSignUp, onResetPassword, onGoogle
             ¿Ya tienes cuenta?{" "}
             <button
               onClick={() => setActiveTab("signin")}
-              className="text-blue-600 hover:underline font-medium"
+              className="text-blue-700 hover:underline font-medium"
             >
               Inicia sesión
             </button>

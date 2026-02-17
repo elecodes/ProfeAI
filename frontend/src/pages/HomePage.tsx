@@ -307,7 +307,7 @@ const HomePage = () => {
                     className={`whitespace-nowrap px-4 md:px-6 py-2 rounded-full font-medium transition-all ${
                     mode === "study"
                         ? "bg-slate-700 text-white shadow-md"
-                        : "bg-white text-[var(--color-secondary)] hover:text-slate-700 border border-gray-200"
+                        : "bg-white text-gray-800 hover:text-gray-800 border border-gray-200"
                     }`}
                 >
                     🧠 Frases
@@ -318,7 +318,7 @@ const HomePage = () => {
                     className={`whitespace-nowrap px-4 md:px-6 py-2 rounded-full font-medium transition-all ${
                     mode === "learned"
                         ? "bg-slate-700 text-white shadow-md"
-                        : "bg-white text-[var(--color-secondary)] hover:text-slate-700 border border-gray-200"
+                        : "bg-white text-gray-800 hover:text-gray-800 border border-gray-200"
                     }`}
                 >
                     ✅ Aprendidas
@@ -329,7 +329,7 @@ const HomePage = () => {
                     className={`whitespace-nowrap px-4 md:px-6 py-2 rounded-full font-medium transition-all ${
                     mode === "quiz"
                         ? "bg-slate-700 text-white shadow-md"
-                        : "bg-white text-[var(--color-secondary)] hover:text-slate-700 border border-gray-200"
+                        : "bg-white text-gray-800 hover:text-gray-800 border border-gray-200"
                     }`}
                 >
                     🎯 Quiz
@@ -340,7 +340,7 @@ const HomePage = () => {
                     className={`whitespace-nowrap px-4 md:px-6 py-2 rounded-full font-medium transition-all ${
                     mode === "dialogues"
                         ? "bg-slate-700 text-white shadow-md"
-                        : "bg-white text-[var(--color-secondary)] hover:text-slate-700 border border-gray-200"
+                        : "bg-white text-gray-800 hover:text-gray-800 border border-gray-200"
                     }`}
                 >
                     🗣️ Diálogos
@@ -351,7 +351,7 @@ const HomePage = () => {
                     className={`whitespace-nowrap px-4 md:px-6 py-2 rounded-full font-medium transition-all ${
                     mode === "chat"
                         ? "bg-slate-700 text-white shadow-md"
-                        : "bg-white text-[var(--color-secondary)] hover:text-slate-700 border border-gray-200"
+                        : "bg-white text-gray-800 hover:text-gray-800 border border-gray-200"
                     }`}
                 >
                     💬 Chat
@@ -363,14 +363,14 @@ const HomePage = () => {
         {/* Barra superior */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="flex items-center gap-4">
-            <h1 className="text-2xl md:text-3xl font-serif font-bold text-[var(--color-primary)]">
+            <h1 className="text-2xl md:text-3xl font-serif font-bold text-black">
               🇪🇸 Aprende Español
             </h1>
           </div>
 
           <div className="flex flex-wrap items-center gap-3 md:gap-4 w-full md:w-auto">
             <div className="flex items-center gap-2">
-                <label htmlFor="nivel" className="text-[10px] md:text-sm font-bold uppercase tracking-widest text-[var(--color-secondary)]">
+                <label htmlFor="nivel" className="text-[10px] md:text-sm font-bold uppercase tracking-widest text-gray-800">
                 Nivel:
                 </label>
                 <select
@@ -391,7 +391,7 @@ const HomePage = () => {
 
             {mode === "study" && (
               <div className="flex items-center gap-2">
-                <label htmlFor="tema" className="text-sm font-bold uppercase tracking-widest text-[var(--color-secondary)]">
+                <label htmlFor="tema" className="text-sm font-bold uppercase tracking-widest text-gray-800">
                   Tema:
                 </label>
                 <select
@@ -412,7 +412,7 @@ const HomePage = () => {
             {mode === "dialogues" && (
               <>
                 <div className="flex items-center gap-2">
-                  <label htmlFor="dialogue" className="text-sm font-bold uppercase tracking-widest text-[var(--color-secondary)]">
+                  <label htmlFor="dialogue" className="text-sm font-bold uppercase tracking-widest text-gray-800">
                     Diálogo:
                   </label>
                   <select
@@ -442,7 +442,7 @@ const HomePage = () => {
                     className={`px-3 md:px-4 py-1.5 md:py-2 rounded-[var(--radius-btn)] text-xs md:text-sm font-bold tracking-wide transition ${
                       showGenerator 
                         ? 'bg-[var(--color-accent)] text-white' 
-                        : 'bg-white border border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white'
+                        : 'bg-white border border-[var(--color-accent)] text-amber-900 hover:bg-[var(--color-accent)] hover:text-white'
                     }`}
                   >
                     {showGenerator ? 'Cancelar' : '✨ Nuevo'}
@@ -457,10 +457,10 @@ const HomePage = () => {
         {!user ? (
           <div className="flex-1 flex items-center justify-center py-20">
             <div className="w-full max-w-md bg-white p-8 rounded-[var(--radius-card)] shadow-lg text-center">
-                <h2 className="text-2xl font-serif font-bold text-[var(--color-primary)] mb-4">
+                <h2 className="text-2xl font-serif font-bold text-black mb-4">
                   🔒 Acceso Restringido
                 </h2>
-                <p className="text-[var(--color-secondary)] mb-8">
+                <p className="text-gray-800 mb-8">
                   Inicia sesión para acceder a las lecciones personalizadas y guardar tu progreso con la IA.
                 </p>
               <Suspense fallback={<Loading />}>
@@ -480,10 +480,10 @@ const HomePage = () => {
               <div className="flex-1 flex items-center justify-center py-20">
                 <div className="text-center p-10 bg-gray-100 rounded-[var(--radius-card)] border border-gray-200">
                   <span className="text-5xl mb-6 block">🔒</span>
-                  <h2 className="text-2xl font-bold text-[var(--color-primary)] mb-3">
+                  <h2 className="text-2xl font-bold text-black mb-3">
                     Contenido Bloqueado
                   </h2>
-                  <p className="text-[var(--color-secondary)]">
+                  <p className="text-gray-800">
                     Esta lección estará disponible la próxima semana.
                     <br/>
                     ¡Sigue practicando las lecciones anteriores!
@@ -510,7 +510,7 @@ const HomePage = () => {
             {mode === "learned" && (
               <div className="glass-panel p-8 rounded-[var(--radius-card)]">
                 <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-serif font-bold text-[var(--color-primary)]">Frases Aprendidas</h2>
+                    <h2 className="text-2xl font-serif font-bold text-black">Frases Aprendidas</h2>
                     {learned.length > 0 && (
                         <button
                             onClick={handleClearLearned}
@@ -522,13 +522,13 @@ const HomePage = () => {
                     )}
                 </div>
                 {learned.length === 0 ? (
-                  <p className="text-[var(--color-secondary)] italic">Aún no has marcado ninguna frase.</p>
+                  <p className="text-gray-800 italic">Aún no has marcado ninguna frase.</p>
                 ) : (
                   <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {learned.map((l, i) => (
                       <li key={i} className="bg-white/50 p-4 rounded-[var(--radius-btn)] border border-gray-100 flex items-center gap-3">
                          <span className="text-green-500">✅</span>
-                        <span className="text-[var(--color-primary)] font-medium">{l.text}</span>
+                        <span className="text-black font-medium">{l.text}</span>
                       </li>
                     ))}
                   </ul>
@@ -541,9 +541,9 @@ const HomePage = () => {
               <div className="w-full max-w-lg glass-panel p-6 md:p-10 rounded-[var(--radius-card)] text-center mx-auto shadow-xl">
                 {!quizCompleted ? (
                   <>
-                    <h2 className="text-3xl font-serif font-bold text-[var(--color-primary)] mb-8">
+                    <h2 className="text-3xl font-serif font-bold text-black mb-8">
                       Traduce:{" "}
-                      <span className="text-[var(--color-accent)] block mt-2">
+                      <span className="text-amber-900 block mt-2">
                         {frases[quizIndex].text}
                       </span>
                     </h2>
@@ -558,17 +558,17 @@ const HomePage = () => {
                         </button>
                       ))}
                     </div>
-                    <p className="mt-8 text-[var(--color-secondary)] text-sm font-bold uppercase tracking-widest">
+                    <p className="mt-8 text-gray-800 text-sm font-bold uppercase tracking-widest">
                       Pregunta {quizIndex + 1} / {frases.length}
                     </p>
                   </>
                 ) : (
                   <div>
-                    <h2 className="text-4xl font-display font-bold text-[var(--color-success)] mb-6">
+                    <h2 className="text-4xl font-display font-bold text-emerald-900 mb-6">
                       🎉 ¡Quiz Completado!
                     </h2>
-                    <div className="text-6xl font-black text-[var(--color-primary)] mb-8">
-                        {quizScore} <span className="text-2xl text-[var(--color-secondary)] font-normal">/ {frases.length}</span>
+                    <div className="text-6xl font-black text-black mb-8">
+                        {quizScore} <span className="text-2xl text-gray-800 font-normal">/ {frases.length}</span>
                     </div>
                     <button
                       onClick={startQuiz}
@@ -597,10 +597,10 @@ const HomePage = () => {
             {/* === Chat Mode === */}
             {mode === "chat" && (
                 <div className="glass-panel p-10 rounded-[var(--radius-card)] text-center max-w-2xl mx-auto shadow-lg">
-                    <h2 className="text-3xl font-serif font-bold text-[var(--color-primary)] mb-6">
+                    <h2 className="text-3xl font-serif font-bold text-black mb-6">
                         💬 Conversación con IA
                     </h2>
-                    <p className="text-[var(--color-secondary)] mb-8 text-lg">
+                    <p className="text-gray-800 mb-8 text-lg">
                         Elige un tema y empieza a practicar tu español con correcciones en tiempo real.
                     </p>
                     

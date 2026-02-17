@@ -74,6 +74,7 @@ The project is organized as an **npm workspace** to clearly separate concerns:
 
 *   **Linting:** `npm run lint`
 *   **Security:** `npm run test:security` (Snyk)
+*   **Accessibility:** `npm run ci:a11y -w frontend` (WCAG AA compliance via pa11y-ci)
 *   **Documentation:** `npm run doc` (Generates TypeDoc in `docs/api`)
 
 ### 🛡️ "Honest Coverage" Testing Strategy
@@ -82,6 +83,7 @@ This project follows a pragmatic quality strategy:
 *   **Domain Services (100%)**: Core business logic (`src/services/`) is fully covered.
 *   **Global Coverage (~46%)**: Focused on critical flows. We avoid over-testing complex browser hooks (like `useTTS`) to prevent brittle tests.
 *   **UI & Storybook**: Visual components are verified via Storybook interaction tests.
+*   **Accessibility (WCAG AA)**: Automated testing ensures color contrast and semantic HTML compliance.
 *   **Automatic Verification**: Run `npm test` before pushing to ensure no regressions.
 
 ## 📄 License

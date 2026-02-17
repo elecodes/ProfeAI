@@ -1,0 +1,88 @@
+
+> profe-ai@1.0.0 ci:a11y
+> start-server-and-test dev http://127.0.0.1:5173 test:a11y
+
+1: starting server using command "npm run dev"
+and when url "[ 'http://127.0.0.1:5173' ]" is responding with HTTP status code 200
+running tests using command "npm run test:a11y"
+
+
+> profe-ai@1.0.0 dev
+> vite
+
+
+  VITE v7.2.4  ready in 423 ms
+
+  ➜  Local:   http://127.0.0.1:5173/
+
+> profe-ai@1.0.0 test:a11y
+> pa11y-ci
+
+Running Pa11y on 2 URLs:
+ > http://127.0.0.1:5173/ - 2 errors
+ > http://127.0.0.1:5173/login - 2 errors
+
+Errors in http://127.0.0.1:5173/:
+
+ • Elements must meet minimum color contrast ratio thresholds
+   (https://dequeuniversity.com/rules/axe/4.10/color-contrast?application=axeAPI)
+
+   ()
+
+   [no context]
+
+ • Elements must meet minimum color contrast ratio thresholds
+   (https://dequeuniversity.com/rules/axe/4.10/color-contrast?application=axeAPI)
+
+   ()
+
+   [no context]
+
+Errors in http://127.0.0.1:5173/login:
+
+ • Elements must meet minimum color contrast ratio thresholds
+   (https://dequeuniversity.com/rules/axe/4.10/color-contrast?application=axeAPI)
+
+   ()
+
+   [no context]
+
+ • Elements must meet minimum color contrast ratio thresholds
+   (https://dequeuniversity.com/rules/axe/4.10/color-contrast?application=axeAPI)
+
+   ()
+
+   [no context]
+
+✘ 0/2 URLs passed
+npm error Lifecycle script `test:a11y` failed with error:
+npm error code 2
+npm error path /Users/elena/Developer/ProfeAI/frontend
+npm error workspace profe-ai@1.0.0
+npm error location /Users/elena/Developer/ProfeAI/frontend
+npm error command failed
+npm error command sh -c pa11y-ci
+Error: Command failed with exit code 2: npm run test:a11y
+    at makeError (/Users/elena/Developer/ProfeAI/node_modules/execa/lib/error.js:60:11)
+    at handlePromise (/Users/elena/Developer/ProfeAI/node_modules/execa/index.js:118:26)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+  shortMessage: 'Command failed with exit code 2: npm run test:a11y',
+  command: 'npm run test:a11y',
+  escapedCommand: '"npm run test:a11y"',
+  exitCode: 2,
+  signal: undefined,
+  signalDescription: undefined,
+  stdout: undefined,
+  stderr: undefined,
+  failed: true,
+  timedOut: false,
+  isCanceled: false,
+  killed: false
+}
+npm error Lifecycle script `ci:a11y` failed with error:
+npm error code 1
+npm error path /Users/elena/Developer/ProfeAI/frontend
+npm error workspace profe-ai@1.0.0
+npm error location /Users/elena/Developer/ProfeAI/frontend
+npm error command failed
+npm error command sh -c start-server-and-test dev http://127.0.0.1:5173 test:a11y

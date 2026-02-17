@@ -11,7 +11,7 @@
     "frontend:build": "npm run build -w frontend",
     "backend:dev": "npx tsx backend/src/server.ts",
     "dev": "concurrently \"npm run frontend:dev\" \"npm run backend:dev\"",
-    "lint": "npm run lint -w frontend",
+    "lint": "npx eslint -c frontend/eslint.config.js frontend backend/src",
     "test": "npm run test:coverage:check",
     "test:vitest": "npm run test -w frontend",
     "ci:a11y": "npm run ci:a11y -w frontend",

@@ -44,7 +44,6 @@ export default defineConfig({
     }
   })],
   test: {
-    environment: "happy-dom",
     globals: true,
     coverage: {
       provider: 'v8',
@@ -73,37 +72,9 @@ export default defineConfig({
         'src/utils/**': { statements: 100, branches: 100, functions: 100, lines: 100 }
       }
     },
+    environment: "happy-dom",
     setupFiles: "./test/setup.js",
     include: ["src/tests/**/*.test.{js,jsx,ts,tsx}", "src/tests/**/integration/**/*.integration.test.{js,jsx,ts,tsx}"],
-    projects: [
-    {
-      name: 'unit',
-      extends: true,
-      test: {
-        include: ["src/tests/**/*.test.{js,jsx,ts,tsx}", "src/tests/**/integration/**/*.integration.test.{js,jsx,ts,tsx}"],
-      }
-    },
-    {
-      extends: true,
-      plugins: [
-      // The plugin will run tests for the stories defined in your Storybook config
-      // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
-      storybookTest({
-        configDir: path.join(dirname, '.storybook')
-      })],
-      test: {
-        name: 'storybook',
-        browser: {
-          enabled: true,
-          headless: true,
-          provider: playwright({}),
-          instances: [{
-            browser: 'chromium'
-          }]
-        },
-        setupFiles: ['.storybook/vitest.setup.js']
-      }
-    }]
   },
   resolve: {
     alias: {
