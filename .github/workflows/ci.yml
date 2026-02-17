@@ -28,9 +28,9 @@ jobs:
       - name: Debug - List test files
         run: |
           echo "Listing test files:"
-          ls -la src/tests/flashcard/
+          ls -la frontend/src/tests/flashcard/
           echo "Git tracked files:"
-          git ls-files src/tests/flashcard/
+          git ls-files frontend/src/tests/flashcard/
 
       - name: Run Lint
         run: npm run lint

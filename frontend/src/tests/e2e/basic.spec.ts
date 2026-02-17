@@ -11,7 +11,10 @@ test('navigation to dialogues', async ({ page }) => {
   await page.goto('/');
 
   // Click the "Diálogos" link.
-  await page.getByTestId('nav-dialogues-btn').click();
+  // We use .first() because it might be in both Sidebar and HomePage tabs
+  const dialogueBtn = page.getByTestId('nav-dialogues-btn').first();
+  await dialogueBtn.waitFor({ state: 'visible' });
+  await dialogueBtn.click();
 
   // Expects page to show restricted access message since we are not logged in
   const heading = page.getByRole('heading', { level: 2, name: /Acceso Restringido/i });

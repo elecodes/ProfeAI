@@ -303,6 +303,7 @@ const HomePage = () => {
             <div className="flex overflow-x-auto no-scrollbar gap-2 md:gap-4 border-b border-gray-200 pb-4 -mx-4 px-4 md:mx-0 md:px-0">
                 <button
                     onClick={() => setMode("study")}
+                    data-testid="nav-study-btn"
                     className={`whitespace-nowrap px-4 md:px-6 py-2 rounded-full font-medium transition-all ${
                     mode === "study"
                         ? "bg-slate-700 text-white shadow-md"
@@ -313,6 +314,7 @@ const HomePage = () => {
                 </button>
                 <button
                     onClick={() => setMode("learned")}
+                    data-testid="nav-learned-btn"
                     className={`whitespace-nowrap px-4 md:px-6 py-2 rounded-full font-medium transition-all ${
                     mode === "learned"
                         ? "bg-slate-700 text-white shadow-md"
@@ -323,6 +325,7 @@ const HomePage = () => {
                 </button>
                 <button
                     onClick={() => setMode("quiz")}
+                    data-testid="nav-quiz-btn"
                     className={`whitespace-nowrap px-4 md:px-6 py-2 rounded-full font-medium transition-all ${
                     mode === "quiz"
                         ? "bg-slate-700 text-white shadow-md"
@@ -333,6 +336,7 @@ const HomePage = () => {
                 </button>
                 <button
                     onClick={() => setMode("dialogues")}
+                    data-testid="nav-dialogues-btn"
                     className={`whitespace-nowrap px-4 md:px-6 py-2 rounded-full font-medium transition-all ${
                     mode === "dialogues"
                         ? "bg-slate-700 text-white shadow-md"
@@ -343,6 +347,7 @@ const HomePage = () => {
                 </button>
                 <button
                     onClick={() => setMode("chat")}
+                    data-testid="nav-chat-btn"
                     className={`whitespace-nowrap px-4 md:px-6 py-2 rounded-full font-medium transition-all ${
                     mode === "chat"
                         ? "bg-slate-700 text-white shadow-md"
