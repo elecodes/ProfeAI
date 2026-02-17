@@ -66,7 +66,10 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Run Playwright tests
-        run: npm run test:e2e
+        run: npx start-server-and-test start http://localhost:3001 'npm run test:e2e'
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:3001
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
   release:
     runs-on: ubuntu-latest
