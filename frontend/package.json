@@ -16,7 +16,7 @@
     "test:unit": "vitest run src/tests/flashcard/*.test.{js,jsx}",
     "test:integration": "vitest run src/tests/flashcard/integration/*.integration.test.jsx",
     "test:a11y": "pa11y-ci",
-    "ci:a11y": "start-server-and-test dev http://localhost:5173 test:a11y",
+    "ci:a11y": "start-server-and-test dev http://127.0.0.1:5173 test:a11y",
     "test:lighthouse": "lhci autorun",
     "ci:lighthouse": "start-server-and-test dev http://localhost:5173 test:lighthouse",
     "test:e2e": "playwright test",
