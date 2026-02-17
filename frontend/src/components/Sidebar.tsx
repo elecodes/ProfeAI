@@ -116,6 +116,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                       : 'text-[var(--color-secondary)] hover:text-[var(--color-primary)] hover:bg-white/20'
                   }`;
               }}
+              data-testid={`nav-${item.ident}-btn`}
             >
               {({ isActive: routerActive }) => {
                   const search = window.location.search;
