@@ -63,12 +63,19 @@ jobs:
         run: npm ci
       - name: Build Frontend
         run: npm run build
+      - name: Cache Playwright Browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        run: npx playwright install chromium --with-deps
       - name: Run Playwright tests
-        run: npx start-server-and-test start http://localhost:3001 'npm run test:e2e'
+        run: npx start-server-and-test start http://127.0.0.1:3001 'npm run test:e2e'
         env:
-          PLAYWRIGHT_BASE_URL: http://localhost:3001
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:3001
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || 'dummy_key_for_testing' }}
 
   release:
