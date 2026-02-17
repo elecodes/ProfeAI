@@ -288,7 +288,7 @@ const HomePage = () => {
   };
 
   if (authLoading) {
-    return <div className="min-h-screen flex items-center justify-center">Cargando...</div>;
+    return <div data-testid="loading-screen" className="min-h-screen flex items-center justify-center">Cargando...</div>;
   }
 
   // === UI ===

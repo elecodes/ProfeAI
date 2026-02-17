@@ -44,8 +44,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       setLoading(false);
     });
+    
+    // Safety timeout: ensure loading stops even if Firebase hangs
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      clearTimeout(timeout);
+    };
   }, []);
 
   return (

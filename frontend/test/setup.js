@@ -26,7 +26,12 @@ vi.mock('firebase/auth', () => ({
   getAuth: vi.fn(() => ({
     currentUser: null,
   })),
-  onAuthStateChanged: vi.fn(() => vi.fn()),
+  onAuthStateChanged: vi.fn((_auth, callback) => {
+    if (typeof callback === 'function') {
+      callback(null);
+    }
+    return vi.fn(); // unsubscribe
+  }),
   setPersistence: vi.fn(() => Promise.resolve()),
   GoogleAuthProvider: vi.fn(),
   createUserWithEmailAndPassword: vi.fn(),
