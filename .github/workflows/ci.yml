@@ -36,17 +36,10 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install chromium --with-deps
 
-      - name: Debug - List test files
-        run: |
-          echo "Listing test files:"
-          ls -la frontend/src/tests/flashcard/
-          echo "Git tracked files:"
-          git ls-files frontend/src/tests/flashcard/
-
       - name: Run Lint
         run: npm run lint
 
-      - name: Run All Tests
+      - name: Run Unit & Storybook Tests (Vitest)
         run: npm run test:vitest
         env:
           VITE_FIREBASE_API_KEY: "dummy-api-key"

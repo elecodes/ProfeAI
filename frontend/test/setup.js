@@ -16,3 +16,38 @@ Object.defineProperty(window, 'matchMedia', {
     dispatchEvent: vi.fn(),
   })),
 });
+
+// Mock Firebase
+vi.mock('firebase/app', () => ({
+  initializeApp: vi.fn(() => ({})),
+}));
+
+vi.mock('firebase/auth', () => ({
+  getAuth: vi.fn(() => ({
+    currentUser: null,
+  })),
+  onAuthStateChanged: vi.fn(() => vi.fn()),
+  setPersistence: vi.fn(() => Promise.resolve()),
+  GoogleAuthProvider: vi.fn(),
+  createUserWithEmailAndPassword: vi.fn(),
+  signInWithEmailAndPassword: vi.fn(),
+  signInWithPopup: vi.fn(),
+  signOut: vi.fn(),
+  sendPasswordResetEmail: vi.fn(),
+  browserLocalPersistence: 'local',
+  browserSessionPersistence: 'session',
+}));
+
+vi.mock('firebase/firestore', () => ({
+  getFirestore: vi.fn(() => ({})),
+  doc: vi.fn(),
+  setDoc: vi.fn(),
+  getDoc: vi.fn(),
+  updateDoc: vi.fn(),
+  serverTimestamp: vi.fn(),
+  arrayUnion: vi.fn(val => val),
+  collection: vi.fn(),
+  getDocs: vi.fn(),
+  query: vi.fn(),
+  where: vi.fn(),
+}));
