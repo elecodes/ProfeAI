@@ -13,6 +13,8 @@ test('navigation to dialogues', async ({ page }) => {
   // Click the "Diálogos" link.
   // We use .first() because it might be in both Sidebar and HomePage tabs
   const dialogueBtn = page.getByTestId('nav-dialogues-btn').first();
+  // Scroll into view first (needed for webkit which may render a narrow viewport)
+  await dialogueBtn.scrollIntoViewIfNeeded();
   await dialogueBtn.waitFor({ state: 'visible' });
   await dialogueBtn.click();
 
@@ -20,3 +22,4 @@ test('navigation to dialogues', async ({ page }) => {
   const heading = page.getByRole('heading', { level: 2, name: /Acceso Restringido/i });
   await expect(heading).toBeVisible();
 });
+
