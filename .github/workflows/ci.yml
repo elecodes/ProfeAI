@@ -34,7 +34,7 @@ jobs:
             playwright-${{ runner.os }}-
 
       - name: Install Playwright Browsers
-        run: npx playwright install chromium --with-deps && npx puppeteer browsers install chrome
+        run: npx playwright install --with-deps && npx puppeteer browsers install chrome
 
       - name: Run Lint
         run: npm run lint
@@ -83,7 +83,7 @@ jobs:
           restore-keys: |
             playwright-${{ runner.os }}-
       - name: Install Playwright Browsers
-        run: npx playwright install chromium --with-deps && npx puppeteer browsers install chrome
+        run: npx playwright install --with-deps && npx puppeteer browsers install chrome
       - name: Run Playwright tests
         run: npx start-server-and-test start http://127.0.0.1:3001 'npm run test:e2e'
         env:
