@@ -287,9 +287,8 @@ const HomePage = () => {
     navigate(`/chat/${safeTopic}/${safeLevel}/${sessionId}`);
   };
 
-  if (authLoading) {
-    return <div data-testid="loading-screen" className="min-h-screen flex items-center justify-center">Cargando...</div>;
-  }
+  // Note: authLoading no longer causes an early return so nav tabs are always rendered
+  // (needed for Playwright E2E tests that run as unauthenticated users)
 
   // === UI ===
   return (
@@ -453,7 +452,9 @@ const HomePage = () => {
         </div>
 
         {/* === Contenido dinámico === */}
-        {!user ? (
+        {authLoading ? (
+          <div data-testid="loading-screen" className="flex-1 flex items-center justify-center py-20">Cargando...</div>
+        ) : !user ? (
           <div className="flex-1 flex items-center justify-center py-20">
             <div className="w-full max-w-md bg-white p-8 rounded-[var(--radius-card)] shadow-lg text-center">
                 <h2 className="text-2xl font-serif font-bold text-black mb-4">
