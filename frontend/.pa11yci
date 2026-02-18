@@ -3,7 +3,10 @@
     "standard": "WCAG2AA",
     "runners": ["axe"],
     "timeout": 50000,
-    "wait": 3000
+    "wait": 3000,
+    "chromeLaunchConfig": {
+      "args": ["--no-sandbox", "--disable-setuid-sandbox"]
+    }
   },
   "urls": [
     "http://127.0.0.1:5173",
