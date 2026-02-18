@@ -9,6 +9,7 @@
   "scripts": {
     "frontend:dev": "npm run dev -w frontend",
     "frontend:build": "npm run build -w frontend",
+    "frontend:preview": "npm run preview -w frontend -- --port 3001",
     "backend:dev": "npx tsx backend/src/server.ts",
     "dev": "concurrently \"npm run frontend:dev\" \"npm run backend:dev\"",
     "lint": "npx eslint -c frontend/eslint.config.js frontend backend/src",

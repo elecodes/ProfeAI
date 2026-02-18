@@ -92,7 +92,7 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps && npx puppeteer browsers install chrome
       - name: Run Playwright tests
-        run: npx start-server-and-test start http://127.0.0.1:3001 'npm run test:e2e'
+        run: npx start-server-and-test frontend:preview http://127.0.0.1:3001 'npm run test:e2e'
         env:
           PLAYWRIGHT_BASE_URL: http://127.0.0.1:3001
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || 'dummy_key_for_testing' }}
