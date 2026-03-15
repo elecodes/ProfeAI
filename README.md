@@ -67,6 +67,8 @@ El proyecto está organizado como un **npm workspace** para separar claramente l
 3.  **Ejecución con Scripts de Workspace:**
     - `npm run dev`: Lanza frontend y backend simultáneamente.
     - `npm run frontend:dev`: Inicia solo el cliente web.
+    - `npm run frontend:build`: Compila la aplicación para producción.
+    - `npm run frontend:preview`: Sirve la versión compilada en `http://localhost:3001` (útil para E2E).
     - `npm run backend:dev`: Inicia solo el servidor API.
 
 4.  **Cargar Contenido (Seed):**
@@ -112,13 +114,15 @@ El proyecto está optimizado para desplegarse como un **Web Service** en **Rende
 7.  **Gestión de Transitorias**: Uso de `overrides` en el `package.json` raíz para forzar versiones seguras de dependencias indirectas (ej: `qs`) identificadas por Snyk.
 8.  **Optimización de arranque**: Uso de `tsx` en el backend para ejecutar directamente TypeScript en producción, simplificando el flujo de compilación.
 9.  **Seguridad Adaptativa**: Configuración de Helmet ajustada para permitir WebSockets de ElevenLabs y Popups de Firebase Auth (`Cross-Origin-Opener-Policy`).
-10. **Variables**: Configura todas las claves de API como variables de entorno. Las variables `VITE_*` deben pasarse igual, el sistema las inyectará automáticamente durante el build.
+10. **Variables**: Configura todas las claves de API como variables de entorno. 
+    > [!IMPORTANT]
+    > Las variables `VITE_*` deben pasarse como **Build-time environment variables** en Render (o mediante el Dashboard de Secretos), ya que Vite las embebe durante el paso de compilación (`npm run build`). Las variables de backend (ej: `FIREBASE_SERVICE_ACCOUNT`) pueden ser de **Runtime**.
 11. **Firebase**: Recuerda añadir el dominio de Render a la lista de **Dominios Autorizados** en la consola de Firebase Authentication.
 
 ## 🧪 Tests y Calidad
 
 *   **Unitarios:** `npm test`
-*   **E2E:** `npm run test:e2e` (Ejecuta tests con Playwright contra el servidor de desarrollo local `http://localhost:5173`)
+*   **E2E:** `npm run test:e2e` (Ejecuta tests con Playwright. Por defecto intenta conectar a `http://localhost:3001`. Asegúrate de tener el servidor de preview o Docker corriendo si pruebas localmente).
 *   **Linting:** `npm run lint`
 *   **Seguridad:** `npm run test:security` (Snyk)
 *   **Documentación:** `npm run doc` (Genera documentación técnica con TypeDoc en `docs/api`)

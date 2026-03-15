@@ -133,6 +133,29 @@ El proyecto está dividido en dos grandes bloques:
 
 ---
 
+### Scenario O: Playwright E2E Timeouts in CI
+**Trigger**: Playwright tests fail in GitHub Actions with "Timeout exceeded" or "Element not found".
+
+1.  **Check Screenshots/Traces**: Download the "playwright-report" artifact from the GitHub Action run.
+2.  **Verify Environment Variables**:
+    *   If the screenshot shows a blank page or Firebase error, ensure `VITE_FIREBASE_*` variables are defined in the **Build Frontend** step of `ci.yml`. Vite requires these *during* build.
+3.  **Visible vs Exists**:
+    *   If an element exists in the DOM but is "not visible" (common in Webkit/Safari CI), ensure you are using `scrollIntoViewIfNeeded()` before clicking.
+4.  **Auth Loading**:
+    *   If the test fails because it only sees a "Cargando..." screen, verify that `HomePage.tsx` is rendering navigation tabs even while `authLoading` is true (non-blocking loading state).
+5.  **Server Type**:
+    *   Ensure CI is running `npm run frontend:preview` to test the actual build, rather than hitting the backend API port directly.
+
+---
+
+### Scenario P: Sentry Release Failing CI
+**Trigger**: CI job fails at the "Create Sentry release" step.
+
+1.  **Missing Secrets**: This usually happens if `SENTRY_AUTH_TOKEN` or `SENTRY_ORG` are not configured in the repo secrets.
+2.  **Fix**: The step is configured with `continue-on-error: true`. It will show a warning but should not fail the build. Do not remove the step; it is needed for production deployments.
+
+---
+
 > **Remember**: In an incident, **Communication > Code**. Tell the team/users what is happening.
 ### Scenario F: UI Bugs / Visual Regressions
 **Trigger**: User report "Button looks broken on mobile" or "Colors are wrong".

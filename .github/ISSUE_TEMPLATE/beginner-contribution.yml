@@ -1,0 +1,31 @@
+name: "👋 Beginner Contribution"
+description: "Guided template for first-time contributors"
+labels: ["good first issue", "help wanted"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for contributing to ProfeAI! 🎉
+
+        Follow these steps:
+        1. Read CONTRIBUTING.md
+        2. Fork the repo
+        3. Claim an issue in the comments
+        4. Open a PR following the PR template
+
+  - type: input
+    id: area
+    attributes:
+      label: What area are you contributing to?
+      description: e.g. "content", "UI", "docs"
+      placeholder: content / UI / docs
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe your change
+      description: Short, clear description of what you want to add or fix.
+    validations:
+      required: true

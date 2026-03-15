@@ -61,7 +61,11 @@ docker system prune
 ## Deployment Ready
 The same `Dockerfile` used locally is optimized for cloud platforms like **Render**:
 1.  **Uniformity**: We use the same image definition for dev and prod.
-2.  **Statics**: React is built and served by Express, eliminating Nginx needs for simple setups.
+2.  **Build-time Variables**: The `Dockerfile` uses `ARG` to capture `VITE_*` variables. If building manually, use:
+    ```bash
+    docker build --build-arg VITE_FIREBASE_API_KEY=your_key -t profe-ai .
+    ```
+3.  **Statics**: React is built and served by Express, eliminating Nginx needs for simple setups.
 
 ## Configuration Files
 - **Dockerfile**: (Root) Defines the multi-stage build (React Build -> Node Server).
