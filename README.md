@@ -134,6 +134,25 @@ Este proyecto sigue una estrategia de calidad pragmática:
 *   **UI & Storybook**: Los componentes visuales se verifican vía Storybook y sus tests de interacción.
 *   **Verificación Automática**: Ejecuta `npm test` antes de cada push para asegurar que no se introducen regresiones.
 
+## 🤝 Contribuciones
+
+¡Las contribuciones son bienvenidas! Para mantener la calidad del proyecto, hemos automatizado parte del proceso:
+
+1.  **Issues**: Al abrir un error o propuesta, utiliza nuestras plantillas para proporcionar toda la información necesaria.
+2.  **Pull Requests**: Asegúrate de completar la lista de verificación (checklist) que aparecerá automáticamente en la descripción de tu PR.
+3.  **Guía de Estilo**: Revisa nuestro `CONTRIBUTING.md` (próximamente) y sigue los estándares de código existentes.
+
+Un bot de bienvenida te guiará una vez que abras tu primera contribución.
+
+## 🏛️ Decisiones Arquitectónicas (ADR)
+Para entender mejor por qué tomamos ciertas decisiones técnicas, puedes consultar nuestros registros de diseño:
+
+*   [ADR 001: Adopción de Storybook](./docs/ADR/001-adopcion-storybook-development.md)
+*   [ADR 002: Optimización de Rendimiento](./docs/ADR/002-performance-latency-optimization.md)
+*   [ADR 003: Estrategia de Testing](./docs/ADR/003-testing-strategy.md)
+*   [ADR 011: Variables de Entorno en Build-time](./docs/ADR/011-playwright-build-env-vars.md)
+*   [ADR 012: Onboarding de Contribuidores Automatizado](./docs/ADR/012-automated-contributor-onboarding.md)
+
 ## 📄 Licencia
 
 Este proyecto está bajo la Licencia MIT.

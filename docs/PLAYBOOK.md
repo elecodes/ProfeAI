@@ -156,6 +156,16 @@ El proyecto está dividido en dos grandes bloques:
 
 ---
 
+### Scenario Q: Contributor Automation / Templates Not Working
+**Trigger**: A contributor reports that the PR template is missing or the welcome bot did not comment.
+
+1.  **Check Structure**: Ensure the `.github` folder is at the root and NOT nested inside other folders (like `ISSUE_TEMPLATE`).
+2.  **Verify Action Status**: Go to the **Actions** tab on GitHub and check the latest runs for "Welcome & Guide Contributors".
+3.  **Permissions**: Ensure the `GITHUB_TOKEN` has `write` permissions for issues and pull requests in the repo settings.
+4.  **Template Names**: GitHub templates must end in `.md` or `.yml` and be in their respective subfolders (`workflows`, `ISSUE_TEMPLATE`).
+
+---
+ 
 > **Remember**: In an incident, **Communication > Code**. Tell the team/users what is happening.
 ### Scenario F: UI Bugs / Visual Regressions
 **Trigger**: User report "Button looks broken on mobile" or "Colors are wrong".
