@@ -140,7 +140,7 @@ Este proyecto sigue una estrategia de calidad pragmática:
 
 1.  **Issues**: Al abrir un error o propuesta, utiliza nuestras plantillas para proporcionar toda la información necesaria.
 2.  **Pull Requests**: Asegúrate de completar la lista de verificación (checklist) que aparecerá automáticamente en la descripción de tu PR.
-3.  **Guía de Estilo**: Revisa nuestro `CONTRIBUTING.md` (próximamente) y sigue los estándares de código existentes.
+3.  **Guía de Estilo**: Revisa nuestro [CONTRIBUTING.md](CONTRIBUTING.md) y sigue los estándares de código existentes.
 
 Un bot de bienvenida te guiará una vez que abras tu primera contribución.
 
