@@ -1,5 +1,5 @@
 import { db } from "../config/firebase";
-import { collection, getDocs, query, where, doc, setDoc } from "firebase/firestore";
+import { collection, getDocs, query, where, doc, setDoc, getDoc } from "firebase/firestore";
 import { Lesson } from "../types";
 
 const COLLECTION_NAME = "lessons";
@@ -10,7 +10,31 @@ const COLLECTION_NAME = "lessons";
  */
 export const LessonService = {
   /**
-   * Fetch all lessons for a specific level
+   * Fetch general lesson for a specific level (e.g., 'beginner_general')
+   * @param {string} level - 'beginner', 'intermediate', or 'advanced'
+   * @returns {Promise<Lesson | null>} - The general lesson object or null
+   */
+  async getGeneralLesson(level: string): Promise<Lesson | null> {
+    try {
+      const docRef = doc(db, COLLECTION_NAME, `${level}_general`);
+      const docSnap = await getDoc(docRef);
+      
+      if (docSnap.exists()) {
+        return {
+          id: docSnap.id,
+          ...docSnap.data()
+        } as Lesson;
+      }
+      
+      return null;
+    } catch (error) {
+      console.error("Error fetching general lesson from Firestore:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Fetch all lessons for a specific level (legacy - gets ALL documents with that level)
    * @param {string} level - 'beginner', 'intermediate', or 'advanced'
    * @returns {Promise<Lesson[]>} - Array of lesson objects
    */

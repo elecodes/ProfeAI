@@ -5,7 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.2.3] - 2026-03-15
+## [1.2.4] - 2026-04-14
+
+### Added
+- **Free Tier Content Script**: Updated `refresh-content.ts` to use `gemini-flash-latest` (free tier) instead of paid `gemini-2.0-flash`.
+- **Backup & Restore**: Added `--backup` and `--restore` flags to the content refresh script.
+- **General Lesson Loading**: App now fetches only `*_general` documents for lessons instead of all documents.
+
+### Changed
+- **Documentation**: Updated ADR 007, PLAYBOOK, and README with new script usage instructions.
+
+### Fixed
+- **Script Dependencies**: Added `dotenv` and `tsx` to root package.json for script execution.
+- **API Version**: Fixed model lookup to use correct API version for free tier models.
+- **Lesson Display**: Fixed app to show only generated content (not old duplicate documents).
 
 ### Added
 - **Automated Contributor Onboarding**: Reorganized `.github` structure and implemented issue/PR templates and a welcome bot.
