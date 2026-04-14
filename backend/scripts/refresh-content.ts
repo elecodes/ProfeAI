@@ -1,38 +1,36 @@
-import dotenv from 'dotenv';
 import admin from 'firebase-admin';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { resolve } from 'path';
 import fs from 'fs/promises';
 
-// Load env vars
-dotenv.config();
+// Parse command line arguments
+const args = process.argv.slice(2);
+const RESTORE_MODE = args.includes('--restore');
+const BACKUP_MODE = args.includes('--backup') || !RESTORE_MODE; // Default: backup before update
 
-// Also try loading from parent directory if not found (common in monorepos or scripts)
-if (!process.env.GOOGLE_GENAI_API_KEY) {
-  dotenv.config({ path: resolve(process.cwd(), '.env') });
-}
-
-// 1. Initialize Firebase Admin
-if (!admin.apps.length) {
+// Manual .env loader to avoid ESM/CJS issues
+function loadEnv() {
+  const rootDir = resolve(process.cwd(), '..'); // Go up to root
+  const envPath = resolve(rootDir, '.env');
   try {
-    admin.initializeApp();
-    console.log('🔥 Firebase Admin initialized successfully.');
-  } catch (error) {
-    console.error('❌ Failed to initialize Firebase Admin:', error);
-    process.exit(1);
+    const content = require('fs').readFileSync(envPath, 'utf-8');
+    content.split('\n').forEach((line: string) => {
+      const trimmed = line.trim();
+      if (trimmed && !trimmed.startsWith('#')) {
+        const eqIdx = trimmed.indexOf('=');
+        if (eqIdx > -1) {
+          const key = trimmed.substring(0, eqIdx).trim();
+          const value = trimmed.substring(eqIdx + 1).trim();
+          process.env[key] = value;
+        }
+      }
+    });
+    console.log('✅ Loaded .env from:', envPath);
+    console.log('🔑 API Key loaded:', process.env.GOOGLE_GENAI_API_KEY ? 'YES' : 'NO');
+  } catch (e) {
+    console.warn('⚠️ Could not load .env:', e);
   }
 }
-
-// 2. Initialize Google AI
-const apiKey = process.env.GOOGLE_GENAI_API_KEY;
-if (!apiKey) {
-  console.error('❌ GOOGLE_GENAI_API_KEY is missing in environment variables.');
-  process.exit(1);
-}
-
-const genAI = new GoogleGenerativeAI(apiKey);
-// Simple check to ensure client is created
-console.log(`🤖 Google AI Client initialized (Key length: ${apiKey.length})`);
 
 async function listAvailableModels(genAI: GoogleGenerativeAI) {
   try {
@@ -72,8 +70,8 @@ async function listAvailableModels(genAI: GoogleGenerativeAI) {
 async function generateNewContent(genAI: GoogleGenerativeAI) {
   // Only use models verified by the diagnostic tool. 
   const modelsToTry = [
-    "gemini-2.0-flash", 
-    "gemini-2.0-flash-lite"
+    "googleai/gemini-flash-latest",
+    "googleai/gemini-1.5-flash"
   ];
 
   const prompt = `
@@ -115,7 +113,7 @@ async function generateNewContent(genAI: GoogleGenerativeAI) {
     
     try {
         const model = genAI.getGenerativeModel({ 
-            model: modelName,
+            model: modelName.replace('googleai/', ''),
             generationConfig: {
               responseMimeType: "application/json"
             }
@@ -159,7 +157,73 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
 async function main() {
-  console.log('🚀 Script de actualización de contenido iniciado...');
+  // Load env first (needed for any mode)
+  loadEnv();
+  
+  // Initialize Firebase Admin FIRST for any mode
+  if (admin.apps.length === 0) {
+    if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+      console.log(`🔑 Using GOOGLE_APPLICATION_CREDENTIALS: ${process.env.GOOGLE_APPLICATION_CREDENTIALS}`);
+      admin.initializeApp();
+    } else {
+      try {
+        const serviceAccount = require('../service-account.json');
+        console.log('📄 Using local service-account.json');
+        admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+      } catch (e) {
+        console.warn('⚠️ Using default initialization...');
+        admin.initializeApp();
+      }
+    }
+  }
+  
+  if (RESTORE_MODE) {
+  console.log('♻️ RESTORE MODE: Restoring from backup...');
+  
+  const db = admin.firestore();
+  const levels = ['beginner', 'intermediate', 'advanced'];
+  const batch = db.batch();
+  
+  for (const level of levels) {
+    const backupRef = db.collection('lessons').doc(`${level}_general_backup`);
+    const currentRef = db.collection('lessons').doc(`${level}_general`);
+    
+    try {
+      const backupDoc = await backupRef.get();
+      const data = backupDoc.data();
+      if (data && data.id) {
+        batch.set(currentRef, data, { merge: false });
+        console.log(`♻️ Restoring ${level} from backup...`);
+      } else {
+        console.warn(`⚠️ No backup found for ${level}, skipping`);
+      }
+    } catch (e) {
+      console.warn(`⚠️ Error restoring ${level}:`, e);
+    }
+  }
+  
+  await batch.commit();
+  console.log('✅ Restore complete!');
+  return;
+}
+
+if (!BACKUP_MODE) {
+  console.log('💾 BACKUP MODE: Only creating backup (no update)');
+} else {
+  console.log('🚀 UPDATE MODE: Will update and create backup');
+}
+  
+  // Load .env first
+  loadEnv();
+  
+  // Initialize Google AI
+  const apiKey = process.env.GOOGLE_GENAI_API_KEY;
+  if (!apiKey) {
+    console.error('❌ GOOGLE_GENAI_API_KEY is missing in environment variables.');
+    process.exit(1);
+  }
+  const genAI = new GoogleGenerativeAI(apiKey);
+  console.log(`🤖 Google AI Client initialized (Key length: ${apiKey.length})`);
   
   try {
     // 1. Initialize Firebase Admin
@@ -213,6 +277,18 @@ async function main() {
         // Target the documents as requested (e.g., beginner_general)
         const docId = `${level}_general`; 
         const docRef = db.collection('lessons').doc(docId);
+        const backupRef = db.collection('lessons').doc(`${level}_general_backup`);
+        
+        // First, backup current content BEFORE updating
+        if (BACKUP_MODE) {
+          const currentDoc = await docRef.get();
+          const currentData = currentDoc.data();
+          console.log(`🔍 Checking backup for ${level}:`, currentData ? 'has data' : 'empty');
+          if (currentData) {
+            batch.set(backupRef, currentData, { merge: false });
+            console.log(`💾 Backed up current ${level} content`);
+          }
+        }
         
         const updateData = {
             id: docId, // Ensure ID is part of the doc
