@@ -115,7 +115,9 @@ El proyecto está dividido en dos grandes bloques:
 
 ---
 
-### Scenario L: Content Refresh Script Failure (429 Rate Limits)
+### Scenario L: Content Refresh (Schedule: Every 14 Days)
+**Runs**: Automatic every 14 days via GitHub Actions, or manually anytime.
+
 **Trigger**: GitHub Action "Auto Update Lessons" fails with "Failed to generate content: All models hit rate limits".
 
 1.  **Wait and Retry**: This is usually a daily or per-minute quota issue. If it fails once, wait a few hours and trigger it manually from the Actions tab.

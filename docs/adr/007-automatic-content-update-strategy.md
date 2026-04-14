@@ -5,6 +5,11 @@ The ProfeAI application requires fresh lesson content every 14 days to keep user
 1.  **Deployment Path Errors**: GitHub Actions failed because script and credential paths didn't align with the monorepo structure.
 2.  **Quota Constraints**: On the Gemini free tier, `gemini-2.0-flash` often hits "Per Minute" rate limits (429 errors) and is restricted to specific models.
 
+## Schedule
+- **Automatic**: Every 14 days via GitHub Actions (`cron: '0 0 */14 * *'`)
+- **Manual**: Trigger from GitHub → Actions → "Auto Update Lessons" → "Run workflow"
+- **Local**: Anytime with `npx tsx backend/scripts/refresh-content.ts`
+
 ## Decision
 We implemented a robust update script (`backend/scripts/refresh-content.ts`) with the following characteristics:
 
