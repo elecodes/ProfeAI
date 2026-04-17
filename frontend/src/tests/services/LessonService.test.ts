@@ -70,4 +70,37 @@ describe('LessonService', () => {
              expect(consoleSpy).toHaveBeenCalledWith("Error writing lesson:", expect.any(Error));
         });
     });
+    describe('getGeneralLesson', () => {
+        it('should fetch the general lesson document', async () => {
+            const mockDoc = {
+                id: 'beginner_general',
+                exists: () => true,
+                data: () => ({ title: 'General Lesson', level: 'beginner' })
+            };
+            
+            vi.mocked(firestore.getDoc).mockResolvedValueOnce(mockDoc as any);
+
+            const lesson = await LessonService.getGeneralLesson('beginner');
+            
+            expect(firestore.doc).toHaveBeenCalledWith(expect.anything(), 'lessons', 'beginner_general');
+            expect(lesson).toEqual({ id: 'beginner_general', title: 'General Lesson', level: 'beginner' });
+        });
+
+        it('should return null if document does not exist', async () => {
+            vi.mocked(firestore.getDoc).mockResolvedValueOnce({
+                exists: () => false
+            } as any);
+
+            const lesson = await LessonService.getGeneralLesson('unknown');
+            expect(lesson).toBeNull();
+        });
+
+        it('should handle fetch errors', async () => {
+            vi.mocked(firestore.getDoc).mockRejectedValueOnce(new Error('Fetch Error'));
+            const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+            await expect(LessonService.getGeneralLesson('beginner')).rejects.toThrow('Fetch Error');
+            expect(consoleSpy).toHaveBeenCalledWith("Error fetching general lesson from Firestore:", expect.any(Error));
+        });
+    });
 });
