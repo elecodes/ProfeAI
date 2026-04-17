@@ -154,6 +154,7 @@ Para entender mejor por qué tomamos ciertas decisiones técnicas, puedes consul
 *   [ADR 011: Variables de Entorno en Build-time](./docs/ADR/011-playwright-build-env-vars.md)
 *   [ADR 012: Onboarding de Contribuidores Automatizado](./docs/ADR/012-automated-contributor-onboarding.md)
 *   [ADR 013: Security Hardening and Dialogue UI Refinement](./docs/adr/013-security-hardening-ui-refinement.md)
+*   [ADR 014: Hardening Firebase Config and Dependencies](./docs/adr/014-hardening-firebase-config-and-deps.md)
 
 ## 📄 Licencia
 

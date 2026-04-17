@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.6] - 2026-04-17
+
+### Security
+- **Firebase Config Hardening**: Moved Firebase configuration to environment variables (`VITE_FIREBASE_*`) to resolve Snyk security alerts for hardcoded secrets.
+- **Dependency Cleanup**: Removed `firebase-admin` from frontend dependencies to eliminate the risk of exposing service account credentials in the client bundle.
+
+### Architecture
+- **Dependency Segregation**: Moved `firebase` (client SDK), `react`, and `react-dom` to `dependencies` in the frontend workspace to align with production build requirements.
+
 ## [1.2.5] - 2026-04-17
 
 ### Added
