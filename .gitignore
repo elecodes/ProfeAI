@@ -138,3 +138,6 @@ storybook-static
 
 # Documentation backups
 README_original*
+
+# Genkit
+.genkit/
