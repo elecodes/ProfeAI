@@ -20,6 +20,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app: express.Application = express();
+app.disable("x-powered-by");
 
 // Middleware
 app.use(
@@ -99,7 +100,7 @@ app.use("/tts", limiter, ttsRoutes);
 app.use(express.static(path.join(__dirname, "../../frontend/dist")));
 
 // Handle SPA routing
-app.get(/.*/, (req: express.Request, res: express.Response) => {
+app.get(/.*/, limiter, (req: express.Request, res: express.Response) => {
   if (req.path.startsWith("/api") || req.path.startsWith("/tts")) {
     return res.status(404).json({ error: "Not found" });
   }

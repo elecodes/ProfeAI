@@ -1,5 +1,5 @@
 import process from 'node:process';
-import { db } from '../firebase/firebase.js';
+import { db } from '../src/lib/firebase.ts';
 import { collection, getDocs } from 'firebase/firestore';
 
 async function testConnection() {

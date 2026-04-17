@@ -135,7 +135,18 @@ El proyecto está dividido en dos grandes bloques:
 1. **Never Hardcode**: Ensure all Firebase keys (API Key, App ID, etc.) are stored in environment variables.
 2. **Vite Specifics**: In the frontend, variables MUST start with `VITE_` to be accessible via `import.meta.env`.
 3. **Segregate Admin**: Never include `firebase-admin` in the frontend `package.json`. It is strictly for backend/script use.
-4. **Reference**: See [ADR 014](./adr/014-hardening-firebase-config-and-deps.md).
+4. **Unified Initialization**: For backend scripts (like `seedLessons.js`), use `backend/src/lib/firebase.ts`. This file handles `.env` loading and client SDK initialization using `VITE_` variables.
+5. **Reference**: See [ADR 014](./adr/014-hardening-firebase-config-and-deps.md).
+
+---
+
+### Scenario U: Broken Backend Scripts / Seeding Failure
+**Trigger**: Running `seedLessons.js` or `debugConnection.js` fails with `ERR_MODULE_NOT_FOUND` or "Firebase configuration missing".
+
+1. **Verify Initialization Path**: Ensure scripts import from `../src/lib/firebase.ts`.
+2. **Check Root .env**: These scripts look for `.env` at the root of the project.
+3. **Validate Credentials**: Ensure `ADMIN_EMAIL` and `ADMIN_PASSWORD` are correct for your Firebase project.
+4. **Run with TSX**: Always use `npx tsx` to run scripts to ensure TypeScript support and ESM compatibility.
 
 ---
 

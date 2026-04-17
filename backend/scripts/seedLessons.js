@@ -2,18 +2,26 @@ import process from 'node:process';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { db, auth } from '../firebase/firebase.js';
+import dotenv from 'dotenv';
+import { db, auth } from '../src/lib/firebase.ts';
 import { doc, setDoc } from 'firebase/firestore';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 
+// Load .env from root
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 const LESSONS_DIR = path.join(__dirname, '../../frontend/src/lessons');
 
 async function authenticate() {
-  const email = "admin@apptutor.test";
-  const password = "adminPassword123!";
+  const email = process.env.ADMIN_EMAIL;
+  const password = process.env.ADMIN_PASSWORD;
+
+  if (!email || !password) {
+    console.error("❌ ADMIN_EMAIL or ADMIN_PASSWORD missing in .env");
+    process.exit(1);
+  }
 
   try {
     console.log("🔐 Attempting to sign in...");

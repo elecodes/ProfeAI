@@ -1,7 +1,7 @@
 {
   "name": "profe-ai-monorepo",
   "private": true,
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "Monorepo for ProfeAI - React Frontend and Node.js Backend",
   "workspaces": [
     "frontend"

@@ -75,10 +75,10 @@ El proyecto está organizado como un **npm workspace** para separar claramente l
 4.  **Cargar Contenido (Seed):**
     Sube las lecciones iniciales desde los archivos JSON locales a Firestore. 
     > [!IMPORTANT]
-    > Requiere un archivo `service-account.json` en la raíz que pertenezca al mismo proyecto configurado en el frontend.
+    > Uses `ADMIN_EMAIL` and `ADMIN_PASSWORD` defined in your `.env`. No manual `service-account.json` is required for this script anymore as it uses the client SDK with admin credentials.
     ```bash
     # Sincroniza lecciones locales a Firestore
-    node backend/scripts/seedLessons.js
+    npx tsx backend/scripts/seedLessons.js
     ```
 
 5.  **Actualizar Contenido con IA (Opcional):**
