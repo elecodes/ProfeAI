@@ -16,13 +16,14 @@ We implemented the following changes:
 - **Config Cleanliness**: Updated `frontend/src/config/firebase.ts` to use `import.meta.env` exclusively, removing all hardcoded strings.
 - **Example Update**: Updated `.env.example` to include all required Firebase variables.
 
-### 2. Dependency Management
-- **Frontend Cleanup**: Removed `firebase-admin` from `frontend/package.json`.
-- **Dependency Segregation**: Moved `firebase`, `react`, and `react-dom` from `devDependencies` to `dependencies` in the frontend workspace.
-- **Audit**: Ran `npm install` and verified build stability with Vite.
+### 3. Backend Security Hardening (Snyk Remediation)
+- **Rate Limiting**: Implemented `express-rate-limit` globally and on the SPA fallback route to prevent DoS (CWE-770).
+- **Header Security**: Disabled `X-Powered-By` and configured `helmet` with a strict CSP to prevent information exposure (CWE-200) and XSS.
+- **Unified Firebase Init**: Created `backend/src/lib/firebase.ts` to centralize secure Firebase initialization for backend scripts, removing legacy `service-account.json` requirements.
 
 ## Consequences
-- **Improved Security posture**: Snyk alerts for hardcoded secrets are resolved, and the codebase follows best practices for secret management.
+- **Improved Security posture**: Snyk alerts for hardcoded secrets, resource allocation, and information exposure are resolved.
 - **Reduced Bundle Risk**: `firebase-admin` is no longer available in the frontend, preventing accidental usage of server-side secrets in the client.
 - **Production Readiness**: Core execution dependencies are correctly categorized, ensuring they are included in production builds.
-- **Onboarding**: New developers have a clear `.env.example` to follow for Firebase setup.
+- **Scalability**: Rate limiting protects the server from abusive traffic or simple DoS attacks.
+- **Onboarding**: New developers have a clear `.env.example` to follow for Firebase setup, including the new `ADMIN_EMAIL` and `ADMIN_PASSWORD` for maintenance scripts.
