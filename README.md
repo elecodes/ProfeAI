@@ -29,6 +29,7 @@ Profe AI es una aplicación web interactiva diseñada para ayudar a estudiantes 
     *   **Navegación por Teclado:** Uso completo sin ratón (Tab, Enter, Escape).
     *   **Lectores de Pantalla:** Etiquetas ARIA descriptivas en todos los botones.
     *   **Indicadores de Estado:** Animaciones de "Pensando..." durante la generación de IA para reducir la espera percibida.
+*   **Contraste de Alto Nivel:** Uso de `amber-300` como estándar mínimo para resaltes sobre fondos oscuros, garantizando legibilidad.
 *   **⚡ Rendimiento Avanzado:**
     *   **Lazy Loading:** Carga progresiva de páginas para un inicio instantáneo.
     *   **AI Model Reporting:** El sistema informa en consola exactamente qué modelo está respondiendo (ej: "Gemini 2.5 Flash Lite").
@@ -152,6 +153,7 @@ Para entender mejor por qué tomamos ciertas decisiones técnicas, puedes consul
 *   [ADR 003: Estrategia de Testing](./docs/ADR/003-testing-strategy.md)
 *   [ADR 011: Variables de Entorno en Build-time](./docs/ADR/011-playwright-build-env-vars.md)
 *   [ADR 012: Onboarding de Contribuidores Automatizado](./docs/ADR/012-automated-contributor-onboarding.md)
+*   [ADR 013: Security Hardening and Dialogue UI Refinement](./docs/adr/013-security-hardening-ui-refinement.md)
 
 ## 📄 Licencia
 

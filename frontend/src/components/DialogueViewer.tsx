@@ -58,12 +58,12 @@ const DialogueViewer: React.FC<Props> = ({ dialogue }) => {
               className={`max-w-[90%] md:max-w-[80%] p-4 md:p-6 shadow-sm transition-all ${
                 index % 2 === 0
                   ? "bg-white border border-gray-100 rounded-[20px] md:rounded-[24px] rounded-tl-sm text-[var(--color-primary)]"
-                  : "bg-slate-600 text-white rounded-[20px] md:rounded-[24px] rounded-tr-sm shadow-md"
+                  : "bg-[var(--color-secondary)] text-white rounded-[20px] md:rounded-[24px] rounded-tr-sm shadow-md border border-white/10"
               }`}
             >
               <div className="flex items-center justify-between mb-3 gap-6">
                 <span className={`text-xs font-bold uppercase tracking-widest ${
-                    index % 2 === 0 ? "text-[var(--color-secondary)]" : "text-[var(--color-accent)]"
+                    index % 2 === 0 ? "text-[var(--color-accent)]" : "text-amber-300"
                 }`}>
                   {line.speaker}
                 </span>
@@ -97,7 +97,7 @@ const DialogueViewer: React.FC<Props> = ({ dialogue }) => {
               <button
                 onClick={() => toggleTranslation(index)}
                 className={`text-xs mt-3 block font-medium hover:underline ${
-                    index % 2 === 0 ? "text-[var(--color-secondary)]" : "text-[var(--color-accent)]"
+                    index % 2 === 0 ? "text-[var(--color-secondary)]" : "text-amber-300"
                 }`}
               >
                 {showTranslation[index] ? "Ocultar traducción" : "Ver traducción"}

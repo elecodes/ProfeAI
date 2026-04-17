@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.5] - 2026-04-17
+
+### Added
+- **Security ADR**: Added [ADR 013](./adr/013-security-hardening-ui-refinement.md) documenting security hardening and UI refinements.
+
+### Changed
+- **Dialogue UI Refinement**: Updated `DialogueViewer.tsx` with better contrast (brand secondary color + `amber-300`) and subtle borders for a more premium look.
+- **Frontend SDKs**: Upgraded `@aws-sdk/client-polly`, `langchain`, and `genkit` to latest secure versions.
+
+### Fixed
+- **Security Hardening**: Resolved transitive vulnerabilities in `path-to-regexp`, `yaml`, and `fast-xml-parser` using npm overrides.
+
 ## [1.2.4] - 2026-04-14
 
 ### Added

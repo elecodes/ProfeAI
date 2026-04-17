@@ -1,7 +1,7 @@
 {
   "name": "profe-ai-monorepo",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.2.5",
   "description": "Monorepo for ProfeAI - React Frontend and Node.js Backend",
   "workspaces": [
     "frontend"
@@ -29,11 +29,14 @@
     "husky": "^9.1.7"
   },
   "overrides": {
-    "qs": "6.14.2"
+    "qs": "6.14.2",
+    "path-to-regexp": "0.1.13",
+    "yaml": "2.8.3",
+    "fast-xml-parser": "5.6.0"
   },
   "dependencies": {
-    "qs": "6.14.2",
     "dotenv": "^16.4.1",
+    "qs": "6.14.2",
     "tsx": "^4.7.0"
   }
 }

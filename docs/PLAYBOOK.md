@@ -107,11 +107,27 @@ El proyecto está dividido en dos grandes bloques:
     *   *Yes*: Block IP at firewall/Cloudflare level.
 
 ### Scenario E: CORS Errors
-**Trigger**: Frontend console "Access-Control-Allow-Origin" error.
-
-1.  **Verify Origin**: Is the user accessing from a new domain?
-    *   *Action*: Add domain to `allowedOrigins` in `server.ts`.
+...
 2.  **Verify Environment**: Is it Prod trying to hit Dev?
+
+---
+
+## 🛡️ Security & UI Maintenance
+
+### Scenario R: Transitive Dependency Vulnerabilities
+**Trigger**: Snyk alert "Critical vulnerability found in transitive dependency".
+
+1.  **Identify Path**: Use `npm explain <dependency>` to see which top-level package is pulling the vulnerable version.
+2.  **Implement Override**: Add the secure version to the `overrides` section in the root `package.json`.
+3.  **Verify**: Run `npm install` and then `npm audit` or Snyk to confirm the resolution.
+4.  **Reference**: See [ADR 013](./adr/013-security-hardening-ui-refinement.md) for examples.
+
+### Scenario S: Contrast or Accessibility Issues
+**Trigger**: Automated a11y tests fail or manual review identifies poor visibility.
+
+1.  **Brand Alignment**: Always use design tokens (e.g., `var(--color-secondary)`) instead of ad-hoc Tailwind colors for background containers.
+2.  **Amber Contrast**: For highlight text on dark backgrounds, use `amber-300` as the minimum threshold for readability. Avoid `amber-100` or `amber-200` on dark navy/slate.
+3.  **Borders for Depth**: On dark backgrounds, use `border-white/10` to provide definition to container elements.
 
 ---
 
