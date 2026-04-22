@@ -150,6 +150,26 @@ El proyecto está dividido en dos grandes bloques:
 
 ---
 
+### Scenario V: TTS Male Voices Sound Female
+**Trigger**: Users report all dialogue characters sound like the same woman, regardless of character gender.
+
+1.  **Check Server Logs**: Look for `POLLY DEBUG` lines. Verify:
+    *   Male requests show `VoiceId="Sergio"` (NOT `Enrique`).
+    *   Female requests show `VoiceId="Lucia"`.
+    *   Engine is `"neural"` for both.
+2.  **Verify Fallback Gender**: If the log shows `Fallback 1: Trying default voice...`, check that the gender is being passed:
+    *   ✅ Correct: `TTSService.generateSpeech(text, language, { gender: options?.gender })`
+    *   ❌ Bug: `TTSService.generateSpeech(text, language, {})` — this loses gender and defaults to female.
+3.  **Cache Poisoning**: If logs are correct but audio is wrong, clear TTS cache:
+    ```bash
+    rm -f cache/tts/*.mp3
+    ```
+4.  **Engine Compatibility**: If adding new Polly voices, verify engine support:
+    *   `Sergio` → `neural` ✅ | `Enrique` → `standard` only ⚠️
+    *   Use `aws polly describe-voices --language-code es-ES` to check.
+5.  **Server Restart**: `npx tsx` does NOT hot-reload. After code changes, restart the backend manually.
+6.  **Reference**: See [ADR 015](./adr/015-tts-male-voice-fix.md).
+
 ### Scenario L: Content Refresh (Schedule: Every 14 Days)
 **Runs**: Automatic every 14 days via GitHub Actions, or manually anytime.
 

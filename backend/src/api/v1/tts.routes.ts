@@ -35,7 +35,8 @@ router.post("/", validate(ttsSchema), async (req: Request, res: Response) => {
       console.warn(`⚠️ Primary TTS failed: ${error.message}`);
       try {
         console.log("🔄 Fallback 1: Trying default voice...");
-        result = await TTSService.generateSpeech(text, language, {});
+        // CRITICAL: preserve gender so male voices don't fall back to female
+        result = await TTSService.generateSpeech(text, language, { gender: options?.gender });
       } catch (err2: any) {
         console.warn(`⚠️ Fallback 1 failed: ${err2.message}`);
         console.log("🔄 Fallback 2: Trying Google Standard Female (Safety Net)...");

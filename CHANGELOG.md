@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.7] - 2026-04-23
+
+### Fixed
+- **TTS Male Voices**: Male characters (e.g., Carlos, Don José) no longer sound female. Root cause: `Enrique` voice was configured with `Engine: "neural"` but only supports `"standard"`. Replaced with `Sergio` (the only neural-capable Spanish male voice).
+- **TTS Fallback Gender Loss**: When primary TTS provider failed, the retry logic passed empty options `{}`, defaulting all voices to female. Fallback now preserves the original `gender` parameter.
+
+### Changed
+- Added debug logging (`POLLY DEBUG`) to TTS service for voice/engine observability.
+- ADR 015 documents the root cause analysis and voice compatibility matrix.
+
 ## [1.2.6] - 2026-04-17
 
 ### Added

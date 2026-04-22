@@ -164,7 +164,7 @@ describe('useTTS Exhaustive', () => {
   });
 
   describe('voice selection logic', () => {
-    it('selects best male voice (Google español) automatically', async () => {
+    it('selects best male voice (Jorge) automatically', async () => {
       const { result } = renderHook(() => useTTS());
       
       await act(async () => {
@@ -173,7 +173,7 @@ describe('useTTS Exhaustive', () => {
 
       expect(global.speechSynthesis.speak).toHaveBeenCalledWith(
         expect.objectContaining({
-          voice: expect.objectContaining({ name: 'Google español' })
+          voice: expect.objectContaining({ name: 'Jorge' })
         })
       );
     });

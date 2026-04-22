@@ -366,130 +366,62 @@ export const useTTS = (): UseTTSReturn => {
             }
           }
 
-          // SPECIAL CASE: For male voices, prioritize Google español
-          if (isMale) {
-            // Buscamos Google español por nombre, ya que los índices varían entre navegadores
-            const googleEspanolVoice = voices.find(v => 
-              v.name.toLowerCase().includes("google") && 
-              v.name.toLowerCase().includes("español") && 
-              v.lang.startsWith('es')
-            );
-            if (googleEspanolVoice) {
-              console.log(`🎯 Using best male voice found by name: ${googleEspanolVoice.name}`);
-              return googleEspanolVoice;
-            }
-
-            // Fallback a cualquier voz masculina natural de Microsoft o Apple
-            const naturalMale = voices.find(v => 
-              v.lang.startsWith('es') && 
-              (v.name.toLowerCase().includes("david") || v.name.toLowerCase().includes("enrique") || v.name.toLowerCase().includes("jorge"))
-            );
-            if (naturalMale) return naturalMale;
-          }
+          // NOTE: Google Web Speech API voices are robotic — we avoid them.
+          // Gender-specific selection is handled in PRIORITY 1 below.
 
           // Get all Spanish voices
           const spanishVoices = voices.filter(v => v.lang.startsWith(langCode));
           console.log(`Available Spanish voices: ${spanishVoices.length}`);
 
-          // PRIORITY 1: Look for natural-sounding voices (avoid robotic Google voices)
-          const anyNaturalVoice: SpeechSynthesisVoice | undefined = voices.find((voice: SpeechSynthesisVoice) => {
-            const name = voice.name.toLowerCase();
-            const langMatch = voice.lang.startsWith(langCode);
-            if (!langMatch) return false;
+          // Male and female name lists for voice matching
+          const maleNaturalNames = [
+            "grandpa", "eddy", "rocko", "reed", "jorge", "carlos",
+            "luis", "pedro", "diego", "roberto", "antonio", "pablo",
+            "david", "enrique"
+          ];
+          const femaleNaturalNames = [
+            "grandma", "flo", "sandy", "shelley", "monica", "paulina",
+            "carmen", "ana", "maria", "isabel", "rosa", "elena",
+            "patricia", "beatriz", "raquel"
+          ];
 
-            // Avoid robotic Google voices that sound artificial
-            if (name.includes("google español") || name.includes("google")) {
-              return false;
-            }
+          const targetNames = isMale ? maleNaturalNames : femaleNaturalNames;
 
-            // Look for natural-sounding voice names
-            const naturalNames = [
-              "eddy", "flo", "grandma", "grandpa", "monica", "paulina",
-              "reed", "rocko", "sandy", "shelley", "carmen", "jorge",
-              "luis", "pedro", "diego", "roberto", "antonio", "pablo",
-              "david", "enrique", "carlos", "ana", "maria", "isabel",
-              "rosa", "elena", "patricia", "beatriz", "raquel"
-            ];
-
-            return naturalNames.some(naturalName => name.includes(naturalName));
-          });
-
-          if (anyNaturalVoice) {
-            console.log(`🎯 Using natural voice: ${anyNaturalVoice.name}`);
-            return anyNaturalVoice;
-          }
-
-          // PRIORITY 2: Look for gender-specific natural voices
+          // PRIORITY 1: Gender-specific natural voice (non-Google)
           const genderNaturalVoice = voices.find((voice) => {
             const name = voice.name.toLowerCase();
             const langMatch = voice.lang.startsWith(langCode);
             if (!langMatch) return false;
 
             // Avoid robotic Google voices
-            if (name.includes("google español") || name.includes("google")) {
-              return false;
-            }
+            if (name.includes("google")) return false;
 
-            if (isMale) {
-              // Prioritize masculine-sounding natural voices
-              const maleNaturalVoices = [
-                "grandpa", "eddy", "rocko", "reed", "jorge", "carlos",
-                "luis", "pedro", "diego", "roberto", "antonio", "pablo",
-                "david", "enrique"
-              ];
-              return maleNaturalVoices.some(maleName => name.includes(maleName));
-            } else {
-              // Prioritize feminine-sounding natural voices
-              const femaleNaturalVoices = [
-                "grandma", "flo", "sandy", "shelley", "monica", "paulina",
-                "carmen", "ana", "maria", "isabel", "rosa", "elena",
-                "patricia", "beatriz", "raquel"
-              ];
-              return femaleNaturalVoices.some(femaleName => name.includes(femaleName));
-            }
+            return targetNames.some(n => name.includes(n));
           });
 
           if (genderNaturalVoice) {
-            console.log(`🎯 Using gender-specific natural voice: ${genderNaturalVoice.name}`);
+            console.log(`🎯 Using gender-specific natural voice: ${genderNaturalVoice.name} (${isMale ? 'male' : 'female'})`);
             return genderNaturalVoice;
           }
 
-          // No longer needed: anyNaturalVoice was already checked above
-          const fallbackNaturalVoice = voices.find((voice) => {
+          // PRIORITY 2: Gender-aware non-Google Spanish voice
+          // Still try to match gender before falling back to any voice
+          const genderAwareNonGoogle = voices.find((voice) => {
             const name = voice.name.toLowerCase();
             const langMatch = voice.lang.startsWith(langCode);
             if (!langMatch) return false;
-
-            // Avoid robotic Google voices that sound artificial
-            if (name.includes("google español") || name.includes("google")) {
-              return false;
-            }
-
-            // Look for natural-sounding voice names
-            const naturalNames = [
-              "eddy", "flo", "grandma", "grandpa", "monica", "paulina",
-              "reed", "rocko", "sandy", "shelley", "carmen", "jorge",
-              "luis", "pedro", "diego", "roberto", "antonio", "pablo",
-              "david", "enrique", "carlos", "ana", "maria", "isabel",
-              "rosa", "elena", "patricia", "beatriz", "raquel"
-            ];
-
-            return naturalNames.some(naturalName => name.includes(naturalName));
+            if (name.includes("google")) return false;
+            // Reject voices that clearly belong to the opposite gender
+            const oppositeNames = isMale ? femaleNaturalNames : maleNaturalNames;
+            return !oppositeNames.some(n => name.includes(n));
           });
 
-          if (fallbackNaturalVoice) {
-            console.log(`🎯 Using fallback natural voice: ${fallbackNaturalVoice.name}`);
-            return fallbackNaturalVoice;
+          if (genderAwareNonGoogle) {
+            console.log(`⚠️ Using gender-filtered non-Google voice: ${genderAwareNonGoogle.name} (${isMale ? 'male' : 'female'})`);
+            return genderAwareNonGoogle;
           }
 
-          /* 
-          // FIX: genderSpecificPremiumVoice was not defined in this scope (copy-paste error from debug function)
-          // Removing this block as logic seems to be handled by priority 3 (any premium) or we should re-implement finding it
-          if (genderSpecificPremiumVoice) {
-            console.log(`✅ Found gender-specific premium voice: ${genderSpecificPremiumVoice.name}`);
-            return genderSpecificPremiumVoice;
-          }
-          */
+
 
           // PRIORITY 3: Use any premium voice if available (better quality)
           const anyPremiumVoice = voices.find((voice) => {

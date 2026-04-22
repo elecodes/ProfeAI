@@ -1,80 +1,90 @@
-# Solución Temporal: Voces Mejoradas con Web Speech API
+# 🔊 Voice Quality Guide — TTS Provider Stack
 
-## Situación Actual
+> **Last updated**: 2026-04-23
 
-ElevenLabs se quedó sin créditos (1 crédito restante de 10,000). El sistema de fallback está funcionando correctamente y usa Web Speech API del navegador.
+## Current TTS Architecture
 
-## Mejoras Aplicadas
+ProfeAI uses a **cascading fallback** strategy for Text-to-Speech:
 
-He optimizado Web Speech API para usar las mejores voces disponibles en tu navegador:
+```
+ElevenLabs (premium) → Amazon Polly (neural) → Google Cloud TTS → Web Speech API (browser)
+```
 
-### Selección Automática de Voces
+The system tries each provider in order. If one fails (quota, network, etc.), it falls back to the next.
 
-El sistema ahora busca voces premium en este orden:
-1. **Voces Premium/Enhanced** (si están disponibles)
-2. **Voces de Google** (mejor calidad)
-3. **Voces de Microsoft** (buena calidad)
-4. **Voz por defecto del idioma** (fallback)
+## Amazon Polly Voice Configuration (Primary Fallback)
 
-### Configuración Optimizada
+Since ElevenLabs often exceeds its free-tier quota, **Amazon Polly** is the de facto primary TTS provider.
 
-- **Rate**: 0.95 (velocidad ligeramente reducida para mejor claridad)
-- **Pitch**: 1.0 (tono natural)
-- **Volume**: 1.0 (volumen máximo)
+### Spanish (`es-ES`) Voice Matrix
 
-## Opciones para Mejorar la Calidad
+| Voice     | Engine     | Gender | Status                        |
+|-----------|------------|--------|-------------------------------|
+| **Sergio**| `neural`   | Male   | ✅ Active — primary male voice |
+| **Lucía** | `neural`   | Female | ✅ Active — primary female     |
+| Enrique   | `standard` | Male   | ⛔ Do NOT use with neural     |
+| Conchita  | `standard` | Female | Legacy, not configured        |
+| Mía       | `standard` | Female | Legacy, not configured        |
 
-### Opción 1: Esperar Reset de ElevenLabs (Más Fácil)
-- **Cuándo**: 1 de diciembre de 2025
-- **Beneficio**: 10,000 caracteres gratis de voces premium
-- **Acción**: Ninguna, solo esperar
+> [!CAUTION]
+> `Enrique` does NOT support the `neural` engine. Using `Enrique` + `neural` causes Polly to silently fail or produce incorrect audio. Always use `Sergio` for neural male Spanish voices. See [ADR 015](./adr/015-tts-male-voice-fix.md).
 
-### Opción 2: Configurar Google Cloud TTS (Recomendado)
-- **Beneficio**: 4,000,000 caracteres gratis/mes
-- **Calidad**: Excelente (voces Neural2)
-- **Guía**: Sigue `GOOGLE_CLOUD_SETUP.md`
-- **Tiempo**: ~15 minutos de configuración
+### Other Languages
 
-### Opción 3: Mejorar Web Speech API (Ahora)
+| Language | Female Voice  | Male Voice    | Engine   |
+|----------|---------------|---------------|----------|
+| `en`     | Joanna        | Matthew       | neural   |
+| `fr`     | Léa           | Mathieu       | standard |
+| `de`     | Vicki         | Hans          | standard |
+| `it`     | Bianca        | —             | standard |
+| `pt`     | Camila        | —             | neural   |
 
-#### En Chrome/Edge (Mejor soporte):
-Las voces de Google ya deberían estar disponibles automáticamente.
+## Gender Handling
 
-#### En Safari (Mac):
-1. Ve a **Preferencias del Sistema** → **Accesibilidad** → **Contenido Hablado**
-2. Haz clic en **Voces del Sistema**
-3. Descarga voces premium:
-   - **Español**: "Mónica" o "Jorge" (España) / "Paulina" (México)
-   - **Inglés**: "Samantha" o "Alex" (US)
+Gender flows through the entire stack:
 
-#### En Firefox:
-Firefox usa voces del sistema operativo, así que descarga las voces premium del sistema.
+1. **Frontend** sends `options.gender` (`"male"` | `"female"`) in the TTS request body.
+2. **Backend** (`tts.routes.ts`) passes it to `TTSService.generateSpeech()`.
+3. **TTSService** selects the appropriate voice based on gender + language.
+4. **Fallback**: If the primary call fails, `gender` is preserved in retries.
 
-## Verificar Voces Disponibles
+> [!WARNING]
+> If fallback code passes `{}` instead of `{ gender: options?.gender }`, ALL voices default to female. This was a critical bug fixed in v1.2.7.
 
-Abre la consola del navegador y ejecuta:
+## ElevenLabs Configuration
+
+| Gender | Voice ID                         |
+|--------|----------------------------------|
+| Female | `f9DFWr0Y8aHd6VNMEdTt`          |
+| Male   | `N2lVS1wzXKqndCShpkY4`          |
+
+Free tier: ~10,000 characters/month. Resets on the 1st.
+
+## Web Speech API (Browser Fallback)
+
+When all backend providers fail, the system falls back to the browser's built-in voices.
+
+### Improving Browser Voice Quality
+
+**Chrome/Edge**: Google voices are available automatically.
+
+**Safari (Mac)**:
+1. System Preferences → Accessibility → Spoken Content
+2. Download premium voices: "Mónica" or "Jorge" (Spain) / "Paulina" (Mexico)
+
+**Firefox**: Uses OS-level voices. Download system premium voices.
+
+### Verify Available Voices
 
 ```javascript
-speechSynthesis.getVoices().forEach(voice => {
-  console.log(`${voice.name} (${voice.lang})`);
-});
+speechSynthesis.getVoices().forEach(v =>
+  console.log(`${v.name} (${v.lang})`)
+);
 ```
 
-Busca voces que incluyan "Premium", "Enhanced", "Google" o "Microsoft".
+## Debugging TTS Issues
 
-## Resultado Esperado
-
-Ahora deberías ver en la consola:
-```
-🎤 Using voice: Google español (es-ES)
-```
-
-O similar, indicando que está usando una voz de mejor calidad.
-
-## Próximos Pasos
-
-1. **Inmediato**: Prueba el audio ahora - debería sonar un poco mejor
-2. **Opcional**: Descarga voces premium del sistema (instrucciones arriba)
-3. **Recomendado**: Configura Google Cloud TTS para 4M caracteres gratis/mes
-
-¿Necesitas ayuda con alguna de estas opciones?
+1. **Check server logs** for `POLLY DEBUG` lines showing VoiceId and Engine.
+2. **Compare audio files**: Different genders should produce different file sizes and MD5 hashes.
+3. **Clear cache**: `rm -f cache/tts/*.mp3` — stale cache can serve wrong voices.
+4. **Restart server**: `npx tsx` does NOT hot-reload; restart after code changes.

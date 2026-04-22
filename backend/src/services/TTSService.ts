@@ -49,7 +49,7 @@ class TTSService {
         },
         es: {
           female: { Engine: "neural", VoiceId: "Lucia" }, // Natural de España
-          male: { Engine: "neural", VoiceId: "Enrique" },
+          male: { Engine: "neural", VoiceId: "Sergio" }, // Enrique solo soporta "standard" — Sergio es el neural masculino
         },
       },
       elevenlabs: {
@@ -83,7 +83,7 @@ class TTSService {
           },
           male: {
             languageCode: "es-ES",
-            name: "es-ES-Neural2-B",
+            name: "es-ES-Neural2-F",
             ssmlGender: "MALE",
           },
         },
@@ -173,6 +173,9 @@ class TTSService {
     // @ts-ignore
     const langConfig = this.voices.polly[language] || this.voices.polly.en;
     const voiceConfig = langConfig[gender] || langConfig.female;
+
+    console.log(`🔍 POLLY DEBUG: gender="${gender}", VoiceId="${voiceConfig.VoiceId}", Engine="${voiceConfig.Engine}", language="${language}"`);
+    console.log(`🔍 POLLY DEBUG: Full voice config:`, JSON.stringify(voiceConfig));
 
     const command = new SynthesizeSpeechCommand({
       Text: text,
