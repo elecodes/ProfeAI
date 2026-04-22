@@ -283,6 +283,14 @@ class TTSService {
 
     const errors: {provider: string, error: string}[] = [];
     let result: TTSResult | null = null;
+    
+    console.log(`🎙️ TTS Request: [${language}] [${finalOptions.gender || "female"}] Text length: ${text.length}`);
+    const availableProviders = [
+      this.elevenLabsKey ? "ElevenLabs" : null,
+      this.pollyClient ? "Polly" : null,
+      this.googleApiKey ? "Google" : null
+    ].filter(Boolean);
+    console.log(`🛠️ Available providers: ${availableProviders.join(", ") || "NONE"}`);
 
     // 1. ElevenLabs (Si hay créditos) - SOLO SE INTENTA SI HAY KEY
     if (this.elevenLabsKey && !result) {

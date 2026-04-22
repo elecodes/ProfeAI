@@ -366,23 +366,25 @@ export const useTTS = (): UseTTSReturn => {
             }
           }
 
-          // SPECIAL CASE: For male voices, use Google español as it sounds best
+          // SPECIAL CASE: For male voices, prioritize Google español
           if (isMale) {
-            // First try index 195 (where user found it works best)
-            if (voices[195] && voices[195].name.includes("Google español")) {
-              console.log(`🎯 Using best male voice: ${voices[195].name} (index 195)`);
-              return voices[195];
-            }
-
-            // If not at 195, search for Google español by name
-            const googleEspanolVoice = voices.find(v => v.name.includes("Google español") && v.lang.startsWith('es'));
+            // Buscamos Google español por nombre, ya que los índices varían entre navegadores
+            const googleEspanolVoice = voices.find(v => 
+              v.name.toLowerCase().includes("google") && 
+              v.name.toLowerCase().includes("español") && 
+              v.lang.startsWith('es')
+            );
             if (googleEspanolVoice) {
-              const googleIndex = voices.indexOf(googleEspanolVoice);
-              console.log(`🎯 Using best male voice: ${googleEspanolVoice.name} (index ${googleIndex})`);
+              console.log(`🎯 Using best male voice found by name: ${googleEspanolVoice.name}`);
               return googleEspanolVoice;
             }
 
-            console.log(`⚠️ Google español voice not found. Available Spanish voices: ${voices.filter(v => v.lang.startsWith('es')).length}`);
+            // Fallback a cualquier voz masculina natural de Microsoft o Apple
+            const naturalMale = voices.find(v => 
+              v.lang.startsWith('es') && 
+              (v.name.toLowerCase().includes("david") || v.name.toLowerCase().includes("enrique") || v.name.toLowerCase().includes("jorge"))
+            );
+            if (naturalMale) return naturalMale;
           }
 
           // Get all Spanish voices
@@ -587,12 +589,8 @@ export const useTTS = (): UseTTSReturn => {
                 manualVoiceConfig[options.gender as 'male' | 'female'] as number : undefined } : {})
       };
 
-      // SPECIAL CASE: Always use Web Speech API for male voices (they sound better)
-      if (finalOptions?.gender === "male") {
-        console.log("🎙️ Using Web Speech API directly for male voice (bypassing backend)");
-        await speakWithWebSpeech(text, lang, finalOptions);
-        return;
-      }
+      // Quitamos el bypass para que intente usar el backend primero (Polly/ElevenLabs son superiores)
+      // Si el backend falla, caerá automáticamente al fallback de Web Speech.
 
       // SPECIAL CASE: If server forces Web Speech API
       if (finalOptions.forceWebSpeech) {
@@ -603,45 +601,54 @@ export const useTTS = (): UseTTSReturn => {
 
       try {
         console.log("🎙️ Attempting backend TTS...");
-        const response = await fetch("/api/tts", {
+        const response = await fetch("/api/v1/tts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             text,
             language: lang,
-            uid: user?.uid, // Send UID for persistence/preferences
+            uid: user?.uid,
             options: finalOptions || {},
           }),
         });
 
         if (response.ok) {
+          const contentType = response.headers.get("Content-Type") || "";
+          
+          // Handle JSON response (e.g., forceWebSpeech or instructions)
+          if (contentType.includes("application/json")) {
+            const jsonResult = await response.json();
+            if (jsonResult.forceWebSpeech) {
+              console.log("🎙️ Server instructed to use Web Speech API via JSON");
+              await speakWithWebSpeech(text, lang, { ...finalOptions, ...jsonResult });
+              return;
+            }
+            console.warn("⚠️ Received unexpected JSON from TTS endpoint:", jsonResult);
+          }
+
           const provider = response.headers.get("X-TTS-Provider") || "unknown";
           const arrayBuffer = await response.arrayBuffer();
-          const audioBlob = new Blob([arrayBuffer], { type: "audio/mpeg" });
+          const audioBlob = new Blob([arrayBuffer], { type: contentType || "audio/mpeg" });
           const audioURL = URL.createObjectURL(audioBlob);
           const newAudio = new Audio(audioURL);
 
-          // ACTUALIZACIÓN DE ESTADO INMEDIATA
           setCurrentProvider(provider);
           setAudio(newAudio);
           (window as any).currentAudio = newAudio;
 
-          // Reproducción asíncrona (no bloqueante)
-          newAudio
-            .play()
-            .catch((err) => console.error("Error playing audio:", err));
-
-          newAudio.onended = () => {
-            URL.revokeObjectURL(audioURL);
-          };
+          newAudio.play().catch((err) => console.error("Error playing audio:", err));
+          newAudio.onended = () => URL.revokeObjectURL(audioURL);
 
           console.log(`✅ TTS successful using ${provider}`);
-          return; // Salimos exitosamente
+          return;
         } else {
-          console.warn("⚠️ Backend TTS failed. Status:", response.status);
+          console.warn(`⚠️ Backend TTS failed. Status: ${response.status} (${response.statusText})`);
+          if (response.status === 404) {
+            console.warn("💡 Tip: The backend might be waking up (Render Free Tier) or the route changed.");
+          }
         }
       } catch (fetchError: any) {
-        console.warn("⚠️ Backend unreachable:", fetchError.message);
+        console.warn("⚠️ Backend unreachable or connection error:", fetchError.message);
       }
 
       // FALLBACK

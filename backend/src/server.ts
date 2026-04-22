@@ -10,7 +10,6 @@ import { env } from "./config/env";
 
 // Now import Services and Routes after env vars are loaded
 import TTSService from "./services/TTSService";
-import v1Router from "./api/v1";
 import ttsRoutes from "./api/v1/tts.routes";
 import chatRoutes from "./api/v1/chat.routes";
 import grammarRoutes from "./api/v1/grammar.routes";
@@ -22,7 +21,7 @@ const __dirname = path.dirname(__filename);
 const app: express.Application = express();
 app.disable("x-powered-by");
 
-// Middleware
+// 1. SECURITY MIDDLEWARE
 app.use(
   helmet({
     contentSecurityPolicy: {
@@ -57,16 +56,36 @@ app.use(
   })
 );
 
+// 2. LOGGING MIDDLEWARE - High priority for debugging
+app.use((req, res, next) => {
+  console.log(`📥 [${req.method}] ${req.path} - ${new Date().toISOString()}`);
+  next();
+});
+
+// 3. CORS CONFIGURATION - Unified
 app.use(cors({
-  origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
+  origin: [
+    "http://localhost:5173", 
+    "http://127.0.0.1:5173",
+    "https://profe-ai-frontend-s2yc.vercel.app",
+    "https://profeai.elecodes.online",
+    "https://profeai.onrender.com",
+    /\.vercel\.app$/ 
+  ],
   methods: ["GET", "POST", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   credentials: true
 }));
 
+// 4. PARSING MIDDLEWARE
 app.use(express.json());
 
-// Rate Limiter
+// 5. UTILITY ROUTES
+app.get("/api/ping", (req, res) => {
+  res.json({ status: "ok", message: "Backend is reachable", timestamp: new Date() });
+});
+
+// 6. RATE LIMITING
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 100,
@@ -75,34 +94,36 @@ const limiter = rateLimit({
   message: { error: "Too many requests, please try again later." }
 });
 
-// GLOBAL REQUEST LOGGER
-app.use((req, res, next) => {
-  console.log(`📥 [${req.method}] ${req.url}`);
-  next();
-});
-
-// API Routes - Explicitly defined for reliability
+// 7. API ROUTES (V1)
 app.use("/api/v1/chat", chatRoutes);
 app.use("/api/v1/grammar", grammarRoutes);
 app.use("/api/v1/tts", ttsRoutes);
 app.use("/api/v1/generate-dialogue", dialogueRoutes);
 
-// Compatibility with legacy frontend paths
+// 8. LEGACY COMPATIBILITY ROUTES
 app.use("/api/chat", limiter, chatRoutes);
 app.use("/api/grammar", limiter, grammarRoutes);
 app.use("/api/tts", limiter, ttsRoutes);
 app.use("/api/generate-dialogue", limiter, dialogueRoutes);
 
-// Fallback for direct /tts if needed, but preferred is /api/tts
+// 9. ERROR HANDLING / 404 LOGGING
+app.use("/api", (req, res) => {
+  console.log(`❌ Unmatched API request: [${req.method}] ${req.originalUrl}`);
+  res.status(404).json({ 
+    error: "API Route not found on backend", 
+    method: req.method,
+    path: req.originalUrl 
+  });
+});
+
 app.use("/tts", limiter, ttsRoutes);
 
-// Serve static files from the build directory (if exists)
+// 10. STATIC FILES & SPA
 app.use(express.static(path.join(__dirname, "../../frontend/dist")));
 
-// Handle SPA routing
-app.get(/.*/, limiter, (req: express.Request, res: express.Response) => {
-  if (req.path.startsWith("/api") || req.path.startsWith("/tts")) {
-    return res.status(404).json({ error: "Not found" });
+app.get(/.*/, (req: express.Request, res: express.Response) => {
+  if (req.path.startsWith("/api")) {
+    return res.status(404).json({ error: "API Route not found" });
   }
   res.sendFile(path.join(__dirname, "../../frontend/dist", "index.html"));
 });

@@ -15,6 +15,8 @@ export const ttsSchema = z.object({
     .object({
       gender: z.string().optional(), // Cambiado de enum a string para mayor flexibilidad
       speed: z.number().optional(),
+      forceWebSpeech: z.boolean().optional(),
+      webSpeechVoiceIndex: z.number().optional(),
     })
     .optional()
     .default({}), // Si no viene nada, enviamos un objeto vacío por defecto

@@ -1,0 +1,20 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/ping",
+      "destination": "https://profeai.onrender.com/api/ping"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "https://profeai.onrender.com/api/:path*"
+    },
+    {
+      "source": "/tts/:path*",
+      "destination": "https://profeai.onrender.com/api/tts/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

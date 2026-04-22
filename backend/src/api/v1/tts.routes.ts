@@ -13,10 +13,19 @@ router.post("/", validate(ttsSchema), async (req: Request, res: Response) => {
     let { text, language, options, uid } = req.body;
     options = options || {};
 
-    if (options.gender === "male") {
-      options.forceWebSpeech = true;
-      options.webSpeechVoiceIndex = 195;
-      console.log(`👨 Setup male voice: Using Web Speech API with Google español (index 195)`);
+    // Premium providers are now tried for both male and female voices.
+    // If specific providers fail, it falls back to others in TTSService.
+    // If Web Speech is forced, return immediately with instructions for the client
+    if (options.forceWebSpeech) {
+      console.log("⚡ Web Speech API forced. Skipping server-side TTS.");
+      res.setHeader("X-TTS-Provider", "web-speech");
+      return res.json({
+        info: "Web Speech API requested",
+        forceWebSpeech: true,
+        webSpeechVoiceIndex: options.webSpeechVoiceIndex,
+        suggestion: "Client should use Web Speech API",
+        provider: "web-speech"
+      });
     }
 
     let result;
@@ -44,11 +53,14 @@ router.post("/", validate(ttsSchema), async (req: Request, res: Response) => {
     console.log(`✅ Audio generated successfully using ${result.provider}`);
   } catch (err: any) {
     console.error("🔴 TTS Error:", err.message);
-    res.status(500).json({
-      error: "TTS generation failed",
+    // Instead of 500, we return 200 with a signal for the client to use Web Speech API
+    // This prevents "Internal Server Error" alerts and noisy logs.
+    res.status(200).json({
+      info: "Server-side TTS failed or unavailable",
+      forceWebSpeech: true,
       message: err.message,
-      fallbackAvailable: true,
       suggestion: "Client should use Web Speech API as fallback",
+      provider: "web-speech-fallback"
     });
   }
 });

@@ -140,16 +140,15 @@ describe('useTTS Exhaustive', () => {
   });
 
   describe('speak branches', () => {
-    it('uses Web Speech directly for male voices', async () => {
+    it('calls backend for male voices', async () => {
       const { result } = renderHook(() => useTTS());
       
       await act(async () => {
         await result.current.speak('Hola', 'es', { gender: 'male' });
       });
 
-      expect(global.speechSynthesis.speak).toHaveBeenCalled();
-      // Should NOT call fetch for male voices (special case in useTTS.tsx:590)
-      expect(global.fetch).not.toHaveBeenCalled();
+      // Should now call fetch for male voices
+      expect(global.fetch).toHaveBeenCalled();
     });
 
     it('uses Web Speech when forceWebSpeech is true', async () => {

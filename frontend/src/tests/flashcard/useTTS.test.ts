@@ -89,7 +89,7 @@ describe("useTTS", () => {
     await result.current.speak("Hello");
 
     expect(mockFetch).toHaveBeenCalledWith(
-      "/api/tts",
+      "/api/v1/tts",
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify({ text: "Hello", language: "es", uid: "test-uid", options: {} }),
